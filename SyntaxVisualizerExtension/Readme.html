@@ -1,0 +1,57 @@
+﻿<html>
+<!-- When viewing in Visual Studio, choose the Design button for easier reading. -->
+<head>
+    <title>Roslyn Syntax Visualizer Readme</title>
+</head>
+<body>
+    <p>
+        The Roslyn Syntax Visualizer is a Visual Studio Extension that will enable inspection
+        of 'live' Roslyn SyntaxTrees for any C# or VB code file that is open inside the
+        Visual Studio IDE when the Roslyn Language Service is present (e.g. when running
+        or debugging other Roslyn extensions).
+    </p>
+    <p>
+        To use the visualizer, you will need to build the <strong>SyntaxVisualizerExtension</strong>
+        project. After building, the visualizer extension will be installed and available
+        for all instances of Visual Studio that are started with the Roslyn Language Service.
+        For example, all of the Roslyn code issue and code refactoring samples run in instances
+        of Visual Studio with the Roslyn Language Service - so the visualizer will be available
+        when you are running or debugging any code issue or code refactoring samples.
+    </p>
+    <p>
+        You can also test the visualizer by setting the <strong>SyntaxVisualizerExtension</strong>
+        project as the startup project and running (CTRL + F5) or debugging (F5) it.
+    </p>
+    <p>
+        Here is a step by step outline of what to do:
+    </p>
+    <ul>
+        <li>Set the <strong>SyntaxVisualizerExtension</strong> project as startup project.</li>
+        <li>Build and run this project (CTRL + F5 or F5).</li>
+        <li>This will bring up a new instance of Visual Studio running with the Roslyn Language
+            Service.</li>
+        <li>In this Visual Studio instance, open the visualizer window by clicking on <strong>
+            View -> Other Windows -> Roslyn Syntax Visualizer</strong>.</li>
+        <li>Open any C# or VB code file. This can either be a standalone code file or a code
+            file that is part of some project.</li>
+        <li>When the code file is opened, the visualizer will display the Roslyn SyntaxTree
+            corresponding to this code file.</li>
+        <li>You can click on / select any SyntaxNode, SyntaxToken or SyntaxTrivia in the visualizer.
+            When you do this, the source text corresponding to the clicked item will also be
+            selected in the code editor.</li>
+        <li>You can also position the cursor / select text anywhere in the code editor. When
+            you do this, the SyntaxNode / SyntaxToken / SyntaxTrivia that best matches the selected
+            source text will be highlighted in the visualizer.</li>
+        <li>You can also inspect the Properties for the currently selected SyntaxNode / SyntaxToken
+            / SyntaxTrivia in the PropertyGrid that is part of the visualizer's user interface.</li>
+        <li>In Visual Studio Premium and Visual Studio Ultimate, you can right click on any
+            SyntaxNode / SyntaxToken / SyntaxTrivia in the visualizer and click on <strong>Directed
+                Syntax Graph</strong>. This will display a graphical representation of the sub-tree
+            rooted at the selected SyntaxNode / SyntaxToken / SyntaxTrivia. This feature is
+            not available in Visual Studio Professional.</li>
+        <li>You can close the visualizer window at any time if you do not wish to have it running.</li>
+        <li>You can also disable / uninistall the visualizer using <strong>Tools -> Extension
+            Manager</strong>.</li>
+    </ul>
+</body>
+</html>

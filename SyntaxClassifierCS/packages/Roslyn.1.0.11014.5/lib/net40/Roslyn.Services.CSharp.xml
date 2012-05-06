@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Roslyn.Services.CSharp</name>
+    </assembly>
+    <members>
+        <member name="T:Roslyn.Services.CSharp.CSharpSyntaxTreeFactoryService.NullSyntaxReference">
+            <summary>
+            Represents a syntax reference that was passed a null
+            reference to a node. In this case, we just hold onto the
+            weak tree reference and throw if any invalid properties
+            are accessed.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.CSharp.CSharpSyntaxTreeFactoryService.PositionalSyntaxReference">
+            <summary>
+            Represents a syntax reference that doesn't actually hold onto the 
+            referenced node.  Instead, enough data is held onto so that the node
+            can be recovered and returned if necessary.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.CSharp.CSharpSyntaxTreeFactoryService.WeakSyntaxTree">
+            <summary>
+            Represents a syntax tree that only has a weak reference to its 
+            underlying data.  This way it can be passed around without forcing
+            the underlying full tree to stay alive.  Think of it more as a 
+            key that can be used to identify a tree rather than the tree itself.
+            </summary>
+        </member>
+    </members>
+</doc>
