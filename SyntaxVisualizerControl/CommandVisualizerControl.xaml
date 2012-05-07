@@ -24,6 +24,7 @@
                        VerticalAlignment="Center"
                        Content="Command Listing"
                        FontWeight="Bold" />
+
             </Grid>
         </Border>
         <ListBox Name="listBox"

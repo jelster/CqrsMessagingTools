@@ -31,8 +31,10 @@ namespace Roslyn.Samples.SyntaxVisualizer.Control
         #region Public Properties, Events
 
         public bool DirectedSyntaxGraphContextMenuEnabled { get; set; }
-        
-        public ISymbol TargetSymbol { get; private set; }
+
+        public INamedTypeSymbol TargetSymbol { get; set; }
+
+
         public bool IsLazy { get; private set; }
 
         public delegate void SyntaxNodeDelegate(CommonSyntaxNode node);
@@ -71,6 +73,7 @@ namespace Roslyn.Samples.SyntaxVisualizer.Control
 
         public void Clear()
         {
+            
             listBox.Items.Clear();
             listBox.Items.Add(new ListBoxItem() {Content = "Placeholder"});
         }
@@ -82,6 +85,8 @@ namespace Roslyn.Samples.SyntaxVisualizer.Control
                 AddItem(messageType);
             }
         }
+
+        
         
         private void AddItem(ISymbol symbol)
         {

@@ -4,6 +4,7 @@ using System.Windows;
 
 using System.Linq;
 using System.IO;
+using System.Windows.Controls;
 using System.Xml.Linq;
 using EnvDTE;
 using EnvDTE80;
@@ -130,6 +131,7 @@ namespace Roslyn.Samples.SyntaxVisualizer.Extension
         // that is currently active in the editor.
         protected virtual void RefreshSyntaxVisualizer()
         {
+            syntaxVisualizer.Clear();
             if (!IsVisible ||   WorkspaceDiscoveryService == null) return;
 
             // Get the Workspace corresponding to the currently active text snapshot.
@@ -137,18 +139,19 @@ namespace Roslyn.Samples.SyntaxVisualizer.Extension
 
             if (workspace != null)
             {
+
                 var compiled = (from p in workspace.CurrentSolution.Projects
                                 from d in p.Documents
                                 let model = d.GetSemanticModel()
                                 let tree = d.GetSyntaxTree().Root.DescendentNodes().OfType<TypeDeclarationSyntax>()
-                                let type = model.Compilation.GetTypeByMetadataName("Infrastructure.Messaging.ICommand")
-                                select new {model, tree, type}).ToList();
+                                select new {model, tree}).ToList();
 
                 if (!compiled.Any())
                 {
                     return;
                 }
-                var interfaceType = compiled.Select(x => x.type).First();
+
+                var interfaceType = syntaxVisualizer.TargetSymbol; // TODO: if TargetSymbol ref is used in the queries here, exceptions may be thrown since it comes from a different syntax tree
                 syntaxVisualizer.BuildMessageList(compiled.SelectMany(x => x.tree, (comp, syn) => comp.model.GetDeclaredSymbol(syn)).Where(x => ((INamedTypeSymbol)x).Interfaces.Any(i => i.Name == interfaceType.Name)));
             }
         }
@@ -160,7 +163,36 @@ namespace Roslyn.Samples.SyntaxVisualizer.Extension
 
         private void RefreshClick(object sender, RoutedEventArgs e)
         {
+            
+            
+            PopulateInterfaces();
             RefreshSyntaxVisualizer();
+        }
+
+        private void PopulateInterfaces()
+        {
+            commandInterfaceSelect.Items.Clear();
+            // Get the Workspace corresponding to the currently active text snapshot.
+            var workspace = WorkspaceDiscoveryService.PrimaryWorkspace;
+
+            if (workspace != null)
+            {
+                var compiled = (from p in workspace.CurrentSolution.Projects
+                                from d in p.Documents
+                                let model = d.GetSemanticModel()
+                                let tree = d.GetSyntaxTree().Root.DescendentNodes().OfType<InterfaceDeclarationSyntax>()
+                                select new {model, tree}).ToList();
+
+                if (!compiled.Any())
+                {
+                    return;
+                }
+
+                var interfaces = compiled.SelectMany(x => x.tree,
+                                                     (comp, ifx) => comp.model.GetDeclaredSymbol(ifx)).Cast<INamedTypeSymbol>();
+                commandInterfaceSelect.DataContext = interfaces;
+
+            }
         }
 
         #region Implementation of IVsBuildStatusCallback
@@ -193,5 +225,11 @@ namespace Roslyn.Samples.SyntaxVisualizer.Extension
         }
 
         #endregion
+
+        private void commandInterfaceSelect_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            syntaxVisualizer.TargetSymbol = (INamedTypeSymbol)commandInterfaceSelect.SelectedItem;
+            RefreshSyntaxVisualizer();
+        }
     }
 }
