@@ -9,22 +9,25 @@
              Unloaded="SyntaxVisualizerToolWindow_Unloaded"
              mc:Ignorable="d">
     <Grid>
-        <StackPanel>
-            <StackPanel>
-                <Button Name="refresh"
-                        Margin="0,0,0,5"
-                        Click="RefreshClick"
-                        Content="Refresh" />
-                <ComboBox Name="commandInterfaceSelect"
-                          DisplayMemberPath="Name"
-                          ItemsSource="{Binding}"
-                          SelectionChanged="commandInterfaceSelect_SelectionChanged"
-                          Text="Base command message interface" />
-            </StackPanel>
-            <my:CommandVisualizerControl Name="syntaxVisualizer" />
-
+        <Grid.RowDefinitions>
+            <RowDefinition MaxHeight="33" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <Button Name="refresh"
+                    Margin="5,5,0,5"
+                    HorizontalAlignment="Left"
+                    Click="RefreshClick"
+                    Content="Refresh" />
+            <ComboBox Name="commandInterfaceSelect"
+                      Width="120"
+                      Margin="5,5,0,5"
+                      HorizontalAlignment="Right"
+                      DisplayMemberPath="Name"
+                      ItemsSource="{Binding}"
+                      SelectionChanged="commandInterfaceSelect_SelectionChanged"
+                      Text="Base command message interface" />
         </StackPanel>
-
-
+        <my:CommandVisualizerControl Name="syntaxVisualizer" Grid.Row="1" />
     </Grid>
 </UserControl>

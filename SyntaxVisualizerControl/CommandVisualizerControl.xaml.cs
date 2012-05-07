@@ -73,9 +73,7 @@ namespace Roslyn.Samples.SyntaxVisualizer.Control
 
         public void Clear()
         {
-            
             listBox.Items.Clear();
-            listBox.Items.Add(new ListBoxItem() {Content = "Placeholder"});
         }
 
         public void BuildMessageList(IEnumerable<ISymbol> messageTypes)
@@ -85,8 +83,6 @@ namespace Roslyn.Samples.SyntaxVisualizer.Control
                 AddItem(messageType);
             }
         }
-
-        
         
         private void AddItem(ISymbol symbol)
         {

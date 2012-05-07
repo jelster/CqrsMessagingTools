@@ -31,7 +31,6 @@
                  Grid.Row="1"
                  Padding="5"
                  SelectionChanged="ListBoxSelectedItemChanged">
-
             <ListBox.ItemContainerStyle>
                 <Style TargetType="{x:Type ListBoxItem}">
                     <Style.Resources>

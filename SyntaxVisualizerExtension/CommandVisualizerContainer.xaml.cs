@@ -163,8 +163,6 @@ namespace Roslyn.Samples.SyntaxVisualizer.Extension
 
         private void RefreshClick(object sender, RoutedEventArgs e)
         {
-            
-            
             PopulateInterfaces();
             RefreshSyntaxVisualizer();
         }
