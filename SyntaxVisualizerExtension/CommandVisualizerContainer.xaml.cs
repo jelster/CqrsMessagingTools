@@ -28,13 +28,9 @@ namespace Roslyn.Samples.SyntaxVisualizer.Extension
     /// </summary>
     public partial class CommandVisualizerContainer : IVsBuildStatusCallback, IDisposable
     {
-        private readonly SyntaxVisualizerToolWindow parent;
-
-        internal CommandVisualizerContainer(SyntaxVisualizerToolWindow parent)
+        public CommandVisualizerContainer()
         {
             InitializeComponent();
-
-            this.parent = parent;
         }
 
         internal void Clear()
@@ -49,28 +45,13 @@ namespace Roslyn.Samples.SyntaxVisualizer.Extension
         {
             get
             {
-                if (globalServiceProvider == null)
-                {
-                    globalServiceProvider = (Microsoft.VisualStudio.OLE.Interop.IServiceProvider)Package.GetGlobalService(
-                        typeof(Microsoft.VisualStudio.OLE.Interop.IServiceProvider));
-                }
-
-                return globalServiceProvider;
+                return globalServiceProvider ??
+                       (globalServiceProvider =
+                        (Microsoft.VisualStudio.OLE.Interop.IServiceProvider) Package.GetGlobalService(
+                            typeof (Microsoft.VisualStudio.OLE.Interop.IServiceProvider)));
             }
         }
 
-        private TServiceInterface GetService<TServiceInterface, TService>() where TServiceInterface : class where TService : class
-        {
-            TServiceInterface service = null;
-
-            if (parent != null)
-            {
-                service = parent.GetVsService<TServiceInterface, TService>();
-            }
-
-            return service;
-        }
-        
         private static object GetService(Microsoft.VisualStudio.OLE.Interop.IServiceProvider serviceProvider, Guid guidService, bool unique)
         {
             var guidInterface = VSConstants.IID_IUnknown;

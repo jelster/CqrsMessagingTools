@@ -41,8 +41,7 @@ namespace Roslyn.Samples.SyntaxVisualizer.Extension
         /// <summary>
         /// Standard constructor for the tool window.
         /// </summary>
-        public SyntaxVisualizerToolWindow() :
-            base(null)
+        public SyntaxVisualizerToolWindow() : base(null)
         {
             // Set the window title reading it from the resources.
             this.Caption = Resources.ToolWindowTitle;
@@ -58,12 +57,10 @@ namespace Roslyn.Samples.SyntaxVisualizer.Extension
             // This is the user control hosted by the tool window; Note that, even if this class implements IDisposable,
             // we are not calling Dispose on this object. This is because ToolWindowPane calls Dispose on 
             // the object returned by the Content property.
-            this.Content = new CommandVisualizerContainer(this);
+            this.Content = new MessagingVisualizerContainer(this);
         }
 
-        internal TServiceInterface GetVsService<TServiceInterface, TService>() 
-            where TServiceInterface : class
-            where TService : class
+        public TServiceInterface GetVsService<TServiceInterface, TService>()  where TServiceInterface : class where TService : class
         {
             return (TServiceInterface)GetService(typeof(TService));
         }

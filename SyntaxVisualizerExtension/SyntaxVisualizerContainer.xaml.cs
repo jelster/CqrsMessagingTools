@@ -43,17 +43,17 @@ namespace Roslyn.Samples.SyntaxVisualizer.Extension
 {
     // Control that hosts SyntaxVisualizerControl inside a Visual Studio ToolWindow. This control implements all the
     // logic necessary for interaction with Visual Studio's code documents and directed syntax graph documents.
-    public partial class SyntaxVisualizerContainer : UserControl, IVsRunningDocTableEvents, IDisposable
+    public partial class SyntaxVisualizerContainer : IVsRunningDocTableEvents, IDisposable
     {
-        private SyntaxVisualizerToolWindow parent;
+        //private readonly MessagingVisualizerContainer parent;
         private IWpfTextView activeWpfTextView;
         private CommonSyntaxTree activeSyntaxTree;
 
-        internal SyntaxVisualizerContainer(SyntaxVisualizerToolWindow parent)
+        public SyntaxVisualizerContainer()
         {
             InitializeComponent();
 
-            this.parent = parent;
+            //this.parent = parent;
 
             InitializeRunningDocumentTable();
 
@@ -96,50 +96,36 @@ namespace Roslyn.Samples.SyntaxVisualizer.Extension
         {
             get
             {
-                if (globalServiceProvider == null)
-                {
-                    globalServiceProvider = (Microsoft.VisualStudio.OLE.Interop.IServiceProvider)Package.GetGlobalService(
-                        typeof(Microsoft.VisualStudio.OLE.Interop.IServiceProvider));
-                }
-
-                return globalServiceProvider;
+                return globalServiceProvider ??
+                       (globalServiceProvider =
+                        (Microsoft.VisualStudio.OLE.Interop.IServiceProvider) Package.GetGlobalService(
+                            typeof (Microsoft.VisualStudio.OLE.Interop.IServiceProvider)));
             }
         }
 
-        private TServiceInterface GetService<TServiceInterface, TService>()
-            where TServiceInterface : class
-            where TService : class
+        private TServiceInterface GetService<TServiceInterface, TService>() where TServiceInterface : class where TService : class
         {
-            TServiceInterface service = null;
+            //TServiceInterface service = null;
 
-            if (parent != null)
-            {
-                service = parent.GetVsService<TServiceInterface, TService>();
-            }
+            //if (parent != null)
+            //{
+            //    service = parent.GetVsService<TServiceInterface, TService>();
+            //}
 
-            return service;
+            return GetService<TServiceInterface, TService>(GlobalServiceProvider);
         }
         
-        private static object GetService(
-            Microsoft.VisualStudio.OLE.Interop.IServiceProvider serviceProvider, Guid guidService, bool unique)
+        private static object GetService(Microsoft.VisualStudio.OLE.Interop.IServiceProvider serviceProvider, Guid guidService, bool unique)
         {
             var guidInterface = VSConstants.IID_IUnknown;
             var ptr = IntPtr.Zero;
             object service = null;
 
-            if (serviceProvider.QueryService(ref guidService, ref guidInterface, out ptr) == 0 &&
-                ptr != IntPtr.Zero)
+            if (serviceProvider.QueryService(ref guidService, ref guidInterface, out ptr) == 0 && ptr != IntPtr.Zero)
             {
                 try
                 {
-                    if (unique)
-                    {
-                        service = Marshal.GetUniqueObjectForIUnknown(ptr);
-                    }
-                    else
-                    {
-                        service = Marshal.GetObjectForIUnknown(ptr);
-                    }
+                    service = unique ? Marshal.GetUniqueObjectForIUnknown(ptr) : Marshal.GetObjectForIUnknown(ptr);
                 }
                 finally
                 {
@@ -150,8 +136,7 @@ namespace Roslyn.Samples.SyntaxVisualizer.Extension
             return service;
         }
 
-        private static TServiceInterface GetService<TServiceInterface, TService>(
-            Microsoft.VisualStudio.OLE.Interop.IServiceProvider serviceProvider)
+        private static TServiceInterface GetService<TServiceInterface, TService>(Microsoft.VisualStudio.OLE.Interop.IServiceProvider serviceProvider)
             where TServiceInterface : class
             where TService : class
         {

@@ -1,0 +1,27 @@
+﻿<UserControl xmlns:my="clr-namespace:Roslyn.Samples.SyntaxVisualizer.Extension"  x:Class="Roslyn.Samples.SyntaxVisualizer.Extension.MessagingVisualizerContainer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:Shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.10.0"
+             mc:Ignorable="d" 
+             Name="SyntaxVisualizerToolWindow"
+             Background="{DynamicResource {x:Static Shell:VsBrushes.ToolWindowBackgroundKey}}"
+             d:DesignHeight="600" d:DesignWidth="300">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <TabControl Grid.Row="0" Grid.Column="0" TabStripPlacement="Bottom" Name="visualizerTabs" Margin="1, 3, 1, 20" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Top" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" MinWidth="250" MinHeight="250">
+            <TabItem Header="Syntax Visualizer">
+                <my:SyntaxVisualizerContainer />
+            </TabItem>
+            <TabItem Header="Command Message Visualizer">
+                <my:CommandVisualizerContainer />
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>

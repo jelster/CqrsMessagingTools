@@ -86,6 +86,9 @@
       <DependentUpon>CommandVisualizerContainer.xaml</DependentUpon>
     </Compile>
     <Compile Include="HelperExtensionMethods.cs" />
+    <Compile Include="MessagingVisualizerContainer.xaml.cs">
+      <DependentUpon>MessagingVisualizerContainer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SyntaxVisualizerContainer.xaml.cs">
       <DependentUpon>SyntaxVisualizerContainer.xaml</DependentUpon>
     </Compile>
@@ -133,6 +136,10 @@
     <Page Include="CommandVisualizerContainer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MessagingVisualizerContainer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="SyntaxVisualizerContainer.xaml">
       <SubType>Designer</SubType>
