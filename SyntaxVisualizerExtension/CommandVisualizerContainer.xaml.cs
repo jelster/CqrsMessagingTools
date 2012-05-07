@@ -148,8 +148,8 @@ namespace Roslyn.Samples.SyntaxVisualizer.Extension
                 {
                     return;
                 }
-
-                syntaxVisualizer.BuildMessageList(compiled.SelectMany(x => x.tree, (comp, syn) => comp.model.GetDeclaredSymbol(syn)).Where(x => x.Name == compiled.First().type.Name));
+                var interfaceType = compiled.Select(x => x.type).First();
+                syntaxVisualizer.BuildMessageList(compiled.SelectMany(x => x.tree, (comp, syn) => comp.model.GetDeclaredSymbol(syn)).Where(x => ((INamedTypeSymbol)x).Interfaces.Any(i => i.Name == interfaceType.Name)));
             }
         }
  
