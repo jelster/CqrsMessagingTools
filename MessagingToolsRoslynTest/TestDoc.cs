@@ -4,7 +4,7 @@ namespace TestCode
     using MessagingToolsRoslynTest;
     using MessagingToolsRoslynTest.Interfaces;
 
-    public class FoomandHandler : ICommandHandler<Bar> //,ICommandHandler<Foo>
+    public class FoomandHandler : ICommandHandler<Bar>
     {
         public bool WasCalled { get; private set; }
         public void Handles(Foo command)
@@ -39,5 +39,13 @@ namespace TestCode
         public string Name { get { return "Baaarrrffff! I'm a Mog - half man, half dog. I'm my own best friend!"; } }
 
         #endregion
+    }
+
+    public class BadFooHandler : ICommandHandler<Foo>
+    {
+        public void Send(Foo command)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

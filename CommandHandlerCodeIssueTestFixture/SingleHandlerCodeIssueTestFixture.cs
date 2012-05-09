@@ -27,7 +27,7 @@ namespace TestCode
     {
         void Handles(T command);
     }    
-                                              
+                                 
     public class FoomandHandler : ICommandHandler<Foo>
     {
         public bool WasCalled { get; private set; }
@@ -36,7 +36,8 @@ namespace TestCode
             WasCalled = true;
             Console.Write(""Foomand handled {0}"", command.Name);
         }
-    }                                           
+    }   
+    public class BadFooHandler : ICommandHandler<Foo> { public void Handles(Foo command) { throw new NotImplementedException(); }}                                        
 }";
 
         private readonly IDocument document;
@@ -54,12 +55,15 @@ namespace TestCode
         [Fact]
         public void when_multiple_command_handlers_flags_issue()
         {
-            var node = document.GetSyntaxTree().Root.DescendentNodes().OfType<ClassDeclarationSyntax>().First();
+            var node = document.GetSyntaxTree().Root.DescendentNodes().OfType<ClassDeclarationSyntax>().First(x => x.Identifier.ValueText == "BadFooHandler");
             var result = sut.GetIssues(document, node, new CancellationToken());
 
             Assert.NotNull(result);
             Assert.NotEmpty(result);
-            Console.WriteLine(result.First().Description);
+            foreach (var issue in result)
+            {
+                Console.WriteLine(issue.Description);
+            }
         }
 
         [Fact]

@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageSyntaxClassifierTest
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessagingToolsRoslynTest", "MessagingToolsRoslynTest\MessagingToolsRoslynTest.csproj", "{4ABA9893-9191-4582-8BA5-95E9AED0A955}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SyntaxHelperUtilities", "SyntaxHelperUtilities\SyntaxHelperUtilities.csproj", "{1F6911AD-8DFB-4888-9EB2-16E4B3195A11}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,10 @@ Global
 		{4ABA9893-9191-4582-8BA5-95E9AED0A955}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4ABA9893-9191-4582-8BA5-95E9AED0A955}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4ABA9893-9191-4582-8BA5-95E9AED0A955}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F6911AD-8DFB-4888-9EB2-16E4B3195A11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F6911AD-8DFB-4888-9EB2-16E4B3195A11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F6911AD-8DFB-4888-9EB2-16E4B3195A11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F6911AD-8DFB-4888-9EB2-16E4B3195A11}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

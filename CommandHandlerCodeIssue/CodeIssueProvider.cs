@@ -9,6 +9,7 @@ using Roslyn.Compilers.Common;
 using Roslyn.Compilers.CSharp;
 using Roslyn.Services;
 using Roslyn.Services.Editor;
+using SyntaxHelperUtilities;
 
 namespace CommandHandlerCodeIssue
 {
@@ -17,6 +18,8 @@ namespace CommandHandlerCodeIssue
     {
         private readonly ICodeActionEditFactory editFactory;
 
+
+        // TODO: extract to resource or config
         private const string CommandHandlerInterfaceName = "ICommandHandler";
 
         [ImportingConstructor]
@@ -29,34 +32,30 @@ namespace CommandHandlerCodeIssue
 
         public IEnumerable<CodeIssue> GetIssues(IDocument document, CommonSyntaxNode node, CancellationToken cancellationToken)
         {
-            ICompilation c = null;
             if (document.Project == null) return null;
-
-            c = document.Project.GetCompilation(cancellationToken);
-            if (c == null) return null;
 
             var classNode = (ClassDeclarationSyntax) node;
             if (classNode.BaseListOpt == null)
                 return null;
 
-            var baseTypes = classNode.BaseListOpt.Types.Where(y => y.PlainName == CommandHandlerInterfaceName).OfType<GenericNameSyntax>();
-            if (!baseTypes.Any()) return null;
+            var commandHandlerVisitor = new CommandHandlerSyntaxVisitor();
 
-            var allCommandHandlersInProject = c.SyntaxTrees
-                .SelectMany(x => x.Root.DescendentNodes().OfType<ClassDeclarationSyntax>().Where(s => s.BaseListOpt != null))
-                .SelectMany(s => s.BaseListOpt.Types.Where(y => y.PlainName == CommandHandlerInterfaceName).OfType<GenericNameSyntax>(), (tree, syntax) => syntax).ToList();
+            var baseTypes = commandHandlerVisitor.Visit(classNode);
+            
+            if (baseTypes == null || !baseTypes.Any()) return null;
+
+            var allCommandHandlersInProject = document.Project.GetCompilation(cancellationToken).SyntaxTrees
+                    .SelectMany(x => x.Root.DescendentNodes().OfType<ClassDeclarationSyntax>().Where(s => s != classNode && s.BaseListOpt != null && commandHandlerVisitor.Visit(s).Any()))
+                    .Select(x => new { classDec = x, handles = commandHandlerVisitor.Visit(x) }).ToList();
 
             if (!allCommandHandlersInProject.Any()) return null;
 
-            var sharedTypes = allCommandHandlersInProject.Union(baseTypes);
+            var dupes = allCommandHandlersInProject.SelectMany(x => x.handles, (c, s) => s.GetText()).FindDuplicates();
 
-            if (sharedTypes.Count() > 1)
-            {
-                var descr = string.Join(Environment.NewLine, sharedTypes.SelectMany(x => x.Ancestors().OfType<ClassDeclarationSyntax>(), ((syntax, declarationSyntax) => declarationSyntax.Identifier.Value + ":" + syntax.Identifier.Value)));
-                return new CodeIssue[] { new CodeIssue(CodeIssue.Severity.Warning, classNode.Identifier.Span, descr) };
-            }
-            
-            return null;
+            return dupes.Any() ? 
+                dupes.Select(x => new CodeIssue(CodeIssue.Severity.Warning, classNode.Identifier.FullSpan, x)) 
+                : null;
+
             //if (allCommandHandlersInProject.Contains(node as ClassDeclarationSyntax))
             //{
             //    return new CodeIssue[] { new CodeIssue(CodeIssue.Severity.Warning, node.FullSpan, "Command Handler detected") };
@@ -74,7 +73,16 @@ namespace CommandHandlerCodeIssue
         }
 
         #endregion
+    }
 
-         
+    public class CommandHandlerSyntaxVisitor : SyntaxVisitor<IEnumerable<GenericNameSyntax>>
+    {
+        private const string CommandHandlerInterfaceName = "ICommandHandler";
+
+        protected override IEnumerable<GenericNameSyntax> VisitClassDeclaration(ClassDeclarationSyntax node)
+        {
+            return node.BaseListOpt != null ? node.BaseListOpt.Types.OfType<GenericNameSyntax>().Where(x => x.PlainName == CommandHandlerInterfaceName) : null;
+        }
+        
     }
 }
