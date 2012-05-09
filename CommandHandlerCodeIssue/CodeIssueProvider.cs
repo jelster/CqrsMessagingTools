@@ -45,10 +45,10 @@ namespace CommandHandlerCodeIssue
             if (baseTypes == null || !baseTypes.Any()) return null;
 
             var allCommandHandlersInProject = document.Project.GetCompilation(cancellationToken).SyntaxTrees
-                    .SelectMany(x => x.Root.DescendentNodes().OfType<ClassDeclarationSyntax>().Where(s => s != classNode && s.BaseListOpt != null && commandHandlerVisitor.Visit(s).Any()))
+                    .SelectMany(x => x.Root.DescendentNodes().OfType<ClassDeclarationSyntax>().Where(s => s.BaseListOpt != null && commandHandlerVisitor.Visit(s).Any()))
                     .Select(x => new { classDec = x, handles = commandHandlerVisitor.Visit(x) }).ToList();
 
-            if (!allCommandHandlersInProject.Any()) return null;
+            if (!allCommandHandlersInProject.Any() || !allCommandHandlersInProject.Select(x => x.classDec).Contains(classNode)) return null;
 
             var dupes = allCommandHandlersInProject.SelectMany(x => x.handles, (c, s) => s.GetText()).FindDuplicates();
 
