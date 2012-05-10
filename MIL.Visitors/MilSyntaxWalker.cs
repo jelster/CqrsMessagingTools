@@ -49,17 +49,42 @@ namespace MIL.Visitors
 
         protected override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
+            if (LookForCommands(node)) return;
+
+            if (LookForCommandHandlers(node)) return;
+
+            if (LookForEvents(node)) return;
+        }
+
+        private bool LookForEvents(ClassDeclarationSyntax node)
+        {
+            if (node.BaseListOpt != null && node.BaseListOpt.Types.Any(t => t.PlainName == EventIfx))
+            {
+                Events.Add(node);
+                return true;
+            }
+            return false;
+        }
+
+        private bool LookForCommands(ClassDeclarationSyntax node)
+        {
             if (node.BaseListOpt != null && node.BaseListOpt.Types.Any(t => t.PlainName == CommandIfx))
             {
                 Commands.Add(node);
-                return;
+                return true;
             }
+            return false;
+        }
+
+        private bool LookForCommandHandlers(ClassDeclarationSyntax node)
+        {
             var handles = cmdHandlerVisitor.Visit(node);
             if (handles.Any())
             {
                 CommandHandlerToCommandMapping.Add(node, handles);
-                return;
+                return true;
             }
+            return false;
         }
     }
 
