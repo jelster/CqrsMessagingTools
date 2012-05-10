@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading;
 using System.Windows.Media;
+using MIL.Visitors;
 using Roslyn.Compilers;
 using Roslyn.Compilers.Common;
 using Roslyn.Compilers.CSharp;
@@ -93,16 +94,5 @@ namespace CommandHandlerCodeIssue
         }
 
         #endregion
-    }
-
-    public class CommandHandlerSyntaxVisitor : SyntaxVisitor<IEnumerable<GenericNameSyntax>>
-    {
-        private const string CommandHandlerInterfaceName = "ICommandHandler";
-
-        protected override IEnumerable<GenericNameSyntax> VisitClassDeclaration(ClassDeclarationSyntax node)
-        {
-            return node.BaseListOpt != null ? node.BaseListOpt.Types.OfType<GenericNameSyntax>().Where(x => x.PlainName == CommandHandlerInterfaceName) : Enumerable.Empty<GenericNameSyntax>();
-        }
-        
     }
 }

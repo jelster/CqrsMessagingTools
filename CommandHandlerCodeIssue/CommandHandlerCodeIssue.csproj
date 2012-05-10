@@ -89,6 +89,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MIL.Visitors\MIL.Visitors.csproj">
+      <Project>{16BB9DE0-00E2-4BBA-A398-FDABBAB7FA0E}</Project>
+      <Name>MIL.Visitors</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SyntaxHelperUtilities\SyntaxHelperUtilities.csproj">
       <Project>{1F6911AD-8DFB-4888-9EB2-16E4B3195A11}</Project>
       <Name>SyntaxHelperUtilities</Name>
