@@ -19,7 +19,7 @@ namespace MessagingToolsRoslynTest.Interfaces
 
 namespace MessagingToolsRoslynTest
 {
-
+    
     public class Foo : ICommand
     {
         #region Implementation of ICommand

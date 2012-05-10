@@ -5,13 +5,19 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SyntaxVisualizerExtension",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SyntaxClassifierCS", "SyntaxClassifierCS\SyntaxClassifierCS.csproj", "{6D411E6A-EC83-4F39-849F-8075F108B732}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageSyntaxClassifierTestFixture", "SyntaxClassifierCS\MessageSyntaxClassifierTestFixture\MessageSyntaxClassifierTestFixture.csproj", "{454A495F-3F36-45E9-80EF-8D89C19AC534}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessagingToolsRoslynTest", "SyntaxClassifierCS\MessagingToolsRoslynTest\MessagingToolsRoslynTest.csproj", "{4ABA9893-9191-4582-8BA5-95E9AED0A955}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SyntaxVisualizerControl", "SyntaxVisualizerControl\SyntaxVisualizerControl.csproj", "{AFE45E23-E7EE-48C5-8143-EBE2FF67070F}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "SyntaxVisualizerDgmlHelper", "SyntaxVisualizerDgmlHelper\SyntaxVisualizerDgmlHelper.vbproj", "{DA4F74AF-2694-4AC9-A8CC-18382DE8215E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommandHandlerCodeIssue", "CommandHandlerCodeIssue\CommandHandlerCodeIssue.csproj", "{D914C2E4-66B3-49E3-A84C-31CA82523BCC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommandHandlerCodeIssueTestFixture", "CommandHandlerCodeIssueTestFixture\CommandHandlerCodeIssueTestFixture.csproj", "{598D8FD9-C432-4217-AB05-AF1A5BAC5337}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageSyntaxClassifierTestFixture", "MessageSyntaxClassifierTestFixture\MessageSyntaxClassifierTestFixture.csproj", "{454A495F-3F36-45E9-80EF-8D89C19AC534}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessagingToolsRoslynTest", "MessagingToolsRoslynTest\MessagingToolsRoslynTest.csproj", "{4ABA9893-9191-4582-8BA5-95E9AED0A955}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SyntaxHelperUtilities", "SyntaxHelperUtilities\SyntaxHelperUtilities.csproj", "{1F6911AD-8DFB-4888-9EB2-16E4B3195A11}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,14 +33,6 @@ Global
 		{6D411E6A-EC83-4F39-849F-8075F108B732}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D411E6A-EC83-4F39-849F-8075F108B732}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6D411E6A-EC83-4F39-849F-8075F108B732}.Release|Any CPU.Build.0 = Release|Any CPU
-		{454A495F-3F36-45E9-80EF-8D89C19AC534}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{454A495F-3F36-45E9-80EF-8D89C19AC534}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{454A495F-3F36-45E9-80EF-8D89C19AC534}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{454A495F-3F36-45E9-80EF-8D89C19AC534}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4ABA9893-9191-4582-8BA5-95E9AED0A955}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4ABA9893-9191-4582-8BA5-95E9AED0A955}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4ABA9893-9191-4582-8BA5-95E9AED0A955}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4ABA9893-9191-4582-8BA5-95E9AED0A955}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AFE45E23-E7EE-48C5-8143-EBE2FF67070F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AFE45E23-E7EE-48C5-8143-EBE2FF67070F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFE45E23-E7EE-48C5-8143-EBE2FF67070F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -43,6 +41,26 @@ Global
 		{DA4F74AF-2694-4AC9-A8CC-18382DE8215E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA4F74AF-2694-4AC9-A8CC-18382DE8215E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DA4F74AF-2694-4AC9-A8CC-18382DE8215E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D914C2E4-66B3-49E3-A84C-31CA82523BCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D914C2E4-66B3-49E3-A84C-31CA82523BCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D914C2E4-66B3-49E3-A84C-31CA82523BCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D914C2E4-66B3-49E3-A84C-31CA82523BCC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{598D8FD9-C432-4217-AB05-AF1A5BAC5337}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{598D8FD9-C432-4217-AB05-AF1A5BAC5337}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{598D8FD9-C432-4217-AB05-AF1A5BAC5337}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{598D8FD9-C432-4217-AB05-AF1A5BAC5337}.Release|Any CPU.Build.0 = Release|Any CPU
+		{454A495F-3F36-45E9-80EF-8D89C19AC534}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{454A495F-3F36-45E9-80EF-8D89C19AC534}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{454A495F-3F36-45E9-80EF-8D89C19AC534}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{454A495F-3F36-45E9-80EF-8D89C19AC534}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4ABA9893-9191-4582-8BA5-95E9AED0A955}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4ABA9893-9191-4582-8BA5-95E9AED0A955}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4ABA9893-9191-4582-8BA5-95E9AED0A955}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4ABA9893-9191-4582-8BA5-95E9AED0A955}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F6911AD-8DFB-4888-9EB2-16E4B3195A11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F6911AD-8DFB-4888-9EB2-16E4B3195A11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F6911AD-8DFB-4888-9EB2-16E4B3195A11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F6911AD-8DFB-4888-9EB2-16E4B3195A11}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
