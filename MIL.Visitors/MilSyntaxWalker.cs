@@ -46,7 +46,6 @@ namespace MIL.Visitors
                 PublicationCalls.Add(node);
                 // TODO: gather more info about who invoked method
             }
-
         }
 
         protected override void VisitClassDeclaration(ClassDeclarationSyntax node)
@@ -113,48 +112,7 @@ namespace MIL.Visitors
         }
     }
 
-    public interface IMilToken
-    {
-        MilTokenType Kind { get; }
-        string Name { get; }
-    }
+    
 
-    public struct MilCommandMessage : IMilToken
-    {
-        private const MilTokenType kind = MilTokenType.Command;
-        public string CommandName;
-
-        public MilTokenType Kind
-        {
-            get { return kind; }
-        }
-
-        public string Name { get; set; }
-    }
-
-    public struct MilCommandHandler : IMilToken
-    {
-        private const MilTokenType kind = MilTokenType.CommandHandler;
-
-        public MilTokenType Kind
-        {
-            get { return kind; }
-        }
-
-        public string Name { get; set; }
-    }
-
-    public enum MilTokenType
-    {
-        Indeterminate = 0,
-        Command,
-        CommandHandler,
-        Event,
-        EventHandler,
-        AggregateRoot,
-        StateObject,
-        Publisher,
-        Scope,
-        Delay
-    }
+  
 }
