@@ -44,7 +44,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="FindReferenceHelper.cs" />
     <Compile Include="CommandVisualizerControl.xaml.cs">
       <DependentUpon>CommandVisualizerControl.xaml</DependentUpon>
     </Compile>

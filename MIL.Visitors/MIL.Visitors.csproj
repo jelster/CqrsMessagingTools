@@ -42,7 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommandHandlerSyntaxVisitor.cs" />
+    <Compile Include="HandlerDeclarationSyntaxVisitor.cs" />
     <Compile Include="MilSyntaxWalker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

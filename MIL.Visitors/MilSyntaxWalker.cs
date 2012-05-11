@@ -12,11 +12,11 @@ namespace MIL.Visitors
         public IList<ClassDeclarationSyntax> Commands { get; private set; }
         public IList<ClassDeclarationSyntax> Events { get; private set; }
 
-        public IEnumerable<ClassDeclarationSyntax> EventHandlers { get { return EventToEventHandlersMapping.Keys.AsEnumerable(); } }
-        protected IDictionary<ClassDeclarationSyntax, IEnumerable<ClassDeclarationSyntax>> EventToEventHandlersMapping { get; set; }
+        public IEnumerable<ClassDeclarationSyntax> EventHandlers { get { return EventToEventHandlersMapping.Values.SelectMany(x => x).AsEnumerable(); } }
+        protected IDictionary<GenericNameSyntax, List<ClassDeclarationSyntax>> EventToEventHandlersMapping { get; set; }
 
         public IEnumerable<ClassDeclarationSyntax> CommandHandlers { get { return CommandHandlerToCommandMapping.Keys.AsEnumerable(); } }
-        protected IDictionary<ClassDeclarationSyntax, IEnumerable<GenericNameSyntax>> CommandHandlerToCommandMapping { get; set; }
+        protected IDictionary<ClassDeclarationSyntax, List<GenericNameSyntax>> CommandHandlerToCommandMapping { get; set; }
 
         public IList<SyntaxNodeOrToken> PublicationCalls { get; private set; }
 
@@ -24,17 +24,19 @@ namespace MIL.Visitors
         {
             Commands = new List<ClassDeclarationSyntax>();
             Events = new List<ClassDeclarationSyntax>();
-            CommandHandlerToCommandMapping = new Dictionary<ClassDeclarationSyntax, IEnumerable<GenericNameSyntax>>();
+            CommandHandlerToCommandMapping = new Dictionary<ClassDeclarationSyntax, List<GenericNameSyntax>>();
             PublicationCalls = new List<SyntaxNodeOrToken>();
-            EventToEventHandlersMapping = new Dictionary<ClassDeclarationSyntax, IEnumerable<ClassDeclarationSyntax>>();
+            EventToEventHandlersMapping = new Dictionary<GenericNameSyntax, List<ClassDeclarationSyntax>>();
         }
 
         protected const string CommandIfx = "ICommand";
         protected const string PublishKeyword = "Send";
         protected const string EventIfx = "IEvent";
         protected const string EventHandlerPlainIfx = "IEventHandler";
+        protected const string CommandHandlerPlainIfx = "ICommandHandler";
 
-        private readonly CommandHandlerSyntaxVisitor cmdHandlerVisitor = new CommandHandlerSyntaxVisitor();
+        private readonly HandlerDeclarationSyntaxVisitor _cmdHandlerDeclarationVisitor = new HandlerDeclarationSyntaxVisitor(CommandHandlerPlainIfx);
+        private readonly HandlerDeclarationSyntaxVisitor _eventHandlerDeclarationVisitor = new HandlerDeclarationSyntaxVisitor(EventHandlerPlainIfx);
         
         protected override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
@@ -54,6 +56,8 @@ namespace MIL.Visitors
             if (LookForCommandHandlers(node)) return;
 
             if (LookForEvents(node)) return;
+
+            if (LookForEventHandlers(node)) return;
         }
 
         private bool LookForEvents(ClassDeclarationSyntax node)
@@ -76,12 +80,33 @@ namespace MIL.Visitors
             return false;
         }
 
-        private bool LookForCommandHandlers(ClassDeclarationSyntax node)
+        private bool LookForEventHandlers(ClassDeclarationSyntax node)
         {
-            var handles = cmdHandlerVisitor.Visit(node);
+            var handles = _eventHandlerDeclarationVisitor.Visit(node);
             if (handles.Any())
             {
-                CommandHandlerToCommandMapping.Add(node, handles);
+                foreach (var eventTypeName in handles)
+                {
+                    if (EventToEventHandlersMapping.ContainsKey(eventTypeName))
+                    {
+                        EventToEventHandlersMapping[eventTypeName].Add(node);
+                    }
+                    else
+                    {
+                        EventToEventHandlersMapping.Add(eventTypeName, new List<ClassDeclarationSyntax>() { node });
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+
+        private bool LookForCommandHandlers(ClassDeclarationSyntax node)
+        {
+            var handles = _cmdHandlerDeclarationVisitor.Visit(node);
+            if (handles.Any())
+            {
+                CommandHandlerToCommandMapping.Add(node, handles.ToList());
                 return true;
             }
             return false;

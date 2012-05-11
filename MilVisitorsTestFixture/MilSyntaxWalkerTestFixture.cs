@@ -62,7 +62,20 @@ namespace MilVisitorsTestFixture
                 sut.Visit(node);
 
                 Assert.NotEmpty(sut.Events);
+                Assert.True(sut.Events.Count == 1);
+                Assert.True(sut.Events.First().Identifier.GetText() == "Foovent");
+            }
 
+            [Fact]
+            public void when_walker_visits_event_handler_class_adds_to_event_handlers_list()
+            {
+                var tree = SyntaxTree.ParseCompilationUnit("public class FooventHandler : IEventHandler<Foo> {}");
+                var node = tree.Root;
+                sut.Visit(node);
+
+                Assert.NotEmpty(sut.EventHandlers);
+                Assert.True(sut.EventHandlers.Count() == 1);
+                Assert.True(sut.EventHandlers.First().Identifier.GetText() == "FooventHandler");
             }
         }
     }

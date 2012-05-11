@@ -39,7 +39,7 @@ namespace CommandHandlerCodeIssue
 
             if (classNode.BaseListOpt == null) return null;
 
-            var commandHandlerVisitor = new CommandHandlerSyntaxVisitor();
+            var commandHandlerVisitor = new HandlerDeclarationSyntaxVisitor(CommandHandlerInterfaceName);
 
             var baseTypes = commandHandlerVisitor.Visit(classNode);
 
