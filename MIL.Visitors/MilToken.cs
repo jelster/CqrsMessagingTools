@@ -52,17 +52,34 @@ namespace MIL.Visitors
         public static readonly MilTypeConstant EventToken;
 
         /// <summary>
-        /// Logic that processes a command. A particular <see cref="CommandToken">CommandToken</see> should have one and only one CommandHandler
+        /// Token that processes a command. A particular <see cref="CommandToken">CommandToken</see> should have one and only one CommandHandler
         /// </summary>
         public static readonly MilTypeConstant CommandHandlerToken;
 
-
+        /// <summary>
+        /// Token representing an individual command message. Handled by an ICommandHandler
+        /// </summary>
         public static readonly MilTypeConstant CommandToken;
-        public static readonly MilTypeConstant PublishToken;
-        public static readonly MilTypeConstant ReceiveToken;
-        public static readonly MilTypeConstant HandlerToken;
-        public readonly static MilTypeConstant StateChangeToken;
 
+        /// <summary>
+        /// Represents a messaging operation where an event or command is sent (published) via an arbitrary mechanism, usually a Command Bus
+        /// </summary>
+        public static readonly MilTypeConstant PublishToken;
+
+        /// <summary>
+        /// Represents a messaging operation where an event or command is received from some sort of subscription mechanism. 
+        /// </summary>
+        public static readonly MilTypeConstant ReceiveToken;
+
+        /// <summary>
+        /// Actually a composite token, this statement is a signifier that the previous statement resulting in a outwardly-visible change of state for the associated object. 
+        /// The new state value is given following the assignment operator ('=')
+        /// </summary>
+        public static readonly MilTypeConstant StateChangeToken;
+
+        /// <summary>
+        /// Used when a command (typically) is pushed out for publication, but not processed immediately. 
+        /// </summary>
         public static readonly MilTypeConstant DelaySend;
 
         static MilTypeConstant()

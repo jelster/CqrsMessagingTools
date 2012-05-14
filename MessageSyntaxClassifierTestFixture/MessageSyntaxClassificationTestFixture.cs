@@ -111,6 +111,8 @@ namespace MessagingToolsRoslynTest
             Assert.NotNull(result);
             Assert.True(result.Count() == 1);
             Assert.False(result.First().TextSpan.IsEmpty);
+
+            Assert.True(result.First().TextSpan.Length == testSyntaxAarea.DescendentNodes().OfType<InvocationExpressionSyntax>().First().Span.Length);
         }
         
     }

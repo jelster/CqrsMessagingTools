@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Roslyn.Compilers.CSharp;
@@ -18,14 +19,15 @@ namespace MIL.Visitors
         public IEnumerable<ClassDeclarationSyntax> CommandHandlers { get { return CommandHandlersWithCommands.Keys.AsEnumerable(); } }
         public IDictionary<ClassDeclarationSyntax, List<GenericNameSyntax>> CommandHandlersWithCommands { get; private set; }
 
-        public List<InvocationExpressionSyntax> PublicationCalls { get; private set; }
+        public List<MemberAccessExpressionSyntax> PublicationCalls { get; private set; }
 
-        public MilSyntaxWalker()
+        public MilSyntaxWalker() : base(visitIntoStructuredTrivia: true)
         {
+            
             Commands = new List<ClassDeclarationSyntax>();
             Events = new List<ClassDeclarationSyntax>();
             CommandHandlersWithCommands = new Dictionary<ClassDeclarationSyntax, List<GenericNameSyntax>>();
-            PublicationCalls = new List<InvocationExpressionSyntax>();
+            PublicationCalls = new List<MemberAccessExpressionSyntax>();
             EventToEventHandlersMapping = new Dictionary<GenericNameSyntax, List<ClassDeclarationSyntax>>();
         }
 
@@ -37,26 +39,28 @@ namespace MIL.Visitors
 
         private readonly HandlerDeclarationSyntaxVisitor _cmdHandlerDeclarationVisitor = new HandlerDeclarationSyntaxVisitor(CommandHandlerPlainIfx);
         private readonly HandlerDeclarationSyntaxVisitor _eventHandlerDeclarationVisitor = new HandlerDeclarationSyntaxVisitor(EventHandlerPlainIfx);
-        
-        protected override void VisitInvocationExpression(InvocationExpressionSyntax node)
+
+        protected override void VisitMemberAccessExpression(MemberAccessExpressionSyntax node)
         {
-            var memberExpression = node.Expression as MemberAccessExpressionSyntax;
-            if (memberExpression != null && memberExpression.Name.GetText() == PublishKeyword)
+            if (node.Name.GetText() == PublishKeyword)
             {
                 PublicationCalls.Add(node);
-                // TODO: gather more info about who invoked method
             }
         }
 
+
         protected override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            if (LookForCommands(node)) return;
+            LookForCommands(node);
+            LookForCommandHandlers(node);
+            LookForEvents(node);
+            LookForEventHandlers(node);
 
-            if (LookForCommandHandlers(node)) return;
-
-            if (LookForEvents(node)) return;
-
-            if (LookForEventHandlers(node)) return;
+            var methods = node.DescendentNodes().OfType<MethodDeclarationSyntax>();
+            foreach (var method in methods.Where(x => x.BodyOpt != null))
+            {
+                Visit(method);
+            }
         }
 
         private bool LookForEvents(ClassDeclarationSyntax node)
