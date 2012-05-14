@@ -15,8 +15,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommandHandlerCodeIssueTest
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageSyntaxClassifierTestFixture", "MessageSyntaxClassifierTestFixture\MessageSyntaxClassifierTestFixture.csproj", "{454A495F-3F36-45E9-80EF-8D89C19AC534}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessagingToolsRoslynTest", "MessagingToolsRoslynTest\MessagingToolsRoslynTest.csproj", "{4ABA9893-9191-4582-8BA5-95E9AED0A955}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SyntaxHelperUtilities", "SyntaxHelperUtilities\SyntaxHelperUtilities.csproj", "{1F6911AD-8DFB-4888-9EB2-16E4B3195A11}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MIL.Visitors", "MIL.Visitors\MIL.Visitors.csproj", "{16BB9DE0-00E2-4BBA-A398-FDABBAB7FA0E}"
@@ -57,10 +55,6 @@ Global
 		{454A495F-3F36-45E9-80EF-8D89C19AC534}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{454A495F-3F36-45E9-80EF-8D89C19AC534}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{454A495F-3F36-45E9-80EF-8D89C19AC534}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4ABA9893-9191-4582-8BA5-95E9AED0A955}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4ABA9893-9191-4582-8BA5-95E9AED0A955}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4ABA9893-9191-4582-8BA5-95E9AED0A955}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4ABA9893-9191-4582-8BA5-95E9AED0A955}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1F6911AD-8DFB-4888-9EB2-16E4B3195A11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1F6911AD-8DFB-4888-9EB2-16E4B3195A11}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1F6911AD-8DFB-4888-9EB2-16E4B3195A11}.Release|Any CPU.ActiveCfg = Release|Any CPU

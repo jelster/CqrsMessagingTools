@@ -34,13 +34,14 @@ namespace SyntaxClassifierCS
         public IEnumerable<SyntaxClassification> ClassifyNode(IDocument document, CommonSyntaxNode syntax, CancellationToken cancellationToken = new CancellationToken())
         {
             var classList = new List<SyntaxClassification>(2);
+            var treeRef = ((SyntaxTree) document.GetSyntaxTree(cancellationToken)).GetReference((SyntaxNode)syntax);
             var model = document.GetSemanticModel(cancellationToken);
-            
-            if (GetClassificationForCommandCreation(model, syntax as ObjectCreationExpressionSyntax, cancellationToken))
+
+            if (GetClassificationForCommandCreation(model, treeRef.GetSyntax() as ObjectCreationExpressionSyntax, cancellationToken))
             {
                 classList.Add(new SyntaxClassification(syntax.Span, invokeClassification));
             }
-            if (GetClassificationForCommandPublication(model, syntax as InvocationExpressionSyntax, cancellationToken))
+            if (GetClassificationForCommandPublication(model, treeRef.GetSyntax() as InvocationExpressionSyntax, cancellationToken))
             {
                 // TODO: create separate classification type?
                 classList.Add(new SyntaxClassification(syntax.Span, invokeClassification));
@@ -65,17 +66,14 @@ namespace SyntaxClassifierCS
                 return false;
 
             return memberExpression.Name.Identifier.ValueText == "Send";
-            //var methodDeclaration = syntax.Ancestors().OfType<MethodDeclarationSyntax>().Where(x => x.Identifier.ValueText.Contains("Send"));
-            //var info = model.GetSemanticInfo(memberExpression, cancellationToken).Symbol as MethodSymbol;
-
-            //return methodDeclaration.Any();
         }
 
         public static bool GetClassificationForCommandCreation(ISemanticModel model, ObjectCreationExpressionSyntax syntax, CancellationToken cancellationToken = new CancellationToken())
         {
-            if (syntax == null) return false; 
-             
+            if (syntax == null) return false;
+
             var cmdType = model.GetSemanticInfo(syntax, cancellationToken);
+            //var cmdType = model.GetSemanticInfo(syntax, cancellationToken);
 
             return cmdType.Type.AllInterfaces.AsList().Select(x => x.Name).Any(x => x == "ICommand");
         }

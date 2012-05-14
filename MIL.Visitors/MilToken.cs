@@ -21,14 +21,42 @@ namespace MIL.Visitors
 
         public static IEnumerable<MilTypeConstant> AllTokens;
 
+        /// <summary>
+        /// Represents a named AR (aggregate root), which may also be an event source
+        /// </summary>
         public static readonly MilTypeConstant AggregateRootToken;
+        
+        /// <summary>
+        /// Syntactical boundary token. 
+        /// </summary>
         public static readonly MilTypeConstant EndOfStatementToken;
-        public static readonly MilTypeConstant ScopeToken;
+
+        /// <summary>
+        /// Left-side (parent) relationship denoting token
+        /// </summary>
         public static readonly MilTypeConstant OriginAssociationToken;
+
+        /// <summary>
+        /// Right-side (child) relationship denoting token
+        /// </summary>
         public static readonly MilTypeConstant DesintationAssociationToken;
+
+        /// <summary>
+        /// Token representing logic that responds to domain events. A given event type may have zero or more of these. 
+        /// </summary>
         public static readonly MilTypeConstant EventHandlerToken;
+
+        /// <summary>
+        /// Token representing the occurrance of something pertinent to the business domain. 
+        /// </summary>
         public static readonly MilTypeConstant EventToken;
+
+        /// <summary>
+        /// Logic that processes a command. A particular <see cref="CommandToken">CommandToken</see> should have one and only one CommandHandler
+        /// </summary>
         public static readonly MilTypeConstant CommandHandlerToken;
+
+
         public static readonly MilTypeConstant CommandToken;
         public static readonly MilTypeConstant PublishToken;
         public static readonly MilTypeConstant ReceiveToken;
@@ -66,9 +94,6 @@ namespace MIL.Visitors
             AggregateRootToken = new MilTypeConstant(MilTokenType.AggregateRoot, strAggregateRootToken, "{1}{0}");
             tokenList.Add(AggregateRootToken);
 
-            ScopeToken = new MilTypeConstant(MilTokenType.Scope, strContextScopeToken, "{0}{0}");
-            tokenList.Add(ScopeToken);
-
             OriginAssociationToken = new MilTypeConstant(MilTokenType.Association, strContextScopeToken, "{0}{1}");
             tokenList.Add(OriginAssociationToken);
             
@@ -94,9 +119,8 @@ namespace MIL.Visitors
             tokenFormat = format;
         }
 
-        private MilTypeConstant() {}
         private static readonly string strStatementToken = Environment.NewLine;
-        private static readonly string strHandlerToken = "";
+        private const string strHandlerToken = "";
         private const string strCommandToken = "?";
         private const string strEventToken = "!";
         private const string strPublishReceiveToken = " -> ";
@@ -131,71 +155,6 @@ namespace MIL.Visitors
         public override string ToString()
         {
             return string.Format(MilTypeConstant.GetFormat(Token), MemberName, Token.MilToken);
-        }
-    }
-
-    public static class TokenFactory
-    {
-        public static MilToken GetStatementTerminator()
-        {
-            return new MilToken(MilTypeConstant.EndOfStatementToken);
-        }
-
-        public static MilToken GetScope()
-        {
-            return new MilToken(MilTypeConstant.ScopeToken);
-        }
-
-        public static MilToken GetReceive()
-        {
-            return new MilToken(MilTypeConstant.ReceiveToken);
-        }
-
-        public static MilToken GetPublish()
-        {
-            return new MilToken(MilTypeConstant.PublishToken);
-        }
-
-        public static MilToken GetEvent(string foovent)
-        {
-            return new MilToken(MilTypeConstant.EventToken, foovent);
-        }
-
-        public static MilToken GetAggregateRoot(string aggregateRoot)
-        {
-            return new MilToken(MilTypeConstant.AggregateRootToken, aggregateRoot);
-        }
-
-        public static MilToken GetCommandHandler(string handler)
-        {
-            return new MilToken(MilTypeConstant.CommandHandlerToken, handler);
-        }
-
-        public static MilToken GetCommand(string command)
-        {
-            return new MilToken(MilTypeConstant.CommandToken, command);
-        }
-
-        public static MilToken GetAssociation(AssociationType direction)
-        {
-            return new MilToken(direction == AssociationType.Origin 
-                ? MilTypeConstant.OriginAssociationToken
-                : MilTypeConstant.DesintationAssociationToken);
-        }
-
-        public static MilToken GetEventHandler(string handler)
-        {
-            return new MilToken(MilTypeConstant.EventHandlerToken, handler);
-        }
-
-        public static MilToken GetStateChangeExpression(string statePropertyPath, string newState)
-        {
-            return new MilToken(MilTypeConstant.StateChangeToken, string.Format("{0} = {1}", statePropertyPath, newState));
-        }
-
-        public static MilToken GetDelay()
-        {
-            return new MilToken(MilTypeConstant.DelaySend);
         }
     }
 }

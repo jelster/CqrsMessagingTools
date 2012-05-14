@@ -107,7 +107,12 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\MIL.Visitors\MIL.Visitors.csproj">
+      <Project>{16BB9DE0-00E2-4BBA-A398-FDABBAB7FA0E}</Project>
+      <Name>MIL.Visitors</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>

@@ -18,14 +18,14 @@ namespace MIL.Visitors
         public IEnumerable<ClassDeclarationSyntax> CommandHandlers { get { return CommandHandlersWithCommands.Keys.AsEnumerable(); } }
         public IDictionary<ClassDeclarationSyntax, List<GenericNameSyntax>> CommandHandlersWithCommands { get; private set; }
 
-        public IList<SyntaxNodeOrToken> PublicationCalls { get; private set; }
+        public List<InvocationExpressionSyntax> PublicationCalls { get; private set; }
 
         public MilSyntaxWalker()
         {
             Commands = new List<ClassDeclarationSyntax>();
             Events = new List<ClassDeclarationSyntax>();
             CommandHandlersWithCommands = new Dictionary<ClassDeclarationSyntax, List<GenericNameSyntax>>();
-            PublicationCalls = new List<SyntaxNodeOrToken>();
+            PublicationCalls = new List<InvocationExpressionSyntax>();
             EventToEventHandlersMapping = new Dictionary<GenericNameSyntax, List<ClassDeclarationSyntax>>();
         }
 

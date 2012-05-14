@@ -1,0 +1,67 @@
+%RegistrationProcess.State, RegistrationProcess.ProcessState:[NotStarted,AwaitingReservationConfirmation,AwaitingPayment]
+%ThirdPartyProcessorPayment.State, ThirdPartyProcessorPayment.States:[Initiated,Accepted,Completed,Rejected]
+
+RegistrationController::StartRegistration
+	:RegisterToConference? ->
+RegisterToConference? -> OrderCommandHandler
+	@Order:OrderPlaced! -> 
+		-> OrderViewModelGenerator
+		-> RegistrationProcessRouter::RegistrationProcess 
+			*RegistrationProcess.State = AwaitingReservationConfirmation
+			:MakeSeatReservation? ->
+	@Order:OrderUpdated! ->
+		-> OrderViewModelGenerator
+
+MakeSeatReservation? -> SeatsAvailabilityHandler 
+	@SeatsAvailability:SeatsReserved! -> 
+		-> RegistrationProcessRouter::RegistrationProcess
+			*RegistrationProcess.State = AwaitingPayment
+			:MarkSeatsReserved? ->
+			:ExpireRegistrationProcess? -> [Delay]
+
+MarkSeatsReserved? -> OrderCommandHandler
+	@Order:OrderPartiallyReserved! ->
+		-> OrderViewModelGenerator.
+	@Order:OrderReservationCompleted! ->	
+		-> OrderViewModelGenerator.
+
+RegistrationController:SpecifyRegistrantAndPaymentDetails
+	:AssignRegistrantDetails? ->
+	:InitiateThirdPartyProcessorPayment? ->
+
+AssignRegistrantDetails? -> OrderCommandHandler
+	@Order:OrderRegistrantAssigned! ->
+		-> @Order
+		
+InitiateThirdPartyProcessorPayment? -> ThirdPartyProcessorPaymentCommandHandler
+	@ThirdPartyProcessorPayment:PaymentInitiated! -> **ThirdPartyProcessorPayment.State=Initiated**
+PaymentController:ThirdPartyProcessorPaymentAccepted
+	:CompleteThirdPartyProcessorPayment? ->
+CompleteThirdPartyProcessorPayment? -> ThirdPartyProcessorPaymentCommandHandler
+	@ThirdPartyProcessorPayment:PaymentCompleted! -> **ThirdPartyProcessorPayment.State=Completed**
+		-> RegistrationProcessRouter:RegistrationProcess **RegistrationProcess.Completed=true**
+			:CommitSeatReservation? -> 
+			:ConfirmOrderPayment? -> 
+CommitSeatReservation? -> SeatsAvailabilityHandler
+	@SeatsAvailability:SeatReservationCommitted! ->
+		-> @SeatsAvailability
+ConfirmOrderPayment? -> .
+<PaymentController:ThirdPartyProcessorPaymentRejected>
+	:CancelThirdPartyProcessorPayment? ->
+	@ThirdPartyProcessorPayment:PaymentRejected! -> **ThirdPartyProcessorPayment.State=Rejected**
+		-> .
+	
+[Delayed] 
+ExpireRegistrationProcess? -> RegistrationProcessRouter:RegistrationProcess
+**RegistrationProcess.Completed=true**
+	:CancelSeatReservation? ->
+	:RejectOrder? ->
+CancelSeatReservation? -> SeatsAvailabilityHandler
+	@SeatsAvailability:SeatsReservationCancelled! -> .
+RejectOrder? -> OrderCommandHandler
+	@Order:OrderExpired! -> .
+		
+
+
+
+			

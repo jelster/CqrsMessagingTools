@@ -74,10 +74,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\MessagingToolsRoslynTest\Class1.cs">
-      <Link>Class1.cs</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <Compile Include="MessageSyntaxClassificationTestFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
