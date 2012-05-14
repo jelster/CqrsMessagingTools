@@ -22,17 +22,20 @@ namespace MIL.Visitors
         public static IEnumerable<MilTypeConstant> AllTokens;
 
         public static readonly MilTypeConstant AggregateRootToken;
-        public static readonly MilTypeConstant CommandHandlerToken;
         public static readonly MilTypeConstant EndOfStatementToken;
         public static readonly MilTypeConstant ScopeToken;
         public static readonly MilTypeConstant OriginAssociationToken;
         public static readonly MilTypeConstant DesintationAssociationToken;
         public static readonly MilTypeConstant EventHandlerToken;
         public static readonly MilTypeConstant EventToken;
+        public static readonly MilTypeConstant CommandHandlerToken;
         public static readonly MilTypeConstant CommandToken;
         public static readonly MilTypeConstant PublishToken;
         public static readonly MilTypeConstant ReceiveToken;
         public static readonly MilTypeConstant HandlerToken;
+        public readonly static MilTypeConstant StateChangeToken;
+
+        public static readonly MilTypeConstant DelaySend;
 
         static MilTypeConstant()
         {
@@ -74,6 +77,12 @@ namespace MIL.Visitors
 
             EventHandlerToken = new MilTypeConstant(MilTokenType.EventHandler, strHandlerToken, "{1}{0}{1}");
             tokenList.Add(EventHandlerToken);
+
+            StateChangeToken = new MilTypeConstant(MilTokenType.StateObject, strStateChangeToken, "{1}{0}");
+            tokenList.Add(StateChangeToken);
+
+            DelaySend = new MilTypeConstant(MilTokenType.Delay, strDelayToken, "{0}{1}");
+            tokenList.Add(DelaySend);
 
             AllTokens = tokenList;
         }
@@ -181,7 +190,12 @@ namespace MIL.Visitors
 
         public static MilToken GetStateChangeExpression(string statePropertyPath, string newState)
         {
-            return null;
+            return new MilToken(MilTypeConstant.StateChangeToken, string.Format("{0} = {1}", statePropertyPath, newState));
+        }
+
+        public static MilToken GetDelay()
+        {
+            return new MilToken(MilTypeConstant.DelaySend);
         }
     }
 }

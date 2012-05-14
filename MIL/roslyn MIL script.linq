@@ -89,7 +89,11 @@ void Main()
 		}
 	}
 }
- 
+public class MilSyntaxWalker : SyntaxWalker
+{
+	
+}
+
 public class CommandHandlerSyntaxVisitor : SyntaxVisitor<IEnumerable<GenericNameSyntax>>
 {
 	private const string CommandHandlerInterfaceName = "ICommandHandler";

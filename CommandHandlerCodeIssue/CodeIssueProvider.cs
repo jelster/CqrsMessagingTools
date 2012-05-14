@@ -33,35 +33,26 @@ namespace CommandHandlerCodeIssue
 
         public IEnumerable<CodeIssue> GetIssues(IDocument document, CommonSyntaxNode node, CancellationToken cancellationToken)
         {
-            if (document.Project == null) return null;
-
             var classNode = (ClassDeclarationSyntax) node;
 
             if (classNode.BaseListOpt == null) return null;
 
-            var commandHandlerVisitor = new HandlerDeclarationSyntaxVisitor(CommandHandlerInterfaceName);
+            var walker = new MilSyntaxWalker();
+            walker.Visit((SyntaxNode) document.GetSyntaxTree(cancellationToken).Root);
+            var allCommandHandlersInProject = walker.CommandHandlers;
 
-            var baseTypes = commandHandlerVisitor.Visit(classNode);
+           
+            if (!allCommandHandlersInProject.Any() && !allCommandHandlersInProject.Contains(node)) return null;
 
-            if (baseTypes == null || !baseTypes.Any()) return null;
+            var dupes = walker.CommandHandlersWithCommands.SelectMany(x => x.Value).FindDuplicates();
 
-            var allCommandHandlersInProject = (from allTrees in document.Project.GetCompilation(cancellationToken).SyntaxTrees
-                                                from classes in allTrees.Root.DescendentNodes().OfType<ClassDeclarationSyntax>()
-                                                    where commandHandlerVisitor.Visit(classes).Any()
-                                               select new KeyValuePair<ClassDeclarationSyntax, IEnumerable<GenericNameSyntax>>(classes, commandHandlerVisitor.Visit(classes))).ToList();
-            var dic = allCommandHandlersInProject.ToDictionary(x => x.Key, pair => pair.Value);
-
-            if (!dic.Any() || !dic.ContainsKey(classNode)) return null;
-
-            var dupes = dic.SelectMany(x => x.Value, (c, s) => s.GetText()).FindDuplicates().ToList();
-
-            if (dupes.Any())
+            if (!dupes.Any())
             {
                 var desc = "{0} is implemented by multiple handlers:{1}{2}";
                 var issues = new List<CodeIssue>();
                 foreach (var dupe in dupes)
                 {
-                    var listing = FormatHandlerListing(dupe, allCommandHandlersInProject);
+                    var listing = FormatHandlerListing(dupe.Identifier.GetText(), allCommandHandlersInProject.ToDictionary(x => x, syntax => syntax.BaseListOpt.Types.OfType<GenericNameSyntax>()));
                     var text = string.Format(desc, dupe, Environment.NewLine, string.Join(Environment.NewLine, listing));
                     issues.Add(new CodeIssue(CodeIssue.Severity.Warning, classNode.Identifier.FullSpan, text));
                 }

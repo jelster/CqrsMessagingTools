@@ -15,8 +15,8 @@ namespace MIL.Visitors
         public IEnumerable<ClassDeclarationSyntax> EventHandlers { get { return EventToEventHandlersMapping.Values.SelectMany(x => x).AsEnumerable(); } }
         protected IDictionary<GenericNameSyntax, List<ClassDeclarationSyntax>> EventToEventHandlersMapping { get; set; }
 
-        public IEnumerable<ClassDeclarationSyntax> CommandHandlers { get { return CommandHandlerToCommandMapping.Keys.AsEnumerable(); } }
-        protected IDictionary<ClassDeclarationSyntax, List<GenericNameSyntax>> CommandHandlerToCommandMapping { get; set; }
+        public IEnumerable<ClassDeclarationSyntax> CommandHandlers { get { return CommandHandlersWithCommands.Keys.AsEnumerable(); } }
+        public IDictionary<ClassDeclarationSyntax, List<GenericNameSyntax>> CommandHandlersWithCommands { get; private set; }
 
         public IList<SyntaxNodeOrToken> PublicationCalls { get; private set; }
 
@@ -24,7 +24,7 @@ namespace MIL.Visitors
         {
             Commands = new List<ClassDeclarationSyntax>();
             Events = new List<ClassDeclarationSyntax>();
-            CommandHandlerToCommandMapping = new Dictionary<ClassDeclarationSyntax, List<GenericNameSyntax>>();
+            CommandHandlersWithCommands = new Dictionary<ClassDeclarationSyntax, List<GenericNameSyntax>>();
             PublicationCalls = new List<SyntaxNodeOrToken>();
             EventToEventHandlersMapping = new Dictionary<GenericNameSyntax, List<ClassDeclarationSyntax>>();
         }
@@ -105,7 +105,7 @@ namespace MIL.Visitors
             var handles = _cmdHandlerDeclarationVisitor.Visit(node);
             if (handles.Any())
             {
-                CommandHandlerToCommandMapping.Add(node, handles.ToList());
+                CommandHandlersWithCommands.Add(node, handles.ToList());
                 return true;
             }
             return false;

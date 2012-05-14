@@ -23,11 +23,14 @@ namespace TestCode
     using MessagingToolsRoslynTest;
     using MessagingToolsRoslynTest.Interfaces;
 
+    public interface ICommand {}
+
     public interface ICommandHandler<T> where T : ICommand
     {
         void Handles(T command);
     }    
-                                 
+    
+    public class Foo : ICommand { }                            
     public class FoomandHandler : ICommandHandler<Foo>
     {
         public bool WasCalled { get; private set; }
@@ -37,17 +40,27 @@ namespace TestCode
             Console.Write(""Foomand handled {0}"", command.Name);
         }
     }   
-    public class BadFooHandler : ICommandHandler<Foo> { public void Handles(Foo command) { throw new NotImplementedException(); }}                                        
+    public class BadFooHandler : ICommandHandler<Foo> 
+    { 
+        public void Handles(Foo command) { throw new NotImplementedException(); }
+    }                                        
 }";
 
         private readonly IDocument document;
         private readonly CodeIssueProvider sut;
         private readonly MockRepository mockRepos = new MockRepository(MockBehavior.Loose);
+        private readonly SyntaxTree tree;
+
         public given_a_project()
         {
-            var a = Workspace.LoadStandAloneProject(@"..\..\..\MessagingToolsRoslynTest\MessagingToolsRoslynTest.csproj");
+            tree = SyntaxTree.ParseCompilationUnit(Code);
 
-            document = a.CurrentSolution.Projects.First().Documents.First(x => x.DisplayName == "TestDoc.cs");
+            var mockDoc = mockRepos.Create<IDocument>();
+            mockDoc.Setup(x => 
+                x.GetSyntaxTree(It.IsAny<CancellationToken>()))
+                .Returns(tree);
+
+            document = mockDoc.Object;
             var mockEditFactory = mockRepos.Create<ICodeActionEditFactory>();
             sut = new CodeIssueProvider(mockEditFactory.Object);
         }
