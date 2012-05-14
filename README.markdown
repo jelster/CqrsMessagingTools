@@ -1,7 +1,7 @@
 # CQRS Messaging Tools
 ## Readme
 
-These concepts wouldn't have happened without the [MS PnP CQRS-Journey](http://cqrsjourney.github.com/) project and team. See below for instructions and warnings
+These concepts wouldn't have happened without the [Microsoft Patterns & Practices group's CQRS-Journey](http://cqrsjourney.github.com/) project and team. See below for instructions and warnings
 
 # Tool Installation Instructions and Walkthrough
 These tools are the product of a week's spent poking around a lot of unfamiliar territory, so be warned: Your Mileage May Vary!
@@ -67,15 +67,18 @@ These tools are the product of a week's spent poking around a lot of unfamiliar 
 2.     @SeatsAvailability:SeatsReserved! -> 
 3.           -> RegistrationProcessRouter::RegistrationProcess
 4.  	     *RegistrationProcess.State = AwaitingPayment
-5. 	     :MarkSeatsReserved? -> 
+5. 	     	 :MarkSeatsReserved? -> 
 6.  	     :ExpireRegistrationProcess? -> [Delay]
 7.
 8.   MarkSeatsReserved? -> OrderCommandHandler
 9.     @Order::OrderPartiallyReserved! ->
-10.	-> OrderViewModelGenerator::.
+10.		-> OrderViewModelGenerator
 ```
 * Line 1 - a command (note the ?) is published to the bus and handled by the `SeatsAvailabilityHandler`
 * Line 2 - as a result of the message being handled by the `SeatsAvailabilityHandler`, the Aggregate Route `@SeatsAvailability` pushes the `SeatsReserved!` event to listeners
 * Line 3 - The RegistrationProcessRouter receives the `SeatsReserved!` event and routes it to the appropriate `RegistrationProcess` instance. 
 * Line 4 - `RegistrationProcess` changes state in response to event
 * Line 5 - The `RegistrationProcess` publishes the `MarkSeatsReserved?` command to the bus
+* Line 6 - An additional command is issued and published, but this time with the optional `[Delay]` token, denoting that the message will not immediately be processed or handled
+* Line 9 - The `Order` Aggregate Root raises and publishes the `OrderPartiallyReserved` event to the bus in response to the `OrderCommandHandler`'s command processing.
+* Line 10 - The event is picked up and handled by the `OrderViewModelGenerator`. The handler doesn't perform any messaging-relevant activities as a result of this, and so the interaction concludes
