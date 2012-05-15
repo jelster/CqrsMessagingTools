@@ -13,87 +13,21 @@ namespace MilVisitorsTestFixture
 	{
 		public class given_a_syntax_tree
 		{
-			private readonly MilSyntaxWalker sut;
-
-			public given_a_syntax_tree()
-			{
-				sut = new MilSyntaxWalker();
-			}
-
-			[Fact]
-			public void when_walker_visits_command_class_declaration_adds_to_command_list()
-			{
-				var tree = SyntaxTree.ParseCompilationUnit("public class Foomand : ICommand {}");
-				SyntaxNode node = tree.Root;
-				sut.Visit(node);
-
-				Assert.NotEmpty(sut.Commands);
-				Assert.True(sut.Commands.Count == 1);
-				Assert.True(sut.Commands.First().Identifier.GetText() == "Foomand");
-			}
-
-			[Fact]
-			public void when_walker_visits_command_handler_class_declaration_added_to_cmd_handler_list()
-			{
-				var tree = SyntaxTree.ParseCompilationUnit("public class FooHandler : ICommandHandler<Foomand> {}");
-				var node = tree.Root;
-				sut.Visit(node);
-
-				Assert.NotEmpty(sut.CommandHandlers);
-				Assert.True(sut.CommandHandlers.Count() == 1);
-				Assert.True(sut.CommandHandlers.First().Identifier.GetText() == "FooHandler");
-			}
-
-			[Fact]
-			public void when_walker_visits_node_with_publish_operation_adds_to_publication_list()
-			{
-				var tree = SyntaxTree.ParseCompilationUnit("public class HaHa { public void Bar() { var a = new Foomand(); messageBus.Send(a); }}");
-				var node = tree.Root;
-				sut.Visit(node);
-
-				Assert.NotEmpty(sut.PublicationCalls);
-				Assert.True(sut.PublicationCalls.Count == 1);
-			}
-
-			[Fact]
-			public void when_walker_visits_event_class_declaration_adds_to_event_list()
-			{
-				var tree = SyntaxTree.ParseCompilationUnit("public class Foovent : IEvent {}");
-				var node = tree.Root;
-				sut.Visit(node);
-
-				Assert.NotEmpty(sut.Events);
-				Assert.True(sut.Events.Count == 1);
-				Assert.True(sut.Events.First().Identifier.GetText() == "Foovent");
-			}
-
-			[Fact]
-			public void when_walker_visits_event_handler_class_adds_to_event_handlers_list()
-			{
-				var tree = SyntaxTree.ParseCompilationUnit("public class FooventHandler : IEventHandler<Foo> {}");
-				var node = tree.Root;
-				sut.Visit(node);
-
-				Assert.NotEmpty(sut.EventHandlers);
-				Assert.True(sut.EventHandlers.Count() == 1);
-				Assert.True(sut.EventHandlers.First().Identifier.GetText() == "FooventHandler");
-			}
-
-			[Fact]
-			public void walker_correctly_finds_publications_in_complete_program()
-			{
-				const string code =
+			#region Code string
+			const string code =
 					@"
 namespace TestCode 
 {
 	using System;  
 	
 	public interface ICommand {}
-	
+	public interface IEvent {}
 	public interface ICommandHandler<T> where T : ICommand
 	{
 		void Handles(T command);
 	}
+	public interface IEventHandler<T> where T : IEvent {}
+
 	public class Foo : ICommand { }	                           
 	public class FoomandHandler : ICommandHandler<Foo>
 	{
@@ -107,7 +41,9 @@ namespace TestCode
 	public class BadFooHandler : ICommandHandler<Foo> 
 	{ 
 		public void Handles(Foo command) { throw new NotImplementedException(); }
-	}                
+	} 
+	public class Bar : IEvent {}
+	public class BarventHandler : IEventHandler<Bar> {}               
 	public class Program
 	{
 		public static void Main()
@@ -121,6 +57,75 @@ namespace TestCode
 	}
 							
 }";
+			#endregion
+
+		    private SyntaxTree tree;
+			private readonly MilSyntaxWalker sut;
+
+			public given_a_syntax_tree()
+			{
+                tree = SyntaxTree.ParseCompilationUnit(code);
+				sut = new MilSyntaxWalker();
+			}
+
+			[Fact]
+			public void when_walker_visits_command_class_declaration_adds_to_command_list()
+			{
+				SyntaxNode node = tree.Root;
+				sut.Visit(node);
+
+				Assert.NotEmpty(sut.Commands);
+				Assert.True(sut.Commands.Count == 1);
+                Assert.True(sut.Commands.First().Identifier.GetText() == "Foo");
+			}
+
+			[Fact]
+			public void when_walker_visits_command_handler_class_declaration_added_to_cmd_handler_list()
+			{
+				var node = tree.Root;
+				sut.Visit(node);
+
+                Console.WriteLine(string.Join(Environment.NewLine, sut.CommandHandlers.Select(x => x.Identifier.GetFullText())));
+				Assert.NotEmpty(sut.CommandHandlers);
+				Assert.True(sut.CommandHandlers.Count() == 2);
+                Assert.True(sut.CommandHandlers.Select(x => x.Identifier.GetText()).Contains("FoomandHandler"));
+			}
+
+			[Fact]
+			public void when_walker_visits_node_with_publish_operation_adds_to_publication_list()
+			{
+				var node = tree.Root;
+				sut.Visit(node);
+
+				Assert.NotEmpty(sut.PublicationCalls);
+				Assert.True(sut.PublicationCalls.Count == 1);
+			}
+
+			[Fact]
+			public void when_walker_visits_event_class_declaration_adds_to_event_list()
+			{
+				var node = tree.Root;
+				sut.Visit(node);
+
+				Assert.NotEmpty(sut.Events);
+				Assert.True(sut.Events.Count == 1);
+				Assert.True(sut.Events.First().Identifier.GetText() == "Bar");
+			}
+
+			[Fact]
+			public void when_walker_visits_event_handler_class_adds_to_event_handlers_list()
+			{
+				var node = tree.Root;
+				sut.Visit(node);
+
+				Assert.NotEmpty(sut.EventHandlers);
+				Assert.True(sut.EventHandlers.Count() == 1);
+				Assert.True(sut.EventHandlers.First().Identifier.GetText() == "BarventHandler");
+			}
+
+			[Fact]
+			public void walker_correctly_finds_publications_in_complete_program()
+			{
 				var compilation = Compilation.Create("test.exe")
 					.AddSyntaxTrees(SyntaxTree.ParseCompilationUnit(code))
 					.UpdateOptions(new CompilationOptions("TestCode.Program", "Program", AssemblyKind.ConsoleApplication))
@@ -144,27 +149,17 @@ namespace TestCode
 																  .SelectMany(x => nameExtractor(x)));
 									};
 
-				var walker = new MIL.Visitors.MilSyntaxWalker();
-                //var types = compilation.SourceModule.GlobalNamespace
-                //    .GetMembers().OfType<NamespaceOrTypeSymbol>()
-                //    .SelectMany(nameExtractor).OfType<TypeSymbol>();
-
-			    
-			    foreach (var tree in compilation.SyntaxTrees)
-			    {
-                    //var model = compilation.GetSemanticModel(tree);
-                    //model.GetDeclaredSymbol(
-                    //    tree.Root.DescendentNodes().OfType<InvocationExpressionSyntax>().First(
-                    //        x => ((MemberAccessExpressionSyntax) x.Expression).GetText() == "Main"));
-			        walker.Visit(tree.Root);
-			    }
-                    
-				//	Console.WriteLine(string.Join("",t.GetText().Take(200).ToList()));
+				var walker = new MilSyntaxWalker();
+				//var types = compilation.SourceModule.GlobalNamespace
+				//    .GetMembers().OfType<NamespaceOrTypeSymbol>()
+				//    .SelectMany(nameExtractor).OfType<TypeSymbol>();
 				
-			    
+				foreach (var tree in compilation.SyntaxTrees)
+				{
+					walker.Visit(tree.Root);
+				}
 				return walker;
 			}
 		}
 	}
-
 }

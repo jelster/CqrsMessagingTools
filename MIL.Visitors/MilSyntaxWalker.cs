@@ -48,42 +48,49 @@ namespace MIL.Visitors
             }
         }
 
-
+        protected override void VisitNamespaceDeclaration(NamespaceDeclarationSyntax node)
+        {
+           foreach (var type in node.DescendentNodes().OfType<ClassDeclarationSyntax>())
+           {
+               Visit(type);
+           }
+        }
+         
         protected override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            LookForCommands(node);
-            LookForCommandHandlers(node);
-            LookForEvents(node);
-            LookForEventHandlers(node);
-
-            var methods = node.DescendentNodes().OfType<MethodDeclarationSyntax>();
-            foreach (var method in methods.Where(x => x.BodyOpt != null))
+            foreach (var classNode in node.DescendentNodesAndSelf().OfType<ClassDeclarationSyntax>())
             {
-                Visit(method);
+                LookForCommands(node);
+                LookForCommandHandlers(node);
+                LookForEvents(node);
+                LookForEventHandlers(node);
+
+                var methods = node.DescendentNodes().OfType<MethodDeclarationSyntax>();
+                foreach (var method in methods.Where(x => x.BodyOpt != null))
+                {
+                    Visit(method);
+                }
             }
+            
         }
 
-        private bool LookForEvents(ClassDeclarationSyntax node)
+        private void LookForEvents(ClassDeclarationSyntax node)
         {
             if (node.BaseListOpt != null && node.BaseListOpt.Types.Any(t => t.PlainName == EventIfx))
             {
                 Events.Add(node);
-                return true;
             }
-            return false;
         }
 
-        private bool LookForCommands(ClassDeclarationSyntax node)
+        private void LookForCommands(ClassDeclarationSyntax node)
         {
             if (node.BaseListOpt != null && node.BaseListOpt.Types.Any(t => t.PlainName == CommandIfx))
             {
                 Commands.Add(node);
-                return true;
             }
-            return false;
         }
 
-        private bool LookForEventHandlers(ClassDeclarationSyntax node)
+        private void LookForEventHandlers(ClassDeclarationSyntax node)
         {
             var handles = _eventHandlerDeclarationVisitor.Visit(node);
             if (handles.Any())
@@ -99,20 +106,16 @@ namespace MIL.Visitors
                         EventToEventHandlersMapping.Add(eventTypeName, new List<ClassDeclarationSyntax>() { node });
                     }
                 }
-                return true;
             }
-            return false;
         }
 
-        private bool LookForCommandHandlers(ClassDeclarationSyntax node)
+        private void LookForCommandHandlers(ClassDeclarationSyntax node)
         {
             var handles = _cmdHandlerDeclarationVisitor.Visit(node);
             if (handles.Any())
             {
                 CommandHandlersWithCommands.Add(node, handles.ToList());
-                return true;
             }
-            return false;
         }
     }
 
