@@ -56,17 +56,15 @@ namespace TestCode
 		public void Handles(Foo command) { throw new NotImplementedException(); }
 	}                                        
 }";
-
-	var compilation = Compilation.Create("test.dll")
+var compilation = Compilation.Create("test.dll")
 		.AddSyntaxTrees(SyntaxTree.ParseCompilationUnit(Code))
 		.UpdateOptions(new CompilationOptions("TestCode.Program", "Program", AssemblyKind.ConsoleApplication))
 		.AddReferences(new AssemblyFileReference(typeof(object).Assembly.Location));
+ 
 	
 	var d = compilation.GetDeclarationDiagnostics().Dump();
 	var milA = new MilSyntaxAnalysis();
 	milA.AnalyzeInitiatingSequence(compilation);
-	Trace.Write("fuck");
-	
 		
 }
 public class MilSyntaxAnalysis
@@ -88,31 +86,41 @@ public class MilSyntaxAnalysis
 	{
 		var walker = new MIL.Visitors.MilSyntaxWalker();
 		var types = compilation.SourceModule.GlobalNamespace
-		.GetMembers().AsList()
-		.Cast<NamespaceOrTypeSymbol>()
+		.GetMembers().OfType<NamespaceOrTypeSymbol>()
 		.SelectMany(nameExtractor);
 		 
 		var cmd =  types.Where(x => x.BaseType != null && x.Interfaces.Select(y => y.Name).Contains("ICommand"));
-			
+	 	
 		foreach (var t in compilation.SyntaxTrees.Select(x => x.GetReference(x.Root)))
 		{
-			
-			Console.WriteLine("111 ---- " + t.GetSyntax().GetText().Substring(0, 200));
-			Console.WriteLine("walker.Commands.Count: {0}", walker.Commands.Count.ToString());
+			var methodBodies = t.GetSyntax().DescendentNodesAndSelf().OfType<MethodDeclarationSyntax>();
+			foreach (var stmt in methodBodies
+				.Select(mb => mb.BodyOpt)
+				.Where(body => body != null)
+				.SelectMany(st => st.Statements, (b, s) => s)
+				.SelectMany(sx => sx.DescendentNodesAndSelf().OfType<MemberAccessExpressionSyntax>())
+				.Where(ma => ((MemberAccessExpressionSyntax)ma).Name.GetText() == "Send"))
+			{
+				stmt.GetText().Dump();
+//				 
+				var model = compilation.GetSemanticModel(t.SyntaxTree);
+				var dataFlow = model.AnalyzeRegionDataFlow(stmt.FullSpan);
+				var send = (LocalSymbol)dataFlow.ReadOutside.First();
+				if (cmd.Contains(send.Type))
+				{
+					Console.WriteLine("Cmd has this type {0}", send.Type.Name);
+				}
+				
+					 
+				//}
+			//Console.WriteLine(t.GetSyntax().GetText().Substring(0, 200));
+			//Console.WriteLine("walker.Commands.Count: {0}", walker.Commands.Count.ToString());
 			 
-			walker.Visit(t.GetSyntax());
+			//walker.Visit(t.GetSyntax());
 			
-			Console.WriteLine("walker.Commands.Count: {0}", walker.Commands.Count.ToString());
+			//Console.WriteLine("walker.Commands.Count: {0}", walker.Commands.Count.ToString());
+			}
 		}
-		
-		walker.PublicationCalls.Count.Dump("Pub calls");
-		 
-		 
-		//walker.Dump(2);
-		 
-		//walker.Dump(2);
-	//	var refs = compilation.
-
 	}
 	
 }

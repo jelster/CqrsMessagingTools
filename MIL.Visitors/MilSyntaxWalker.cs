@@ -13,8 +13,8 @@ namespace MIL.Visitors
         public IList<ClassDeclarationSyntax> Commands { get; private set; }
         public IList<ClassDeclarationSyntax> Events { get; private set; }
 
+        public IDictionary<GenericNameSyntax, List<ClassDeclarationSyntax>> EventToEventHandlersMapping { get; set; }
         public IEnumerable<ClassDeclarationSyntax> EventHandlers { get { return EventToEventHandlersMapping.Values.SelectMany(x => x).AsEnumerable(); } }
-        protected IDictionary<GenericNameSyntax, List<ClassDeclarationSyntax>> EventToEventHandlersMapping { get; set; }
 
         public IEnumerable<ClassDeclarationSyntax> CommandHandlers { get { return CommandHandlersWithCommands.Keys.AsEnumerable(); } }
         public IDictionary<ClassDeclarationSyntax, List<GenericNameSyntax>> CommandHandlersWithCommands { get; private set; }
@@ -60,10 +60,10 @@ namespace MIL.Visitors
         {
             foreach (var classNode in node.DescendentNodesAndSelf().OfType<ClassDeclarationSyntax>())
             {
-                LookForCommands(node);
-                LookForCommandHandlers(node);
-                LookForEvents(node);
-                LookForEventHandlers(node);
+                LookForCommands(classNode);
+                LookForCommandHandlers(classNode);
+                LookForEvents(classNode);
+                LookForEventHandlers(classNode);
 
                 var methods = node.DescendentNodes().OfType<MethodDeclarationSyntax>();
                 foreach (var method in methods.Where(x => x.BodyOpt != null))

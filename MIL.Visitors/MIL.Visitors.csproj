@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HandlerDeclarationSyntaxVisitor.cs" />
+    <Compile Include="MilSemanticAnalyzer.cs" />
     <Compile Include="MilSyntaxWalker.cs" />
     <Compile Include="MilToken.cs" />
     <Compile Include="MilTokenFormatter.cs" />
