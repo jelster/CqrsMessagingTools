@@ -41,17 +41,31 @@ namespace TestCode
         public void Handles(Foo command) { throw new NotImplementedException(); }
     } 
     public class Bar : IEvent {}
-    public class BarventHandler : IEventHandler<Bar> {}               
+    public class Foobar : IEvent {}
+    public class BarventHandler : IEventHandler<Bar> {}
+    public class OtherventHandler : IEventHandler<Bar>, IEventHandler<Foobar> {}               
     public class Program
     {
+        IBus bus;
+        public Program()
+        {
+            bus = new MyBus();
+        }
         public static void Main()
         {
             var handler = new FoomandHandler();
             var cmd = new Foo();
             
-            handler.Send(cmd);
+            bus.Send(cmd);
+            Send(cmd);
+        }
+        public void Send(ICommand cmd) { }		
+    }
 
-        }		
+    public interface IBus { void Send(ICommand cmd); }
+    public class MyBus : IBus
+    {
+        public void Send(ICommand cmd) {}
     }
                             
 }";
@@ -81,7 +95,7 @@ namespace TestCode
 
                 Assert.NotEmpty(sut.Commands);
                 Assert.True(sut.Commands.Count == 1);
-                Assert.True(sut.Commands.First().Identifier.GetText() == "Foo");
+                Assert.True(sut.Commands.First().GetClassName() == "Foo");
             }
 
             [Fact]
@@ -90,10 +104,9 @@ namespace TestCode
                 var node = tree.Root;
                 sut.Visit(node);
 
-                Console.WriteLine(String.Join(Environment.NewLine, sut.CommandHandlers.Select(x => x.Identifier.GetFullText())));
                 Assert.NotEmpty(sut.CommandHandlers);
                 Assert.True(sut.CommandHandlers.Count() == 2);
-                Assert.True(sut.CommandHandlers.Select(x => x.Identifier.GetText()).Contains("FoomandHandler"));
+                Assert.True(sut.CommandHandlers.CollectionContainsClassName("FoomandHandler"));
             }
 
             [Fact]
@@ -113,8 +126,8 @@ namespace TestCode
                 sut.Visit(node);
 
                 Assert.NotEmpty(sut.Events);
-                Assert.True(sut.Events.Count == 1);
-                Assert.True(sut.Events.First().Identifier.GetText() == "Bar");
+                Assert.True(sut.Events.Count == 2);
+                Assert.True(sut.Events.First().GetClassName() == "Bar");
             }
 
             [Fact]
@@ -124,8 +137,7 @@ namespace TestCode
                 sut.Visit(node);
 
                 Assert.NotEmpty(sut.EventHandlers);
-                Assert.True(sut.EventHandlers.Count() == 1);
-                Assert.True(sut.EventHandlers.First().Identifier.GetText() == "BarventHandler");
+                Assert.True(sut.EventHandlers.CollectionContainsClassName("BarventHandler"));
             }
 
             [Fact]
@@ -134,6 +146,27 @@ namespace TestCode
                 var analysis = new MilSemanticAnalyzer(compilation);
                 var walker = analysis.ExtractMessagingSyntax();
                 Assert.NotEmpty(walker.PublicationCalls);
+            }
+
+            [Fact]
+            public void when_multiple_event_handlers_for_same_event_walker_finds_all()
+            {
+                var node = tree.Root;
+                sut.Visit(node);
+                
+                var handles = sut.EventToEventHandlersMapping.Single(x => x.Key == "Bar");
+                Assert.True(handles.Value.Count == 2);
+                Assert.True(handles.Value.CollectionContainsClassName("BarventHandler"));
+                Assert.True(handles.Value.CollectionContainsClassName("OtherventHandler"));
+            }
+
+            [Fact]
+            public void when_send_is_not_prefixed_by_member_access_walker_ignores()
+            {
+                var analysis = new MilSemanticAnalyzer(compilation);
+                var walker = analysis.ExtractMessagingSyntax();
+                Assert.True(walker.PublicationCalls.Count == 1);
+                 
             }
         }
     }
