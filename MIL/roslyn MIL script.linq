@@ -102,7 +102,7 @@ public class MilSyntaxAnalysis
 				.Where(ma => ((MemberAccessExpressionSyntax)ma).Name.GetText() == "Send"))
 			{
 				stmt.GetText().Dump();
-//				 
+ 			 
 				var model = compilation.GetSemanticModel(t.SyntaxTree);
 				var dataFlow = model.AnalyzeRegionDataFlow(stmt.FullSpan);
 				var send = (LocalSymbol)dataFlow.ReadOutside.First();
@@ -110,15 +110,6 @@ public class MilSyntaxAnalysis
 				{
 					Console.WriteLine("Cmd has this type {0}", send.Type.Name);
 				}
-				
-					 
-				//}
-			//Console.WriteLine(t.GetSyntax().GetText().Substring(0, 200));
-			//Console.WriteLine("walker.Commands.Count: {0}", walker.Commands.Count.ToString());
-			 
-			//walker.Visit(t.GetSyntax());
-			
-			//Console.WriteLine("walker.Commands.Count: {0}", walker.Commands.Count.ToString());
 			}
 		}
 	}
