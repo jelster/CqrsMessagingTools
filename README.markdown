@@ -53,7 +53,7 @@ These tools are the product of a week's spent poking around a lot of unfamiliar 
   * Raises code error if more than one class handles a command. Currently uses ICommand and ICommandHandler<T>  as hard-coded interfaces (for now)
 
 # Messaging Intermediate (or -ary) Language (MIL) 
-
+For a detailed walkthrough of MIL, click [here](https://github.com/jelster/CqrsMessagingTools/wiki/MIL-Walkthrough)
 ## Goals:
 * Simple plain-text DSL (Domain-Specific-Language)
 * Readable and understandable by flesh and silicone alike (the format is self-describing and already tokenized)
