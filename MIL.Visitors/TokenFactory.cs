@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace MIL.Visitors
 {
     public static class TokenFactory
@@ -57,6 +59,11 @@ namespace MIL.Visitors
         public static MilToken GetDelay()
         {
             return new MilToken(MilTypeConstant.DelaySend);
+        }
+
+        public static MilToken GetStateDefinition(string processName, string statePropertyName, IEnumerable<string> stateFlags)
+        {
+            return new MilToken(MilTypeConstant.StateDefinitionToken, string.Format("{0}, {1}:[{2}]", processName, statePropertyName, string.Join(",", stateFlags)));
         }
     }
 }

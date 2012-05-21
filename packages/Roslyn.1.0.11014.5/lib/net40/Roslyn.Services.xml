@@ -1,0 +1,2166 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Roslyn.Services</name>
+    </assembly>
+    <members>
+        <member name="M:Roslyn.Utilities.Contract.Requires(System.Boolean,System.String)">
+             <summary>
+             Equivalent to Debug.Assert.  
+            
+             DevDiv 867813 covers removing this completely at a future date
+             </summary>
+        </member>
+        <member name="M:Roslyn.Utilities.Contract.Assert(System.Boolean,System.String)">
+             <summary>
+             Equivalent to Debug.Assert.  
+            
+             DevDiv 867813 covers removing this completely at a future date
+             </summary>
+        </member>
+        <member name="M:Roslyn.Utilities.Contract.Assume(System.Boolean,System.String)">
+             <summary>
+             Equivalent to Debug.Assert.  
+            
+             DevDiv 867813 covers removing this completely at a future date
+             </summary>
+        </member>
+        <member name="M:Roslyn.Utilities.Contract.ThrowIfNull``1(``0,System.String)">
+            <summary>
+            Throws a non-accessible exception if the provided value is null.  This method executes in
+            all builds
+            </summary>
+        </member>
+        <member name="M:Roslyn.Utilities.Contract.ThrowIfFalse(System.Boolean,System.String)">
+            <summary>
+            Throws a non-accessible exception if the provided value is false.  This method executes
+            in all builds
+            </summary>
+        </member>
+        <member name="M:Roslyn.Utilities.Contract.ThrowIfTrue(System.Boolean,System.String)">
+            <summary>
+            Throws a non-accessible exception if the provided value is true. This method executes in
+            all builds.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Utilities.FileUtilities.GetExtension(System.String)">
+            <summary>
+            Returns an extension of the specified path string.
+            </summary>
+            <remarks>
+            The same functionality as <see cref="M:System.IO.Path.GetExtension(System.String)"/> but doesn't throw an exception
+            if there are invalid characters in the path.
+            </remarks>
+        </member>
+        <member name="M:Roslyn.Utilities.Hash.Combine(System.Int32,System.Int32)">
+            <summary>
+            This is how VB Anonymous Types combine hash values for fields.
+            </summary>
+            <param name="currentKey"></param>
+            <param name="newKey"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Roslyn.Utilities.Hash.Combine``1(``0,System.Int32)">
+            <summary>
+            This is how VB Anonymous Types combine hash values for fields.
+            </summary>
+            <param name="newKeyPart"></param>
+            <param name="currentKey"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Roslyn.Utilities.ImmutableList`1.ElementList">
+            <summary>
+            This is a simple list of elements
+            </summary>
+        </member>
+        <member name="T:Roslyn.Utilities.ImmutableList`1.CompoundList">
+            <summary>
+            This is a compound list of lists
+            </summary>
+        </member>
+        <member name="M:Roslyn.Utilities.NumberDispenser.GetNextNumber(System.Object)">
+            <summary>
+            Returns a sequential number from a counter associated with an object.
+            I.E. When called with same object, results will be 1,2,3,4,5 ....
+            
+            Note this is supposed to be used with objects that only _sometimes_ need a counter.
+            If a counter is needed frequently, add it to the object.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Utilities.ReferenceEqualityComparer">
+            <summary>
+            Compares objects based upon their reference identity.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Utilities.StringExtensions.NeedsLocalization(System.String)">
+            <summary>
+            Used to indicate places where we are hard-coding strings that will later need to be
+            localized.  This way, we can use a "Find All References" to find and fix these.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Utilities.StringExtensions.IsValidClrNamespaceName(System.String)">
+            <summary>
+            Checks if the given name is a sequence of valid CLR names separated by a dot.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Utilities.StringTable">
+            <summary>
+            This is basically a hash-set of strings that is searchable by  
+            strings, string sub ranges, character array ranges or string-builder.  
+            </summary>
+        </member>
+        <member name="T:Roslyn.Utilities.SyntaxPath">
+            <summary>
+            Stores the "path" from the root of a tree to a node, allowing the node to be recovered in a
+            later snapshot of the tree, under certain circumstances.
+            
+            The implementation stores the child indices to represent the path, so any edit which affects
+            the child indices could render this object unable to recover its node.  NOTE: One thing C#
+            IDE has done in the past to do a better job of this is to store the fully qualified name of
+            the member to at least be able to descend into the same member.  We could apply the same sort
+            of logic here.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Utilities.SyntaxPath.TryResolve(Roslyn.Compilers.Common.CommonSyntaxNode,Roslyn.Compilers.Common.CommonSyntaxNodeOrToken@)">
+            <summary>
+            Attempts to recover the node at this path in the provided tree.  If the node is found
+            then 'true' is returned, otherwise the result is 'false' and 'node' will be null.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Utilities.WeakReference`1.#ctor(`0)">
+            <summary>
+            Create a weak reference to an object.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.DefaultWorkspaceListener">
+            <summary>
+            An implementation of the workspace listener that does nothing.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IWorkspaceListener.OnProjectRemoved(Roslyn.Services.ISolution,Roslyn.Services.ProjectId)">
+            <summary>
+            Called when a project with ID equal to <paramref name="projectId"/> is removed from the
+            solution.
+            </summary>
+            <param name="solution">TODO: Clarify the contract - is this the old solution that still
+            has the project, or is this the new one which already doesn't? As a listener, I'd prefer
+            this to be the former (I'd still want to inspect the solution when the project was still
+            there). However right now we pass the new solution which doesn't contain the projectId.
+            Or maybe we should pass both the old and the new one.</param>
+            <param name="projectId">The ID of the project that was removed.</param>
+        </member>
+        <member name="T:Roslyn.Services.DocumentId">
+            <summary>
+            An identifier that can be used to retrieve the same IDocument across versions of the
+            workspace.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.DocumentInfo">
+            <summary>
+            A class that represents all the arguments necessary to create a new document instance.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Extensions.FindSourceDefinition(Roslyn.Compilers.Common.ISymbol,Roslyn.Services.ISolution,System.Threading.CancellationToken)">
+            <summary>
+            Finds the definition symbol declared in source code for a corresponding reference symbol. 
+            Returns null if no such symbol can be found in the specified solution.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.ExportLanguageServiceProviderAttribute">
+            <summary>
+            Specifies the exact type of the service exported by the ILanguageService.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Utilities.ISemanticModelExtensions.GetSemanticInfo(Roslyn.Compilers.Common.ISemanticModel,Roslyn.Compilers.Common.CommonSyntaxToken)">
+            <summary>
+            Gets semantic information, such as type, symbols, and diagnostics, about the parent of a token.
+            </summary>
+            <param name="semanticModel">The SemanticModel object to get semantic information
+            from.</param>
+            <param name="token">The token to get semantic information from. This must be part of the syntax tree
+            associated with the binding.</param>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Utilities.ISemanticModelExtensions.GetSemanticInfo(Roslyn.Compilers.Common.ISemanticModel,Roslyn.Compilers.Common.CommonSyntaxNodeOrToken)">
+            <summary>
+            Gets semantic information, such as type, symbols, and diagnostics, about a node or
+            token.
+            </summary>
+            <param name="semanticModel">The SemanticModel object to get semantic information
+            from.</param>
+            <param name="nodeOrToken">The node or token to inquire about. If this a token, the parent of the token is
+            queried.</param>
+        </member>
+        <member name="T:Roslyn.Services.ILanguageService">
+            <summary>
+            Empty interface just to mark language services.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Internal.Measurement.EmptyMeasurementBlock">
+            <summary>
+            Implementation of IMeasurementBlock that does nothing
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Internal.Measurement.IMeasurementBlock">
+            <summary>
+            Defines methods for logging events before and after a section of code
+            executes.  An end event is logged when the IMeasurementBlock is disposed
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Internal.Measurement.IMeasurementBlock.Begin">
+            <summary>
+            Logs a Begin event
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Internal.Measurement.EmptyMeasurementBlockFactory">
+            <summary>
+            Implementation of IMeasurementBlockFactory that does nothing and returns EmptyMeasurementBlocks
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Internal.Measurement.IMeasurementBlockFactory">
+            <summary>
+            Defines methods for creating IMeasurementBlocks
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Internal.Measurement.IMeasurementBlockFactory.BeginNew(Roslyn.Services.Internal.Measurement.FunctionId)">
+            <summary>
+            Starts and returns a new MeasurementBlock for the given FunctionId.
+            
+            using (IMeasurementBlockFactory.BeginNew(functionId)
+            {
+            }
+            </summary>
+            <param name="functionId">The function being measured</param>
+            <returns>A running IMeasurementBlock instance</returns>
+        </member>
+        <member name="T:Roslyn.Services.Internal.Measurement.FunctionId">
+            <summary>
+            Enum to uniquely identify each measurement block location
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Internal.Measurement.CodeMarkers.CodeMarkerStartEnd">
+            <summary>
+            Use CodeMarkerStartEnd in a using clause when you need to bracket an
+            operation with a start/end CodeMarker event pair.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Internal.Measurement.CodeMarkers.CodeMarkerExStartEnd">
+            <summary>
+            Use CodeMarkerExStartEnd in a using clause when you need to bracket an
+            operation with a start/end CodeMarker event pair.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Internal.Measurement.MeasurementBlockFactorySelector">
+            <summary>
+            Provides a property for the active MeasurementBlockFactory
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Shared.Collections.IntervalTree`1">
+            <summary>
+            An interval tree represents an ordered tree data structure to store intervals of the form [start, end).  It
+            allows you to efficiently find all intervals that intersect or overlap a provided interval.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Extensions.CommonSyntaxNodeExtensions.IsChildNode``1(Roslyn.Compilers.Common.CommonSyntaxNode,System.Func{``0,Roslyn.Compilers.Common.CommonSyntaxNode})">
+            <summary>
+            Returns true if is a given token is a child token of of a certain type of parent node.
+            </summary>
+            <typeparam name="TParent">The type of the parent node.</typeparam>
+            <param name="node">The node that we are testing.</param>
+            <param name="childGetter">A function that, when given the parent node, returns the child token we are interested in.</param>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Extensions.CommonSyntaxNodeExtensions.IsFoundUnder``1(Roslyn.Compilers.Common.CommonSyntaxNode,System.Func{``0,Roslyn.Compilers.Common.CommonSyntaxNode})">
+            <summary>
+            Returns true if this node is found underneat the specified child in the given parent.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Extensions.ISyntaxTreeInfo.ProbablyContainsIdentifier(System.String)">
+            <summary>
+            Returns true when the identifier is probably (but not guaranteed) to be within the
+            syntax tree.  Returns false when the identifier is guaranteed to not be within the the
+            syntax tree.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Extensions.INamespaceSymbolExtensions.FindNamespaces(Roslyn.Compilers.Common.INamespaceSymbol,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Searches the namespace for namespaces with the provided name.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Extensions.IProjectExtensions.FindNamespacesWithTypeName(Roslyn.Services.IProject,System.String,System.Int32,System.Threading.CancellationToken)">
+            <summary>
+            Searches the compilation for types with the provided name.  If arity is negative then
+            this will find types with any arity, otherwise the type's arity must match.  The
+            namespaces containing the type will be returned.  Nested types will not be found with
+            this search.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Extensions.IProjectExtensions.FindNamespacesWithAccessibleTypeName(Roslyn.Services.IProject,Roslyn.Compilers.Common.INamespaceOrTypeSymbol,System.String,System.Int32,System.Threading.CancellationToken)">
+            <summary>
+            Searches namespaceSymbol (and all descendents) for types with the provided name.  If
+            arity is negative then this will find types with any arity, otherwise the type's arity
+            must match.  The namespaces containing the type will be returned.  Nested types will not
+            be found with this search.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Extensions.IProjectExtensions.FindAccessibleTypes(Roslyn.Services.IProject,Roslyn.Compilers.Common.INamespaceOrTypeSymbol,System.String,System.Int32,System.Threading.CancellationToken)">
+            <summary>
+            Searches namespaceSymbol (and all descendents) for types with the provided name.  If
+            arity is negative then this will find types with any arity, otherwise the type's arity
+            must match.  Nested types will be found by this search.  Only types that are accessible
+            from the passed in context location will be returned.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Extensions.IProjectExtensions.FindTypes(Roslyn.Services.IProject,System.String,System.Int32,System.Threading.CancellationToken)">
+            <summary>
+            Searches namespaceSymbol (and all descendents) for types with the provided name.  If
+            arity is negative then this will find types with any arity, otherwise the type's arity
+            must match.  Nested types will be found by this search.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Extensions.ISyntaxTreeExtensions.GetTouchingIdentifier(Roslyn.Compilers.Common.CommonSyntaxTree,System.Int32,Roslyn.Services.Shared.LanguageServices.ISyntaxFactsService,System.Boolean)">
+            <summary>
+            Returns the identifier token touching this position, or a token of Kind = None if the
+            caret is not touching an identifier.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Extensions.ISyntaxTreeExtensions.GetTouchingWord(Roslyn.Compilers.Common.CommonSyntaxTree,System.Int32,Roslyn.Services.Shared.LanguageServices.ISyntaxFactsService,System.Boolean)">
+            <summary>
+            Returns the identifier, keyword, contextual keyword or preprocessor keyword touching this
+            position, or a token of Kind = None if the caret is not touching either.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Extensions.ISyntaxTreeExtensions.GetTouchingWordOrHashToken(Roslyn.Compilers.Common.CommonSyntaxTree,System.Int32,Roslyn.Services.Shared.LanguageServices.ISyntaxFactsService,System.Boolean)">
+            <summary>
+            Returns the identifier, keyword, contextual keyword, preprocessor keyword, or hash 
+            touching this position, or a token of Kind = None if the caret is not touching either.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Extensions.ISyntaxTreeExtensions.FindTokenOnLeft(Roslyn.Compilers.Common.CommonSyntaxTree,System.Int32,System.Boolean)">
+            <summary>
+            if two token is next to each other give one at the left
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Extensions.ITextExtensions.GetLeadingWhitespaceOfLineAtPosition(Roslyn.Compilers.IText,System.Int32)">
+            <summary>
+            Returns the leading whitespace of the line located at the specified position in the given snapshot.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Extensions.ITextLineExtensions.GetFirstNonWhitespacePosition(Roslyn.Compilers.ITextLine)">
+            <summary>
+            Returns the first non-whitespace position on the given line, or null if 
+            the line is empty or contains only whitespace.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Extensions.ITextLineExtensions.GetLastNonWhitespacePosition(Roslyn.Compilers.ITextLine)">
+            <summary>
+            Returns the last non-whitespace position on the given line, or null if 
+            the line is empty or contains only whitespace.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Extensions.ITextLineExtensions.IsEmptyOrWhitespace(Roslyn.Compilers.ITextLine)">
+            <summary>
+            Determines whether the specified line is empty or contains whitespace only.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Extensions.ITypeSymbolExtensions.FindImplementationsForInterfaceMember(Roslyn.Compilers.Common.ITypeSymbol,Roslyn.Compilers.Common.ISymbol,Roslyn.Services.ILanguageServiceProviderFactory,System.Threading.CancellationToken)">
+            <summary>
+            Returns the corresponding symbol in this type or a base type that implements 
+            interfaceMember (either implicitly or explicitly), or null if no such symbol exists
+            (which might be either because this type doesn't implement the container of
+            interfaceMember, or this type doesn't supply a member that successfully implements
+            interfaceMember).
+            </summary>
+        </member>
+        <member name="F:Roslyn.Services.Shared.Extensions.SymbolDisplayFormats.NameFormat">
+            <summary>
+            Standard format for displaying to the user.
+            </summary>
+            <remarks>
+            No return type.
+            </remarks>
+        </member>
+        <member name="F:Roslyn.Services.Shared.Extensions.SymbolDisplayFormats.SignatureFormat">
+            <summary>
+            Contains enough information to determine whether two symbols have the same signature.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.LanguageServices.ISemanticFactsService.IsSymbolAccessible(Roslyn.Compilers.Common.ISymbol,Roslyn.Compilers.Common.IAssemblySymbol)">
+            <summary>
+            Checks if 'symbol' is accessible from within assembly 'within'.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.LanguageServices.ISemanticFactsService.IsSymbolAccessible(Roslyn.Compilers.Common.ISymbol,Roslyn.Compilers.Common.INamedTypeSymbol,Roslyn.Compilers.Common.ITypeSymbol)">
+            <summary>
+            Checks if 'symbol' is accessible from within name type 'within', with an optional
+            qualifier of type "throughTypeOpt".
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.LanguageServices.ISemanticFactsService.HaveSameSignature(Roslyn.Compilers.Common.IMethodSymbol,Roslyn.Compilers.Common.IMethodSymbol)">
+            <summary>
+            Checks if the two methods have the same signature, according to the rules of the
+            language.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.Shared.LanguageServices.ISemanticFactsService.SupportsImplicitInterfaceImplementation">
+            <summary>
+            True if this language supports implementing an interface by signature only. If false,
+            implementations must specific explicitly which symbol they're implementing.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.LanguageServices.AbstractSemanticFactsService.IsSymbolAccessible(Roslyn.Compilers.Common.ISymbol,Roslyn.Compilers.Common.IAssemblySymbol)">
+            <summary>
+            Checks if 'symbol' is accessible from within assembly 'within'.  
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.LanguageServices.AbstractSemanticFactsService.IsSymbolAccessible(Roslyn.Compilers.Common.ISymbol,Roslyn.Compilers.Common.INamedTypeSymbol,Roslyn.Compilers.Common.ITypeSymbol)">
+            <summary>
+            Checks if 'symbol' is accessible from within name type 'within', with an optional
+            qualifier of type "throughTypeOpt".
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.LanguageServices.AbstractSemanticFactsService.IsSymbolAccessible(Roslyn.Compilers.Common.ISymbol,Roslyn.Compilers.Common.INamedTypeSymbol,Roslyn.Compilers.Common.ITypeSymbol,System.Boolean@)">
+            <summary>
+            Checks if 'symbol' is accessible from within assembly 'within', with
+            an qualifier of type "throughTypeOpt". Sets "failedThroughTypeCheck" to true
+            if it failed the "through type" check.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.LanguageServices.AbstractSemanticFactsService.IsSymbolAccessibleCore(Roslyn.Compilers.Common.ISymbol,Roslyn.Compilers.Common.ISymbol,Roslyn.Compilers.Common.ITypeSymbol,System.Boolean@)">
+            <summary>
+            Checks if 'symbol' is accessible from within 'within', which must be a INamedTypeSymbol or 
+            an IAssemblySymbol.  If 'symbol' is accessed off
+            of an expression then 'throughTypeOpt' is the type of that expression. This is needed to
+            properly do protected access checks. Sets "failedThroughTypeCheck" to true if this protected
+            check failed.
+            
+            NOTE(cyrusn): I expect this function to be called a lot.  As such, i do not do any memory
+            allocations in the function itself (including not making any iterators).  This does mean
+            that certain helper functions that we'd like to call are inlined in this method to
+            prevent the overhead of returning collections or enumerators.  
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.LanguageServices.ISyntaxFactsService.IsTypeCharacter(System.Char)">
+            <summary>
+            Returns true if the given character is a character which may be included in an
+            identifier to specify the type of a variable.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Utilities.BloomFilter.#ctor(System.Int32,System.Double,System.Boolean)">
+            <summary><![CDATA[
+            From the bloom filter calculator here: http://hur.st/bloomfilter?n=4&p=1.0E-20
+            
+            1) n  = Number of items in the filter
+            
+            2) p = Probability of false positives, (a double between 0 and 1).
+            
+            3) m = Number of bits in the filter
+            
+            4) k = Number of hash functions
+            
+            m = ceil((n * log(p)) / log(1.0 / (pow(2.0, log(2.0)))))
+            
+            k = round(log(2.0) * m / n)
+            ]]></summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Utilities.BloomFilter.ComputeHash(System.String,System.Int32)">
+            <summary>
+            Modification of the murmurhash2 algorithm.  Code is simpler because it operates over
+            strings instead of byte arrays.  Because each string character is two bytes, it is known
+            that the input will be an even number of bytes (though not necessarily a multiple of 4).
+            
+            This is needed over the normal 'string.GetHashCode()' because we need to be able to generate
+            'k' different well distributed hashes for any given string s.  Also, we want to be able to
+            generate these hashes without allocating any memory.  My ideal solution would be to use an
+            MD5 hash.  However, there appears to be no way to do MD5 in .Net where you can:
+            
+            a) feed it individual values instead of a byte[]
+            
+            b) have the hash computed into a byte[] you provide instead of a newly allocated one
+            
+            Generating 'k' pieces of garbage on each insert and lookup seems very wasteful.  So,
+            instead, we use murmur hash since it provides well distributed values, allows for a
+            seed, and allocates no memory.
+            
+            Murmur hash is public domain.  Actual code is included below as reference.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Shared.Utilities.CSharpPatternMatcher">
+            <summary>
+            NOTE(cyrusn): The pattern matcher is threadsafe.  However, it maintains an internal cache of
+            information as it is used.  Therefor, you should not keep it around forever and should get
+            and release the matcher appropriately once you no longer need it.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Shared.Utilities.AbstractPatternMatcher">
+            <summary>
+            NOTE(cyrusn): The pattern matcher is threadsafe.  However, it maintains an internal cache of
+            information as it is used.  Therefor, you should not keep it around forever and should get
+            and release the matcher appropriately once you no longer need it.
+            </summary>
+        </member>
+        <member name="F:Roslyn.Services.Shared.Utilities.AbstractPatternMatcher.caseSensitive">
+            <summary>
+            Whether case-sensitive matches are preferred. When set to true, this means that
+            case-sensitive matches may be prefered over a case insensitive one. For example, if the
+            candidate matches the pattern exactly but case insensitively, it will still lose to a
+            case-sensitive camel-case match.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Utilities.AbstractPatternMatcher.MatchSingleWordPattern(System.String,System.String)">
+            <summary>
+            Determines if a candidate string should matched given the user's pattern. 
+            </summary>
+            <param name="candidate">The string to test.</param>
+            <param name="pattern">The pattern to match against, which may use things like
+            Camel-Cased patterns.</param>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Utilities.AbstractPatternMatcher.MatchMultiWordPattern(System.String,System.String)">
+            <summary>
+            Determines if a given candidate string matches under a multiple word query text, as you
+            would find in features like Navigate To. Do not call. Internal only for testing
+            purposes.
+            </summary>
+            <param name="candidate">The word being tested.</param>
+            <param name="pattern">The multiple-word query pattern.</param>
+            <returns>If this was a match, a set of match types that occured while matching the
+            patterns. If it was not a match, it returns null.</returns>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Utilities.AbstractPatternMatcher.BreakIntoCharacterParts(System.String)">
+            <summary>
+            Breaks an identifier string into constituent parts. Do not call. Internal only for
+            testing purposes.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Utilities.AbstractPatternMatcher.BreakIntoWordParts(System.String)">
+            <summary>
+            Breaks an identifier string into constituent parts. Do not call. Internal only for
+            testing purposes.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Utilities.EnumValueUtilities.GetNextEnumValue(Roslyn.Compilers.Common.INamedTypeSymbol,System.Threading.CancellationToken)">
+            <summary>
+            Determines, using heuristics, what the next likely value is in this enum.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Utilities.IntegerUtilities.Convert(System.Int64,Roslyn.Compilers.SpecialType)">
+            <summary>
+            Helper as VB's CType doesn't work without arithmetic overflow.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Shared.Utilities.Matcher`1">
+            <summary>
+            Helper class to allow one to do simple regular expressions over a sequence of objects (as
+            opposed to a sequence of characters).
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Utilities.Matcher.Repeat``1(Roslyn.Services.Shared.Utilities.Matcher{``0})">
+            <summary>
+            Matcher equivalent to (m*)
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Utilities.Matcher.OneOrMore``1(Roslyn.Services.Shared.Utilities.Matcher{``0})">
+            <summary>
+            Matcher equivalent to (m+)
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Utilities.Matcher.Choice``1(Roslyn.Services.Shared.Utilities.Matcher{``0},Roslyn.Services.Shared.Utilities.Matcher{``0})">
+            <summary>
+            Matcher equivalent to (m_1|m_2)
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Utilities.Matcher.Sequence``1(Roslyn.Services.Shared.Utilities.Matcher{``0}[])">
+            <summary>
+            Matcher equivalent to (m_1 ... m_n)
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Utilities.Matcher.Single``1(System.Func{``0,System.Boolean},System.String)">
+            <summary>
+            Matcher that matches an element if the provide predicate returns true.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Shared.Utilities.MatchResultType">
+            <summary>
+            Note(cyrusn): this enum is ordered from strongest match type to weakest match type.
+            </summary>
+        </member>
+        <member name="F:Roslyn.Services.Shared.Utilities.MatchResultType.Exact">
+            <summary>
+            The candidate string matched the pattern exactly.
+            </summary>
+        </member>
+        <member name="F:Roslyn.Services.Shared.Utilities.MatchResultType.Prefix">
+            <summary>
+            The pattern was a prefix of the candidate string.
+            </summary>
+        </member>
+        <member name="F:Roslyn.Services.Shared.Utilities.MatchResultType.Substring">
+            <summary>
+            The pattern was a substring of the candidate string, but in a way that wasn't a CamelCase match.
+            </summary>
+        </member>
+        <member name="F:Roslyn.Services.Shared.Utilities.MatchResultType.CamelCase">
+            <summary>
+            The pattern was matched the CamelCased candidate string.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.Shared.Utilities.MatchResult.CamelCaseWeight">
+            <summary>
+            The weight of a CamelCase match. A higher number indicates a more accurate match.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.Shared.Utilities.MatchResult.CaseSensitive">
+            <summary>
+            Whether the match could be done case sensitively. This may be true even if case sensitivity is not
+            preferred.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.Shared.Utilities.MatchResult.ResultType">
+            <summary>
+            The type of match that occured.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Utilities.NameGenerator.EnsureUniqueness(System.Collections.Generic.IList{System.String},System.Collections.Generic.IList{System.Boolean},System.Func{System.String,System.Boolean})">
+            <summary>
+            Ensures that any 'names' is unique and does not collide with any other name.  Names t hat
+            are marked as IsFixed can not be touched.  This does mean that if there are two names
+            that are the same, and both are fixed that you will end up with non-unique names at the
+            end.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Shared.Utilities.NameGenerator.EnsureUniqueness(System.String,System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Transforms baseName into a name that does not conflict with any name in 'reservedNames'
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Shared.Utilities.NavigateToPatternMatcher">
+            <summary>
+            NOTE(cyrusn): The pattern matcher is threadsafe.  However, it maintains an internal cache of
+            information as it is used.  Therefor, you should not keep it around forever and should get
+            and release the matcher appropriately once you no longer need it.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Shared.Utilities.NodeIterator">
+            <summary>
+            an iterator that will return every single node contained by the span in the tree
+            
+            use iterator rather than visitor so that we can easily visit nodes in parallel and also
+            cache nodes so that we can avoid using expensive tree navigation again.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Shared.Utilities.ProgressTracker">
+            <summary>
+            Utility class that can be used to track the progress of an operation in a threadsafe manner.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Shared.Utilities.SymbolEquivalenceComparer">
+            <summary>
+            Provides a way to test two symbols for equivalence.  While there are ways to ask for
+            different sorts of equivalence, the following must hold for two symbols to be considered
+            equivalent.
+            
+            1) The kinds of the two symbols must match.
+            
+            2) The names of the two symbols must match.
+            
+            3) The arity of the two symbols must match.
+            
+            4) If the symbols are methods or parameterized properties, then the signatures of the two
+            symbols must match.
+            
+            5) Both symbols must be definitions or must be instantiations.  If they are instantiations,
+            then they must be instantiated in the same manner.
+            
+            6) The containing symbols of the two symbols must be equivalent.
+            
+            Note: equivalence does not concern itself with whole symbols.  Two types are considered
+            equivalent if the above hold, even if one type has different members than the other.  Note:
+            type parameters, and signature parameters are not considered 'children' when comparing
+            symbols.
+            
+            Options are provided to tweak the above slightly.  For example, by default, symbols are
+            equivalent only if they come from the same assembly.  However, one can ask if two symbols are
+            equivalent even if their assemblies differ.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Shared.Utilities.VisualBasicPatternMatcher">
+            <summary>
+            NOTE(cyrusn): The pattern matcher is threadsafe.  However, it maintains an internal cache of
+            information as it is used.  Therefor, you should not keep it around forever and should get
+            and release the matcher appropriately once you no longer need it.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.WorkspaceExtensions.ApplyChanges(Roslyn.Services.IWorkspace,Roslyn.Services.ISolution,Roslyn.Services.ISolution,System.Threading.CancellationToken)">
+            <summary>
+            Apply changes made between the old solution and the new solution to the workspace's current solution. If the changes are applied successfully
+            the method returns true.  If the workspace's current solution is not the same instance as the specified old solution then no changes are applied
+            and the method returns false.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.WeakWorkspaceListener">
+            <summary>
+            Provides an implementation of a workspace listener that is weakly attached to a real
+            listener.  By being weakly attacked, this listener will not keep the underlying object
+            alive when it is connected to a workspace.  It will also disconnect itself from the
+            workspace when it detects that its underlying listener has been collected.
+            
+            This type handles adding and removing itself from the workspace.  You should not handle
+            this yourself.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Host.IWorkspaceService">
+            <summary>
+            Empty interface just to mark workspace services.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Host.IHaveWorkspaceServices">
+            <summary>
+            Provides access to all available workspace services.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Host.IRetainer`1.GetValue(System.Threading.CancellationToken)">
+            <summary>
+            Get the value if one exists.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Host.IRetainer`1.TryGetValue(`0@)">
+            <summary>
+            Attempts to get the value if it is immediately available.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.Host.IRetainer`1.HasValue">
+            <summary>
+            True if the value is immediately available.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Host.WorkspaceServiceFactory">
+            <summary>
+            A service that enables storing and retrieving of information associated with solutions,
+            projects or documents across runtime sessions.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Workspace">
+            <summary>
+            A basic workspace that computes in-progress state via a background compiler.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IWorkspace.GetDocumentId(Roslyn.Compilers.ITextContainer)">
+            <summary>
+            Gets the document ID associated with a text container.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IWorkspace.TryGetDocument(Roslyn.Compilers.IText,Roslyn.Services.IDocument@)">
+            <summary>
+            Tries to get the document corresponding to the text from the current solution. If the document does not contain
+            the exact text a document from a new solution containing the specified text is constructed. If no document is associated
+            with the specified text's container, then the method returns false.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IWorkspace.TryGetDocumentFromInProgressSolution(Roslyn.Compilers.IText,Roslyn.Services.IDocument@)">
+            <summary>
+            Tries to get the document corresponding to the text from the current in-progress solution. If the document does not contain
+            the exact text a document from a new solution containing the specified text is constructed. If no document is associated
+            with the specified text's container, then the method returns false.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IWorkspace.AddListener(Roslyn.Services.IWorkspaceListener)">
+            <summary>
+            Adds a listener to the set of actively listening listeners.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IWorkspace.RemoveListener(Roslyn.Services.IWorkspaceListener)">
+            <summary>
+            Removes a listener from the set of actively listening listeners.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IWorkspace.ApplyChangesAsync(Roslyn.Services.ISolution,Roslyn.Services.ISolution,System.Threading.CancellationToken)">
+            <summary>
+            Apply changes made between the old solution and the new solution to the workspace's current solution. If the changes are applied successfully
+            the method returns true.  If the workspace's current solution is not the same instance as the specified old solution then no changes are applied
+            and the method returns false.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IWorkspace.AddProjectAsync(System.String,System.String)">
+            <summary>
+            Add a new project to the solution with name projectName and for the language languageName.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IWorkspace.RemoveProjectAsync(Roslyn.Services.ProjectId)">
+            <summary>
+            Remove the specified project from the workspace.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IWorkspace.AddDocumentAsync(Roslyn.Services.ProjectId,System.Collections.Generic.IEnumerable{System.String},System.String,Roslyn.Compilers.IText,Roslyn.Compilers.SourceCodeKind)">
+            <summary>
+            Adds a new document to this workspace.  Note: the supplied document name is purely a
+            preference.  If the workspace can not accommodate it, it may pick a different name for the
+            final document (for example, by appending a numerical suffix to ensure it is unique).  An
+            extension should not be provided here.  It will be automatically added for you.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.IWorkspace.CurrentSolution">
+            <summary>
+            The current solution, with the most up to date set of projects and documents. On access,
+            metadata for this solution may need to be loaded or compiled.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.IWorkspace.CurrentInProgressSolution">
+            <summary>
+            The current in-progress solution. The in-progress solution is a self-consistent version
+            of the solution that contains only projects and documents that correspond to metadata
+            that is already loaded or compiled.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.IWorkspace.Listeners">
+            <summary>
+            The set of listeners actively listening to this workspace.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Workspace.LoadSolution(System.String,System.String,System.String)">
+            <summary>
+            Creates a new workspace by loading the related projects as defined in the saved solution file.
+            </summary>
+            <param name="solutionFileName">The full path to the solution file.</param>
+            <param name="configuration">The configuration, typically "Debug" or "Release".</param>
+            <param name="platform">The platform, typically "x86" or "AnyCPU"</param>
+        </member>
+        <member name="M:Roslyn.Services.Workspace.LoadStandAloneProject(System.String,System.String,System.String,System.String)">
+            <summary>
+            Creates a new workspace with as single project by loading the project details from the specified project file.
+            Project references are converted into metadata references of existing assemblies.
+            </summary>
+            <param name="projectFileName">The full path to the project file.</param>
+            <param name="configuration">An optional configuration, typically "Debug" or "Release".</param>
+            <param name="platform">An optional platform, typically "x86" or "AnyCPU"</param>
+            <param name="language">An optional language. If null, the language is determined from the file extension.</param>
+        </member>
+        <member name="T:Roslyn.Services.Host.IBackgroundCompiler">
+            <summary>
+            Compiles projects of IWorkspace's solution asynchronously.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Host.IBackgroundCompiler.AddListener(Roslyn.Services.Host.IBackgroundCompilerListener)">
+            <summary>
+            Add a new listener.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Host.IBackgroundCompiler.RemoveListener(Roslyn.Services.Host.IBackgroundCompilerListener)">
+            <summary>
+            Remove an existing listener.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.Host.IBackgroundCompiler.Listeners">
+            <summary>
+            The listeners listening for background compiler notifications.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Host.BackgroundCompiler.AddDocument(Roslyn.Services.DocumentId)">
+            <summary>
+            Add document to list of documents identifying projects that should be built in the background.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Host.BackgroundCompiler.RemoveDocument(Roslyn.Services.DocumentId)">
+            <summary>
+            Remove document to list of documents identifying projects that should be built in the background.
+            If all documents associated with a project are removed, the project will no longer be built in the background.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Host.BackgroundCompiler.Rebuild(Roslyn.Services.ProjectId)">
+            <summary>
+            Rebuild projects in the background. If a background build is already underway it will be cancelled and a
+            new build started.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Host.IBackgroundCompilerFactory.CreateBackgroundCompiler(Roslyn.Services.IWorkspace)">
+            <summary>
+            Creates a new background compiler that builds projects of the specified workspace asynchronously.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Host.IBackgroundParser.Start">
+            <summary>
+            Put the background parser in the started state. When started calls to Parse will cause
+            parses to run.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Host.IBackgroundParser.Stop">
+            <summary>
+            Put the background parser in the stopped state. When stopped calls to Parse will not
+            cause parses to run.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Host.IBackgroundParser.Parse(Roslyn.Services.IDocument)">
+            <summary>
+            Parse the document in the background.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Host.IBackgroundParser.CancelParse(Roslyn.Services.IDocument)">
+            <summary>
+            Cancel any queued parse work for the specified document.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Host.IBackgroundParser.CancelAllParses">
+            <summary>
+            Cancel all running and queued parse work.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.Host.IBackgroundParser.IsStarted">
+            <summary>
+            True if the background parser is in the started state. This does not mean any parses are
+            actually in progress.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Host.IBackgroundParserFactory.CreateBackgroundParser(Roslyn.Services.IWorkspace)">
+            <summary>
+            Creates a new background parser that parses documents asynchronously.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Host.CostBasedRetainerFactory`1">
+            <summary>
+            A RetainerFactory that creates retainers with a retention policy based on a 
+            costing algorithm and preference toward retaining the most recently accessed values.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.MSBuild.MSBuildWorkspace">
+            <summary>
+            A workspace based directly over MSBuild solution and project files.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Host.HostWorkspace">
+            <summary>
+            A base class used by Hosts to define host specific Workspaces.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Host.TrackingWorkspace">
+            <summary>
+            A workspace that tracks open documents and versions.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IWorkspaceVersion.GetSolutionLastModified">
+            <summary>
+            Gets the time when the solution was last modified.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IWorkspaceVersion.GetProjectLastModified(Roslyn.Services.ProjectId)">
+            <summary>
+            Gets the time when the project was last modified.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IWorkspaceVersion.GetDocumentLastModified(Roslyn.Services.DocumentId)">
+            <summary>
+            Gets the time when the document was last modified.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IWorkspaceVersion.GetAnyProjectLastModified">
+            <summary>
+            Gets the time when any project in the solution was last modified.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IWorkspaceVersion.GetAnyDocumentLastModified">
+            <summary>
+            Gets the time when any document in the solution was last modified.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IWorkspaceVersion.GetAnyDocumentLastModified(Roslyn.Services.ProjectId)">
+            <summary>
+            Gets the time when any document in the specified project was last modified.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.MSBuild.MSBuildWorkspace.OpenFile(System.String)">
+            <summary>
+            Open either an entire solution or a single project file.
+            </summary>
+            <param name="fileName"></param>
+        </member>
+        <member name="M:Roslyn.Services.MSBuild.MSBuildWorkspace.OpenSolution(System.String)">
+            <summary>
+            Open an entire solution file. Close any solution file that is already open.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.MSBuild.MSBuildWorkspace.CloseSolution">
+            <summary>
+            Close the currently open solution file.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.MSBuild.MSBuildWorkspace.OpenProject(System.String)">
+            <summary>
+            Open a single project file into a new solution.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Host.IHostDocument">
+            <summary>
+            Used by HostWorkspace to access information about a source document. This data is read once
+            and is expected to be the state of the document when it is first loaded or declared, except
+            for LoadText which always returns the current source text as stored on disk.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Host.IHostDocument.LoadText(System.Threading.CancellationToken)">
+            <summary>
+            Loads the current source text from disk.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.Host.IHostDocument.Id">
+            <summary>
+            The unique Id for the document.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.Host.IHostDocument.Folders">
+            <summary>
+            The list of nested folders describing where the document logically sits with respect to
+            other documents. The folders may not match the filename.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.Host.IHostDocument.DisplayName">
+            <summary>
+            The display name of the document. The display name may not match the filename.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.Host.IHostDocument.SourceCodeKind">
+            <summary>
+            The source code kind of the document.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Host.IHostProject">
+            <summary>
+            Used by HostWorkspace to access information about a project. This data is read once and is
+            expected to be the state of the project when it is first loaded or declared.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.Host.IHostProject.Id">
+            <summary>
+            The unique Id of the project.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.Host.IHostProject.DisplayName">
+            <summary>
+            The display name of the project. This may differ from the project's filename.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.Host.IHostProject.AssemblyName">
+            <summary>
+            The name of the assembly that this project will create. Must not include the .dll or
+            .exe portion. This is not a file name.
+            </summary>,
+        </member>
+        <member name="P:Roslyn.Services.Host.IHostProject.Language">
+            <summary>
+            The language of the project.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.Host.IHostProject.InitialCompilationOptions">
+            <summary>
+            The initial compilation options for the project.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.Host.IHostProject.InitialParseOptions">
+            <summary>
+            The initial parse options for the source code documents in this project.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.Host.IHostProject.InitialDocuments">
+            <summary>
+            The list of source documents initially associated with the project.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.Host.IHostProject.InitialProjectReferences">
+            <summary>
+            The project references initially defined for the project.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.Host.IHostProject.InitialMetadataReferences">
+            <summary>
+            The metadata references initially defined for the project.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.Host.IHostProject.IsSubmission">
+            <summary>
+            Returns true if this is a submission project for interactive sessions.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.Host.IHostProject.PreviousSubmissionProjectId">
+            <summary>
+            The project ID of the previous submission, if one exists.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Host.IHostSolution">
+            <summary>
+            Used by HostWorkspace to access information about a solution. This data is read once and is
+            expected to be the state of the solution when it is first loaded or declared.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.Host.IHostSolution.Id">
+            <summary>
+            The unique Id of the solution.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.Host.IHostSolution.Projects">
+            <summary>
+            A list of projects initially associated with the solution.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.MSBuild.MSBuildWorkspace.SectionBlock">
+            <summary>
+            Represents a SectionBlock in a .sln file. Section blocks are of the form:
+            
+            Type(ParenthesizedName) = Value
+                Key = Value
+                [more keys/values]
+            EndType
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Host.ExportWorkspaceServiceFactoryAttribute">
+            <summary>
+            Specifies the exact type of the service exported by the ILanguageService.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.CompilationTracker">
+            <summary>
+            Tracks the changes made to a project and provides the facility to get a lazily built
+            compilation for that project.  As the compilation is being built, the partial results are
+            stored as well so that they can be used in the 'in progress' workspace snapshot.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.CompilationTracker.#ctor(Roslyn.Services.ProjectState)">
+            <summary>
+            Creates a tracker for the provided project.  The tracker will be in the 'empty' state
+            and will have no extra information beyond the project itself.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.CompilationTracker.Fork(Roslyn.Services.ProjectState,System.Func{Roslyn.Compilers.Common.ICompilation,System.Threading.CancellationToken,Roslyn.Compilers.Common.ICompilation},System.Threading.CancellationToken,System.Boolean)">
+            <summary>
+            Creates a new instance of the compilation info, retaining any already built
+            compilation state as the now 'old' state
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.CompilationTracker.Clone">
+            <summary>
+            Creates a fork with the same final project.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.CompilationTracker.Copy(System.Threading.CancellationToken)">
+            <summary>
+            Creates a pure copy of the compilation info.  We do this so that we can have a
+            version that we know isn't being changed as we observe it.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.CompilationTracker.WithElevatedInProgressState(Roslyn.Services.Solution,System.Threading.CancellationToken)">
+            <summary>
+            Creates a new tracker that has this tracker's in progress state elevated to 'final
+            state'.  If this tracker has no in progress state, then null is returned. Note: this
+            must only be called on a cloned workspace snapshot (with copied trackers) so that
+            the workspace is not changing while this method is executing.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.CompilationTracker.GetInProgressCompilationState(Roslyn.Services.Solution,Roslyn.Services.ProjectState@,Roslyn.Compilers.Common.ICompilation@,Roslyn.Services.SkeletonReferenceAndProject@,System.Threading.CancellationToken)">
+            <summary>
+            Tries to get the latest snapshot of the compilation without waiting for it to be
+            fully built. This method takes advantage of the progress side-effect produced during
+            BuildCompilation. It will either return the already built compilation, any
+            in-progress compilation or any known old compilation in that order of preference.
+            The compilation state that is returned will have a compilation that is retained so
+            that it cannot disappear.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.CompilationTracker.GetCompilation(Roslyn.Services.Solution,System.Threading.CancellationToken)">
+            <summary>
+            Gets or builds the compilation
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.CompilationTracker.BuildCompilation(Roslyn.Services.Solution,System.Threading.CancellationToken)">
+            <summary>
+            Builds the compilation matching the project state. In the process of building, also
+            produce in progress snapshots that can be accessed from other threads.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.CompilationTracker.GetMetadataReference(Roslyn.Services.Solution,Roslyn.Services.ProjectState,System.Threading.CancellationToken)">
+            <summary>
+            Get a metadata reference to this compilation info's compilation with respect to
+            another project. For cross language references produce a skeletal assembly. If the
+            compilation is not available, it is built. If a skeletal assembly reference is
+            needed and does not exist, it is also built.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.CompilationTracker.GetInProgressMetadataReference(Roslyn.Services.Solution,Roslyn.Services.ProjectState,System.Threading.CancellationToken)">
+            <summary>
+            Attempts to get (without waiting) a metadata reference to a possibly in progress
+            compilation. Actual compilation references are preferred over skeletal assembly
+            references.  Could potentially return null if nothing can be provided.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.CompilationTracker.GetAssemblyBytesReference(Roslyn.Services.Solution,System.Threading.CancellationToken)">
+            <summary>
+            Gets an assembly reference to a skeletal assembly for this compilation info's
+            compilation, compiling and emitting the compilation if necessary.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.CompilationTracker.Retain(Roslyn.Services.Solution,Roslyn.Compilers.Common.ICompilation)">
+            <summary>
+            Converts a compilation into a ICompilationRetainer employing an external compilation retention policy.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.CompilationTracker.HasCompilationOrIsSubmission">
+            <summary>
+            Returns true if this tracker currently either points to a compilation, has an in-progress
+            compilation being computed, or has a skeleton reference.  Note: this is simply a weak
+            statement about the tracker at this exact moment in time.  Immediately after this returns
+            the tracker might change and may no longer have a final compilation (for example, if the
+            retainer let go of it) or might not have an in-progress compilation (for example, if the
+            background compiler finished with it).
+            
+            Because of the above limitations, this should only be used by clients as a weak form of
+            information about the tracker.  For example, a client may see that a tracker has no
+            compilation and may choose to throw it away knowing that it could be reconstructed at a
+            later point if necessary.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.CompilationTracker.State">
+            <summary>
+            This base class guards all the state for the implementation.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.IDocument">
+            <summary>
+            Represents a document that is part of a solution and project. Equivalent to a single .cs or
+            .vb file, but abstracted away from the notion of a file system.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IDocument.GetText(System.Threading.CancellationToken)">
+            <summary>
+            Get the current text for the document. This method may do work to load the text from
+            disk the first time it is called.
+            
+            This operation is guaranteed to return the same text instance if called multiple times.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IDocument.TryGetText(Roslyn.Compilers.IText@)">
+            <summary>
+            Get the current text for the document if it is already loaded and available.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IDocument.GetSyntaxTree(System.Threading.CancellationToken)">
+            <summary>
+            Gets the SyntaxTree corresponding to this document. This method may do work to load the
+            text from disk and parse it into a syntax tree.
+            
+            This operation is guaranteed to return the same tree instance if called multiple times.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IDocument.TryGetSyntaxTree(Roslyn.Compilers.Common.CommonSyntaxTree@)">
+            <summary>
+            Get the current syntax tree for the document if the text is already loaded and the tree
+            is already parsed.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IDocument.GetSemanticModel(System.Threading.CancellationToken)">
+            <summary>
+            Get the semantic model corresponding to this document. This method may do work to build the 
+            compilation for the project.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IDocument.TryGetSemanticModel(Roslyn.Compilers.Common.ISemanticModel@)">
+            <summary>
+            Gets the current semantic model for this document if the model is already computed.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.IDocument.Id">
+            <summary>
+            The document's identifier. Many document instances may share the same ID, but only one
+            document in a solution may have that ID.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.IDocument.Project">
+            <summary>
+            The project this document belongs to.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.IDocument.Folders">
+            <summary>
+            The sequence of logical folders the document is contained in.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.IDocument.DisplayName">
+            <summary>
+            The display name of the document. Display names do not need to be unique within a solution.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.IDocument.IsOpened">
+            <summary>
+            True if the document is in the 'opened' state.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.IDocument.SourceCodeKind">
+            <summary>
+            The kind of source code this document contains.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.IDocument.LanguageServices">
+            <summary>
+            The language services provider you should use to get access to language specific services.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.MSBuild.ExportMSBuildLanguageServiceAttribute">
+            <summary>
+            Specifies the exact type of the service exported by the ILanguageService
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.ExportLanguageServiceAttribute">
+            <summary>
+            Specifies the exact type of the service exported by the ILanguageService.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Host.IRetainedObject">
+            <summary>
+            Optionally implemented on objects that are intended to be used with a retainer.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Host.IRetainedObject.OnEvicted">
+            <summary>
+            Called when the retainer evicts the object.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.IWorkspaceRegistryService">
+            <summary>
+            A service that allows workspaces to be registered globally, so that they can be later found
+            using IWorkspaceDiscoveryService.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IWorkspaceRegistryService.RegisterPrimaryWorkspace(Roslyn.Services.IWorkspace)">
+            <summary>
+            Register a workspace as the primary workspace. Primary workspaces are normally the
+            single workspace provided by the host.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IWorkspaceRegistryService.RegisterSecondaryWorkspace(Roslyn.Services.IWorkspace)">
+            <summary>
+            Register a workspace as a secondary workspace. Secondary workspaces are normally
+            workspaces that exist in addition to a hosts primary workspace.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IWorkspaceRegistryService.UnregisterSecondaryWorkspace(Roslyn.Services.IWorkspace)">
+            <summary>
+            Unregister a workspace as a secondary workspace.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IWorkspaceRegistryService.RegisterText(Roslyn.Compilers.ITextContainer,Roslyn.Services.IWorkspace)">
+            <summary>
+            Associate a text container with a particular workspace. A text container may only be
+            associated with a single workspace at a time.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IWorkspaceRegistryService.UnregisterText(Roslyn.Compilers.ITextContainer)">
+            <summary>
+            Disassociate a text container from a workspace.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Host.IWorkspaceTaskScheduler">
+            <summary>
+            An abstraction for running tasks either in sequence or in parallel.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Host.IWorkspaceTaskScheduler.ScheduleTask(System.Action,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Execute the task action on a thread owned by a task scheduler.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Host.IWorkspaceTaskScheduler.ScheduleTask``1(System.Func{``0},System.String,System.Threading.CancellationToken)">
+            <summary>
+            Execute the task function on a thread owned by a task scheduler and return the schedule
+            task that can be used to wait for the result.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Host.IWorkspaceTaskSchedulerFactory">
+            <summary>
+            A factory that creates either sequential or parallel task schedulers.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Host.IWorkspaceTaskSchedulerFactory.CreateTaskScheduler(System.Threading.Tasks.TaskScheduler)">
+            <summary>
+            Creates a workspace task scheduler that schedules tasks to run in parallel.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Host.IWorkspaceTaskSchedulerFactory.CreateTaskQueue(System.Threading.Tasks.TaskScheduler)">
+            <summary>
+            Creates a workspace task scheduler that schedules task to run in sequence.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Host.PersistenceService">
+            <summary>
+            A service that enables storing and retrieving of information associated with solutions,
+            projects or documents across runtime sessions.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Host.IPersistenceService">
+            <summary>
+            This service allows you to persist information relative to solution, projects and documents.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.IProject">
+            <summary>
+            Represents a snapshot of a project at any point in time.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IProject.GetCompilation(System.Threading.CancellationToken)">
+            <summary>
+            Get the compilation corresponding to this project. The first time this is called the
+            compilation will be built.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IProject.ContainsDocument(Roslyn.Services.DocumentId)">
+            <summary>
+            True if the project contains a document with the specified ID.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IProject.GetDocument(Roslyn.Services.DocumentId)">
+            <summary>
+            Get the document in this project with the specified document Id.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IProject.GetDocument(Roslyn.Compilers.Common.CommonSyntaxTree)">
+            <summary>
+            Get the document in this project with the specified syntax tree.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IProject.IsPubliclyEquivalentTo(Roslyn.Services.IProject,System.Threading.CancellationToken)">
+            <summary>
+            True if the publicly exposed symbols of this project match the specified project.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IProject.IsEquivalentTo(Roslyn.Services.IProject,System.Threading.CancellationToken)">
+            <summary>
+            True if all aspects of this project match the specified project.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IProject.GetDifferences(Roslyn.Services.IProject)">
+            <summary>
+            Gets an object that lists the added, changed and removed documents differences between this project and the specified project.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.IProject.AssemblyName">
+            <summary>
+            The name of the assembly this project represents.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.IProject.DisplayName">
+            <summary>
+            The display name of the project. This may be different than the assembly name.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.IProject.Id">
+            <summary>
+            The ID of the project. Multiple IProject instances may share the same ID. However, only
+            one project may have this ID in any given solution.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.IProject.Solution">
+            <summary>
+            The solution this project belongs to.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.IProject.LanguageServices">
+            <summary>
+            The language service provider associated with this project. You can use this provider to
+            access language specific services.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.IProject.CompilationOptions">
+            <summary>
+            The options used when building the compilation for this project.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.IProject.ParseOptions">
+            <summary>
+            The options used when parsing documents for this project.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.IProject.AssemblyResolver">
+            <summary>
+            Assembly resolver used to resolve reference names and relative paths.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.IProject.HasDocuments">
+            <summary>
+            True if the project has any documents.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.IProject.DocumentIds">
+            <summary>
+            All the document IDs associated with this project.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.IProject.Documents">
+            <summary>
+            All the documents associated with this project.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.IProject.ProjectReferences">
+            <summary>
+            The list of all other projects within the same solution that this project references.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.IProject.MetadataReferences">
+            <summary>
+            The list of all other metadata sources (assemblies) that this project references.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.IProject.IsSubmission">
+            <summary>
+            Returns true if this is a submission project.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.IProject.PreviousSubmissionProjectId">
+            <summary>
+            The ProjectId of the previous submission, if this is a chained submission.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Host.IProjectDependencyGraph.GetTopologicallySortedProjects(System.Threading.CancellationToken)">
+            <summary>
+            Returns all the projects for the solution in a topologically sorted order with respect
+            to their dependencies. That is, projects that depend on other projects will always show
+            up later than them in this stream.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Host.IProjectDependencyGraph.GetProjectsThatDirectlyDependOnThisProject(Roslyn.Services.ProjectId)">
+            <summary>
+            Gets the list of projects (topologically sorted) that directly depend on this project.
+            </summary> 
+        </member>
+        <member name="M:Roslyn.Services.Host.IProjectDependencyGraph.GetProjectsThatThisProjectDirectlyDependsOn(Roslyn.Services.ProjectId)">
+            <summary>
+            Gets the list of projects (topologically sorted) that this project directly depends on.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Host.ProjectDependencyServiceFactory.ProjectDependencyService.WorkspaceTracker">
+            <summary>
+            The workspace tracker tracks workspaces changes and resets the lazily created graph if
+            project references change
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.RecoverableTextRetainer">
+            <summary>
+            A text retainer that will save text to temporary storage when it is evicted from the retainer factory's cache and 
+            reload from that storage if and when it is needed again.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.RecoverableTextRetainer.RecoverableText">
+            <summary>
+            A fake IText wrapper that manages the lifetime and recoverability of the actual IText.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.ISolution">
+            <summary>
+            Represents a set of projects, documents and compilations.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.ContainsProject(Roslyn.Services.ProjectId)">
+            <summary>
+            True if the solution contains a project with the specified project ID.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.GetProject(Roslyn.Services.ProjectId)">
+            <summary>
+            Gets the project in this solution with the specified project ID.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.GetProjectByAssemblyName(System.String)">
+            <summary>
+            Gets the project in this solution with the specified assembly name.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.GetProjectByDisplayName(System.String)">
+            <summary>
+            Gets the project in this solution with the specified display name.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.AddProject(Roslyn.Services.ProjectId,System.String,System.String,System.String)">
+            <summary>
+            Creates a new solution instance that includes a project with the specified language and
+            names.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.AddProject(Roslyn.Services.ProjectId,System.String,System.String,System.Func{System.String},System.Func{System.Collections.Generic.IEnumerable{Roslyn.Services.DocumentInfo}},System.Func{System.Collections.Generic.IEnumerable{Roslyn.Services.ProjectId}},System.Func{System.Collections.Generic.IEnumerable{Roslyn.Compilers.MetadataReference}},System.Func{Roslyn.Compilers.Common.ICompilationOptions},System.Func{Roslyn.Compilers.Common.IParseOptions},Roslyn.Compilers.AssemblyResolver,System.Boolean,Roslyn.Services.ProjectId)">
+            <summary>
+            Create a new solution instance that includes a project with the specified language and
+            names, and has documents and references that will be defined by the function specified
+            the first time the related members of the project are accessed.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.AddProject(Roslyn.Services.IProject)">
+            <summary>
+            Create a new solution instance with a new project based on a project from a different
+            solution instance.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.RemoveProject(Roslyn.Services.ProjectId)">
+            <summary>
+            Create a new solution instance without the project specified.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.UpdateCompilationOptions(Roslyn.Services.ProjectId,Roslyn.Compilers.Common.ICompilationOptions)">
+            <summary>
+            Create a new solution instance with the project specified updated to have
+            the specified compilation options.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.UpdateParseOptions(Roslyn.Services.ProjectId,Roslyn.Compilers.Common.IParseOptions)">
+            <summary>
+            Create a new solution instance with the project specified updated to have
+            the specified parse options.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.AddProjectReference(Roslyn.Services.ProjectId,Roslyn.Services.ProjectId)">
+            <summary>
+            Create a new solution instance with the project specified updated to include
+            the specified project reference.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.AddProjectReferences(Roslyn.Services.ProjectId,System.Collections.Generic.IEnumerable{Roslyn.Services.ProjectId})">
+            <summary>
+            Create a new solution instance with the project specified updated to include
+            the specified project references.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.RemoveProjectReference(Roslyn.Services.ProjectId,Roslyn.Services.ProjectId)">
+            <summary>
+            Create a new solution instance with the project specified updated to no longer
+            include the specified project reference.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.RemoveAllProjectReferences(Roslyn.Services.ProjectId)">
+            <summary>
+            Create a new solution instance with the project specified updated to contain
+            no project references.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.AddMetadataReference(Roslyn.Services.ProjectId,Roslyn.Compilers.MetadataReference)">
+            <summary>
+            Create a new solution instance with the project specified updated to include the 
+            specified metadata reference.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.AddMetadataReferences(Roslyn.Services.ProjectId,System.Collections.Generic.IEnumerable{Roslyn.Compilers.MetadataReference})">
+            <summary>
+            Create a new solution instance with the project specified updated to include the
+            specified metadata references.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.RemoveMetadataReference(Roslyn.Services.ProjectId,Roslyn.Compilers.MetadataReference)">
+            <summary>
+            Create a new solution instance with the project specified updated to no longer include
+            the specified metadata reference.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.RemoveAllMetadataReferences(Roslyn.Services.ProjectId)">
+            <summary>
+            Create a new solution instance with the project specified updated to no longer include
+            any metadata references.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.UpdateMetadataReference(Roslyn.Services.ProjectId,Roslyn.Compilers.MetadataReference,Roslyn.Compilers.MetadataReference)">
+            <summary>
+            Create a new solution instance with the project specified updated to no longer include
+            the old metadata reference and instead include the new metadata reference.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.ContainsDocument(Roslyn.Services.DocumentId)">
+            <summary>
+            True if the solution contains the document in one of its projects
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.GetDocument(Roslyn.Services.DocumentId)">
+            <summary>
+            Gets the document in this solution with the specified document ID.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.GetDocument(Roslyn.Compilers.Common.CommonSyntaxTree)">
+            <summary>
+            Gets the document in this solution with the specified syntax tree.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.AddDocument(Roslyn.Services.DocumentId,System.String,Roslyn.Compilers.IText)">
+            <summary>
+            Creates a new solution instance with the project specified updated to include a new
+            document instance defined by its name and text.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.AddDocument(Roslyn.Services.DocumentId,System.String,System.Func{System.Threading.CancellationToken,Roslyn.Compilers.IText})">
+            <summary>
+            Creates a new solution instance with the project updated to include a new document with
+            the arguments specified.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.AddDocument(Roslyn.Services.DocumentId)">
+            <summary>
+            Creates a new solution instance with the project updated to include a new document that
+            will load its text from the file named in the document id.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.AddDocument(Roslyn.Services.IDocument)">
+            <summary>
+            Creates a new solution instance updated to include a document equivalent to the one
+            specified.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.RemoveDocument(Roslyn.Services.DocumentId)">
+            <summary>
+            Creates a new solution instance that no longer includes the specified document.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.RemoveAllDocuments(Roslyn.Services.ProjectId)">
+            <summary>
+            Creates a new solution instance with the project specified updated to no longer contain
+            any documents.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.UpdateSourceCodeKind(Roslyn.Services.DocumentId,Roslyn.Compilers.SourceCodeKind)">
+            <summary>
+            Creates a new solution instance with the document specified updated to have the source code
+            kind specified.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.UpdateFolders(Roslyn.Services.DocumentId,System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Creates a new solution instance with the document specified updated to be contained in
+            the sequence of logical folders.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.UpdateDocument(Roslyn.Services.DocumentId,Roslyn.Compilers.IText)">
+            <summary>
+            Creates a new solution instance with the document specified updated to have the text
+            specified.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.UpdateDocument(Roslyn.Services.DocumentId,Roslyn.Compilers.IText,Roslyn.Compilers.TextChangeRange[])">
+            <summary>
+            Creates a new solution instance with the document specified updated to have the text
+            specified.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.UpdateDocument(Roslyn.Services.IDocument)">
+            <summary>
+            Creates a new solution instance with the document specified updated to be equivalent to
+            the document supplied.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.OpenDocument(Roslyn.Services.DocumentId,Roslyn.Compilers.IText)">
+            <summary>
+            Creates a new solution instance with the document specified put into the open state.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.CloseDocument(Roslyn.Services.DocumentId,System.Func{System.Threading.CancellationToken,Roslyn.Compilers.IText})">
+            <summary>
+            Creates a new solution instance with the document specified put into the closed state.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.GetReferencedProjectMetadata(Roslyn.Services.ProjectId,Roslyn.Services.ProjectId,System.Threading.CancellationToken)">
+            <summary>
+            Gets the metadata reference of the to-project as seen by the from-project. The first
+            time this is called for any given project pair the metadata reference will be built.
+            This may be expensive if the two projects are of different languages. This method will
+            return the same metadata reference instance each time it is called for the same project
+            pair.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.Clone">
+            <summary>
+            Creates a cheap clone of this solution that caches results separately from the original.
+            </summary>
+            <remarks>
+            Use solution clones when doing operations that are likely to access a lot of text,
+            syntax trees or compilations. When the clone is reclaimed so will the computed results.
+            </remarks>
+        </member>
+        <member name="M:Roslyn.Services.ISolution.GetDifferences(Roslyn.Services.ISolution)">
+            <summary>
+            Gets an objects that lists the added, changed and removed project differences between
+            this solution and the specified solution.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.ISolution.Id">
+            <summary>
+            The Id of the solution. Multiple solution instances may share the same Id.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.ISolution.HasProjects">
+            <summary>
+            True if the solution contains any projects.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.ISolution.ProjectIds">
+            <summary>
+            A list of all the ids for all the projects contained by the solution.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.ISolution.Projects">
+            <summary>
+            A list of all the projects contained by the solution.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.ISolution.MetadataFileProvider">
+            <summary>
+            Provides files for metadata references of projects contained by the solution.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Solution.Load(System.String,System.String,System.String)">
+            <summary>
+            Creates a new solution by loading the related projects as defined in the saved solution file.
+            </summary>
+            <param name="solutionFileName">The full path to the solution file.</param>
+            <param name="configuration">The configuration, typically "Debug" or "Release".</param>
+            <param name="platform">The platform, typically "x86" or "AnyCPU"</param>
+        </member>
+        <member name="M:Roslyn.Services.Solution.LoadStandAloneProject(System.String,System.String,System.String,System.String)">
+            <summary>
+            Creates a new solution with as single project by loading the project details from the specified project file.
+            Project references are converted into metadata references of existing assemblies.
+            </summary>
+            <param name="projectFileName">The full path to the project file.</param>
+            <param name="configuration">An optional configuration, typically "Debug" or "Release".</param>
+            <param name="platform">An optional platform, typically "x86" or "AnyCPU"</param>
+            <param name="language">An optional language. If null, the language is determined from the file extension.</param>
+        </member>
+        <member name="M:Roslyn.Services.Solution.ForkProject(Roslyn.Services.ProjectState,System.Func{Roslyn.Compilers.Common.ICompilation,System.Threading.CancellationToken,Roslyn.Compilers.Common.ICompilation})">
+            <summary>
+            Creates a new snapshot with an updated project and an action that will produce a new
+            compilation matching the new project out of an old compilation. All dependent projects
+            are fixed-up if the change to the new project affects its public metadata, and old
+            dependent compilations are forgotten.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Solution.Roslyn#Services#ISolutionInProgress#GetInProgressSolution">
+            <summary>
+            Get a subset of this workspace that has projects for which some form of compilation is already available.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Solution.GetCompilation(Roslyn.Services.ProjectId,System.Threading.CancellationToken)">
+            <summary>
+            Get or build the compilation for the specified project
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Solution.GetReferencedProjectMetadata(Roslyn.Services.ProjectId,Roslyn.Services.ProjectId,System.Threading.CancellationToken)">
+            <summary>
+            Get a metadata reference for the 'toProject' as seen from the 'fromProject'
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Solution.GetMetadataReference(Roslyn.Services.ProjectId,Roslyn.Services.ProjectState,System.Threading.CancellationToken)">
+            <summary>
+            Get a metadata reference for the project's compilation
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.Solution.GetInProgressMetadataReference(Roslyn.Services.ProjectId,Roslyn.Services.ProjectState,System.Threading.CancellationToken)">
+            <summary>
+            Attempt to get the best readily available compilation for the project. It may be a
+            partially built compilation.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Host.ISolutionFactory">
+            <summary>
+            A factory that creates empty solutions.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Host.ITextFactory">
+            <summary>
+            A factory for creating IText instances.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Host.SyntaxTreeRetainerFactoryFactory">
+            <summary>
+            A cache of syntax trees we've seen in the workspace. Used to prevent having to reparse the
+            most recently seen parse trees over and over again.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Host.ITemporaryStorageService">
+            <summary>
+            This service allows you to access temporary storage.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.Host.ITemporaryStorage">
+            <summary>
+            TemporaryStorage can be used to read and write text to a temporary storage location.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.IWorkspaceDiscoveryService">
+            <summary>
+            This service lets you discover the available workspaces.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IWorkspaceDiscoveryService.GetWorkspaces">
+            <summary>
+            Gets all known workspaces
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IWorkspaceDiscoveryService.GetWorkspace(Roslyn.Compilers.ITextContainer)">
+            <summary>
+            Gets the workspace associated with a text container, or null if no workspace is
+            associated.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.IWorkspaceDiscoveryService.Rendezvous(Roslyn.Compilers.ITextContainer,System.Action{Roslyn.Services.IWorkspace})">
+            <summary>
+            Invokes the action when the workspace corresponding to the text container is first available.
+            </summary>
+        </member>
+        <member name="P:Roslyn.Services.IWorkspaceDiscoveryService.PrimaryWorkspace">
+            <summary>
+            The host's workspace.
+            </summary>
+        </member>
+        <member name="F:Roslyn.Services.Host.WorkspaceTaskSchedulerFactory.WorkspaceTaskScheduler.gate">
+            <summary>
+            An object to synchronize reads/writes of all mutable fields of this class.
+            </summary>
+        </member>
+        <member name="F:Roslyn.Services.Host.WorkspaceTaskSchedulerFactory.WorkspaceTaskQueue.gate">
+            <summary>
+            An object to synchronize reads/writes of all mutable fields of this class.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.SolutionExtensions.AddProject(Roslyn.Services.ISolution,System.String,System.String,System.String,Roslyn.Services.ProjectId@)">
+            <summary>
+            Create a new solution instance that includes a project with the specified language and names.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.SolutionExtensions.AddProject(Roslyn.Services.ISolution,System.String,System.String,System.String,System.Func{Roslyn.Services.ISolution,Roslyn.Services.ProjectId,Roslyn.Services.ISolution})">
+            <summary>
+            Create a new solution instance that includes a project with the specified language and names.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.SolutionExtensions.AddCSharpProject(Roslyn.Services.ISolution,System.String,System.String,System.Func{Roslyn.Services.ISolution,Roslyn.Services.ProjectId,Roslyn.Services.ISolution})">
+            <summary>
+            Create a new solution instance that includes a CSharp project with the specified names.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.SolutionExtensions.AddCSharpProject(Roslyn.Services.ISolution,System.String,System.String,Roslyn.Services.ProjectId@)">
+            <summary>
+            Create a new solution instance that includes a CSharp project with the specified names.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.SolutionExtensions.AddCSharpProject(Roslyn.Services.ISolution,Roslyn.Services.ProjectId,System.String,System.String)">
+            <summary>
+            Create a new solution instance that includes a CSharp project with the specified names.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.SolutionExtensions.AddVisualBasicProject(Roslyn.Services.ISolution,System.String,System.String,System.Func{Roslyn.Services.ISolution,Roslyn.Services.ProjectId,Roslyn.Services.ISolution})">
+            <summary>
+            Create a new solution instance that includes a Visual Basic project with the specified names.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.SolutionExtensions.AddVisualBasicProject(Roslyn.Services.ISolution,System.String,System.String,Roslyn.Services.ProjectId@)">
+            <summary>
+            Create a new solution instance that includes a Visual Basic project with the specified names.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.SolutionExtensions.AddVisualBasicProject(Roslyn.Services.ISolution,Roslyn.Services.ProjectId,System.String,System.String)">
+            <summary>
+            Create a new solution instance that includes a Visual Basic project with the specified names.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.SolutionExtensions.AddDocument(Roslyn.Services.ISolution,Roslyn.Services.ProjectId,System.String,Roslyn.Compilers.IText,Roslyn.Services.DocumentId@)">
+            <summary>
+            Create a new solution instance with the project specified updated to include a new document instance defined by its name
+            and text.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.SolutionExtensions.AddDocument(Roslyn.Services.ISolution,Roslyn.Services.ProjectId,System.String,System.String,System.Func{Roslyn.Services.ISolution,Roslyn.Services.DocumentId,Roslyn.Services.ISolution})">
+            <summary>
+            Create a new solution instance with the project specified updated to include a new document instance defined by its name
+            and text.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.SolutionExtensions.AddDocument(Roslyn.Services.ISolution,Roslyn.Services.ProjectId,System.String,System.String,Roslyn.Services.DocumentId@)">
+            <summary>
+            Create a new solution instance with the project specified updated to include a new document instance defined by its name
+            and text.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.SolutionExtensions.AddDocument(Roslyn.Services.ISolution,Roslyn.Services.ProjectId,System.String,Roslyn.Compilers.IText,System.Func{Roslyn.Services.ISolution,Roslyn.Services.DocumentId,Roslyn.Services.ISolution})">
+            <summary>
+            Create a new solution instance with the project specified updated to include a new document instance defined by its name
+            and text.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Services.SolutionExtensions.AddDocument(Roslyn.Services.ISolution,Roslyn.Services.ProjectId,System.String,Roslyn.Services.DocumentId@)">
+            <summary>
+            Creates a new solution instance with the project specified updated to include a new document that will load its text from 
+            the specified file.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.ISyntaxTreeFactoryService">
+            <summary>
+            Interface is consumable from multiple threads.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.ProjectId">
+            <summary>
+            An identifier that can be used to refer to the same IProject across versions.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Services.SolutionId">
+            <summary>
+            An identifier that can be used to refer to the same ISolution across versions. 
+            </summary>
+        </member>
+        <member name="T:Roslyn.Utilities.LazyStrongRetainer`1">
+            <summary>
+            This retainer computes a value lazily and holds onto it strongly.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Utilities.LazyWeakRetainer`1">
+            <summary>
+            This retainer computes values lazily and holds onto them weakly. If the value is accessed
+            after it has been reclaimed then it is computed again.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Utilities.LinkedHashQueue`1">
+            <summary>
+            A queue that will only allow one instance of an object inside of it at a time.  When an
+            object is enqueued that is already in the list, it is removed from its location and placed
+            at the end of the queue.  These aspects make the queue useful for LRU caches.
+            
+            This class is not threadsafe.  If you need it to be, wrap it within your own lock.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Utilities.LinkedHashQueue`1.Enqueue(`0)">
+            <summary>
+            Adds this item (or moves it if it's already in the queue) to the end.  If the item is not
+            in the list, 'true' is returned, otherwise 'false'.
+            </summary>
+        </member>
+        <member name="T:Roslyn.Utilities.ObservedStrongRetainer`1">
+            <summary>
+            This retainer as strong retention on top of another retainer.
+            </summary>
+            <remarks>When a value is accessed/observed it a strong reference is held.</remarks>
+        </member>
+        <member name="T:Roslyn.Utilities.StrongRetainer`1">
+            <summary>
+            This retainer keeps a strong reference to a value.
+            </summary>
+        </member>
+        <member name="M:Roslyn.Utilities.TaskExtensions.UnwrapWithDefault(System.Threading.Tasks.Task{System.Threading.Tasks.Task})">
+            <summary>
+            Creates a proxy <see cref="T:System.Threading.Tasks.Task">Task</see> that represents the 
+            asynchronous operation of a Task{Task}.
+            </summary>
+            <remarks>
+            It is often useful to be able to return a Task from a <see cref="T:System.Threading.Tasks.Task`1">
+            Task{TResult}</see>, where the inner Task represents work done as part of the outer Task{TResult}.  However, 
+            doing so results in a Task{Task}, which, if not dealt with carefully, could produce unexpected behavior.  Unwrap 
+            solves this problem by creating a proxy Task that represents the entire asynchronous operation of such a Task{Task}.
+            </remarks>
+            <param name="task">The Task{Task} to unwrap.</param>
+            <exception cref="T:System.ArgumentNullException">The exception that is thrown if the 
+            <paramref name="task"/> argument is null.</exception>
+            <returns>A Task that represents the asynchronous operation of the provided Task{Task}.</returns>
+        </member>
+        <member name="M:Roslyn.Utilities.TaskExtensions.UnwrapWithDefault``1(System.Threading.Tasks.Task{System.Threading.Tasks.Task{``0}})">
+            <summary>
+            Creates a proxy <see cref="T:System.Threading.Tasks.Task`1">Task{TResult}</see> that represents the 
+            asynchronous operation of a Task{Task{TResult}}.
+            </summary>
+            <remarks>
+            It is often useful to be able to return a Task{TResult} from a Task{TResult}, where the inner Task{TResult} 
+            represents work done as part of the outer Task{TResult}.  However, doing so results in a Task{Task{TResult}}, 
+            which, if not dealt with carefully, could produce unexpected behavior.  Unwrap solves this problem by 
+            creating a proxy Task{TResult} that represents the entire asynchronous operation of such a Task{Task{TResult}}.
+            </remarks>
+            <param name="task">The Task{Task{TResult}} to unwrap.</param>
+            <exception cref="T:System.ArgumentNullException">The exception that is thrown if the 
+            <paramref name="task"/> argument is null.</exception>
+            <returns>A Task{TResult} that represents the asynchronous operation of the provided Task{Task{TResult}}.</returns>        
+        </member>
+        <member name="M:Roslyn.Utilities.TaskExtensions.GenericImplementation`1.ProcessOuterTask(System.Threading.Tasks.TaskCompletionSource{`0},System.Threading.Tasks.Task)">
+            <summary>Processes an outer task of task, transferring the appropriate results to the TCS.</summary>
+            <param name="tcs">The TCS for the proxy task returned to the user.</param>
+            <param name="task">The outer Task{Task} or Task{Task{TResult}} provided by the user.</param>
+        </member>
+        <member name="M:Roslyn.Utilities.TaskExtensions.GenericImplementation`1.ProcessCompletedOuterTask(System.Threading.Tasks.TaskCompletionSource{`0},System.Threading.Tasks.Task)">
+            <summary>Processes the outer task once it's completed.</summary>
+            <param name="tcs">The TCS for the proxy task returned to the user.</param>
+            <param name="task">The outer Task{Task} or Task{Task{TResult}} provided by the user.</param>
+        </member>
+        <member name="M:Roslyn.Utilities.TaskExtensions.GenericImplementation`1.ProcessInnerTask(System.Threading.Tasks.TaskCompletionSource{`0},System.Threading.Tasks.Task)">
+            <summary>
+            Processes the inner task of a Task{Task} or Task{Task{TResult}}, 
+            transferring the appropriate results to the TCS.
+            </summary>
+            <param name="tcs">The TCS for the proxy task returned to the user.</param>
+            <param name="task">The inner task returned by the task provided by the user.</param>
+        </member>
+        <member name="M:Roslyn.Utilities.TaskExtensions.GenericImplementation`1.TrySetFromTask(System.Threading.Tasks.TaskCompletionSource{`0},System.Threading.Tasks.Task)">
+            <summary>Transfer the completion status from "task" to "tcs".</summary>
+            <param name="tcs">The target TCS to which the results of <paramref name="task"/> should be transfered.</param>
+            <param name="task">The source task whose results should be transfered to <paramref name="tcs"/>.</param>
+            <returns>true if the transfer was successful; otherwise, false.</returns>
+        </member>
+        <member name="M:Roslyn.Utilities.TaskFactoryExtensions.Delay(System.Threading.Tasks.TaskFactory,System.TimeSpan)">
+            <summary>
+            Creates a Task that will complete after a time delay.
+            </summary>
+            <param name="factory">Extension parameter</param>
+            <param name="delay">The time span to wait before completing the returned Task</param>
+            <returns>A Task that represents the time delay</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="delay"/> is less than -1 or greater than Int32.MaxValue.
+            </exception>
+            <remarks>
+            After the specified time delay, the Task is completed in RanToCompletion state.
+            </remarks>
+        </member>
+        <member name="M:Roslyn.Utilities.TaskFactoryExtensions.Delay(System.Threading.Tasks.TaskFactory,System.TimeSpan,System.Threading.CancellationToken)">
+            <summary>
+            Creates a Task that will complete after a time delay.
+            </summary>
+            <param name="factory">Extension parameter</param>
+            <param name="delay">The time span to wait before completing the returned Task</param>
+            <param name="cancellationToken">The cancellation token that will be checked prior to completing the returned Task</param>
+            <returns>A Task that represents the time delay</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="delay"/> is less than -1 or greater than Int32.MaxValue.
+            </exception>
+            <exception cref="T:System.ObjectDisposedException">
+            The provided <paramref name="cancellationToken"/> has already been disposed.
+            </exception>        
+            <remarks>
+            If the cancellation token is signaled before the specified time delay, then the Task is completed in
+            Canceled state.  Otherwise, the Task is completed in RanToCompletion state once the specified time
+            delay has expired.
+            </remarks>        
+        </member>
+        <member name="M:Roslyn.Utilities.TaskFactoryExtensions.Delay(System.Threading.Tasks.TaskFactory,System.Int32)">
+            <summary>
+            Creates a Task that will complete after a time delay.
+            </summary>
+            <param name="factory">Extension parameter</param>
+            <param name="millisecondsDelay">The number of milliseconds to wait before completing the returned Task</param>
+            <returns>A Task that represents the time delay</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="millisecondsDelay"/> is less than -1.
+            </exception>
+            <remarks>
+            After the specified time delay, the Task is completed in RanToCompletion state.
+            </remarks>
+        </member>
+        <member name="M:Roslyn.Utilities.TaskFactoryExtensions.Delay(System.Threading.Tasks.TaskFactory,System.Int32,System.Threading.CancellationToken)">
+            <summary>
+            Creates a Task that will complete after a time delay.
+            </summary>
+            <param name="factory">Extension parameter</param>
+            <param name="millisecondsDelay">The number of milliseconds to wait before completing the returned Task</param>
+            <param name="cancellationToken">The cancellation token that will be checked prior to completing the returned Task</param>
+            <returns>A Task that represents the time delay</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="millisecondsDelay"/> is less than -1.
+            </exception>
+            <exception cref="T:System.ObjectDisposedException">
+            The provided <paramref name="cancellationToken"/> has already been disposed.
+            </exception>        
+            <remarks>
+            If the cancellation token is signaled before the specified time delay, then the Task is completed in
+            Canceled state.  Otherwise, the Task is completed in RanToCompletion state once the specified time
+            delay has expired.
+            </remarks>        
+        </member>
+        <member name="T:Roslyn.Utilities.WeakRetainer`1">
+            <summary>
+            This retainer keeps a weak reference to a value.
+            </summary>
+        </member>
+    </members>
+</doc>
