@@ -190,6 +190,7 @@ namespace TestCode
             Assert.NotNull(pubOps.FirstOrDefault(x => x.Token.MilTokenType == MilTokenType.Command));
             Assert.NotNull(pubOps.Skip(1).FirstOrDefault(x => x.Token.MilTokenType == MilTokenType.Publisher));
             Assert.NotNull(pubOps.Skip(2).FirstOrDefault(x => x.Token.MilTokenType == MilTokenType.CommandHandler));
+            Assert.NotNull(pubOps.Skip(3).First());
         }
 
     }

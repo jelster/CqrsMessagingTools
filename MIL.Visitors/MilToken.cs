@@ -82,6 +82,8 @@ namespace MIL.Visitors
         /// </summary>
         public static readonly MilTypeConstant DelaySend;
 
+        public static readonly MilTypeConstant StateDefinitionToken;
+
         static MilTypeConstant()
         {
             // TODO: initialize these services in some other way...
@@ -126,6 +128,7 @@ namespace MIL.Visitors
             DelaySend = new MilTypeConstant(MilTokenType.Delay, strDelayToken, "{0}{1}");
             tokenList.Add(DelaySend);
 
+            StateDefinitionToken = new MilTypeConstant(MilTokenType.LanguageElement, strProcessingHintToken, "{1}{0}");
             AllTokens = tokenList;
         }
 

@@ -1,0 +1,44 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+Roslyn.Services.VisualBasic
+</name>
+</assembly>
+<members>
+<member name="P:My.Resources.Resources.ResourceManager">
+	<summary>
+  Returns the cached ResourceManager instance used by this class.
+</summary>
+</member><member name="P:My.Resources.Resources.Culture">
+	<summary>
+  Overrides the current thread's CurrentUICulture property for all
+  resource lookups using this strongly typed resource class.
+</summary>
+</member><member name="T:My.Resources.Resources">
+	<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
+</member><member name="T:Roslyn.Services.VisualBasic.VisualBasicSyntaxTreeFactoryService.WeakSyntaxTree">
+	<summary>
+ Represents a syntax tree that only has a weak reference to its
+ underlying data. This way it can be passed around without forcing
+ the underlying full tree to stay alive. Think of it more as a
+ key that can be used to identify a tree rather than the tree itself.
+ </summary>
+</member><member name="T:Roslyn.Services.VisualBasic.VisualBasicSyntaxTreeFactoryService.PositionalSyntaxReference">
+	<summary>
+ Represents a syntax reference that doesn't actually hold onto the referenced node.
+ Instead, enough data is held onto so that the node can be recovered and returned if
+ necessary.
+ </summary>
+</member><member name="T:Roslyn.Services.VisualBasic.VisualBasicSyntaxTreeFactoryService.NullSyntaxReference">
+	<summary>
+ Represents a syntax reference that was passed a null
+ reference to a node. In this case, we just hold onto the
+ weak tree reference and throw if any invalid properties
+ are accessed.
+ </summary>
+</member>
+</members>
+</doc>
