@@ -135,7 +135,7 @@ namespace Foo.Web
             public void when_process_incomplete_returns_empty_token()
             {
                 var otherSut = new AnalysisService();
-                var otherToken = otherSut.GetProcessToken(AppCompilation, "");
+                var otherToken = otherSut.GetProcessToken(null, null);
 
                 Assert.True(otherToken.Token == MilTypeConstant.EndOfStatementToken);
             }

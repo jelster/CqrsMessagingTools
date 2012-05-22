@@ -29,29 +29,31 @@ namespace MIL.Services
             return processDefinition.StateEnum.MemberNames;
         }
 
-        public MilToken GetProcessToken(Compilation appCompilation, string process)
+        public MilToken GetProcessToken(Compilation appCompilation, string process = "")
         {
+            if (appCompilation == null) return TokenFactory.GetStatementTerminator();
+
             var p = ExtractProcessFromCompiledSource(appCompilation, process);
             return ProcessDefinition.GetTokenFromDefinition(p);
         }
 
         private ProcessDefinition ExtractProcessFromCompiledSource(Compilation compilation, string processName)
         {
-            if (string.IsNullOrWhiteSpace(processName)) return null;
-
-            var processType =
-                from glob in compilation.Assembly.GlobalNamespace
-                    .GetMembers()
-                    .OfType<NamespaceOrTypeSymbol>()
-                from childNs in glob
-                    .GetMembers()
-                    .OfType<NamespaceSymbol>()
-                from childTypes in childNs.GetTypeMembers()
-                select childTypes;
+            //var processType =
+            //    from glob in compilation.Assembly.GlobalNamespace
+            //        .GetMembers()
+            //        .OfType<NamespaceOrTypeSymbol>()
+            //    from childNs in glob
+            //        .GetMembers()
+            //        .OfType<NamespaceSymbol>()
+            //    from childTypes in childNs.GetTypeMembers()
+            //    select childTypes;
+            var w = new Walk();
+            var processType = w.Visit(compilation.Assembly.GlobalNamespace);
 
             if (!processType.Any()) return null;
 
-            var processSymbol = processType.SingleOrDefault(x => x.Name.Contains(processName));
+            var processSymbol = processType.FirstOrDefault(x => x.Name.Contains(processName ?? ""));
 
             if (processSymbol == null) return null;
 
@@ -60,13 +62,25 @@ namespace MIL.Services
             
             return p;
         }
-    }
 
+    }
+class Walk : SymbolVisitor<NamespaceSymbol, IEnumerable<NamedTypeSymbol>>
+{
+
+    protected override IEnumerable<NamedTypeSymbol> VisitNamespace(NamespaceSymbol symbol, NamespaceSymbol argument)
+    {
+        foreach (var ns in symbol.GetNamespaceMembers())
+        {
+            return VisitNamespace(ns, argument);
+        }
+        return symbol.GetTypeMembers();
+    }
+}
     class ProcessDefinition
     {
         public ProcessDefinition(NamedTypeSymbol process, string ifxName)
         {
-            ProcessInterface = process.Interfaces.First(x => x.Name.Contains(ifxName));
+            ProcessInterface = process.Interfaces.ToList().First(x => x.Name.Contains(ifxName));
             ProcessName = process.Name;
             ProcessInterfaceName = ifxName;
             ProcessType = process;
