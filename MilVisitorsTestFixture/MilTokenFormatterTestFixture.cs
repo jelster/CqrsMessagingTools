@@ -10,15 +10,18 @@ namespace MilVisitorsTestFixture
 	{
 		protected MilToken sut;
 		protected string result;
-		public virtual void returns_properly_formatted_string()
+
+        [Fact]
+	    public abstract void returns_properly_formatted_string();
+
+		protected void AssertStringTokenBase()
 		{
 			result = sut.ToString();
 			Assert.True(result.Contains(sut.Token.MilToken));
 			Console.Write(result);
 		}
 	}
-	public class given_a_MIL_token
-	{
+	 
 		public class when_command_token_converted_to_string : MilTokenFormatterTestFixture
 		{
 			public when_command_token_converted_to_string()
@@ -29,7 +32,7 @@ namespace MilVisitorsTestFixture
 			[Fact]
 			public override void returns_properly_formatted_string()
 			{
-				base.returns_properly_formatted_string();
+				base.AssertStringTokenBase();
 
 				Assert.True(result == "Barmand?");
 				Console.WriteLine(result);
@@ -46,13 +49,13 @@ namespace MilVisitorsTestFixture
 			[Fact]
 			public override void returns_properly_formatted_string()
 			{
-				base.returns_properly_formatted_string();
+				base.AssertStringTokenBase();
 
 				Assert.True(result == "Foovent!");
 				Console.WriteLine(result);
 			}
 		}
-	}
+	
 
 	public class given_a_MIL_statement
 	{
