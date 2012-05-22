@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Roslyn.Compilers.CSharp;
 
-namespace MIL.Visitors
+namespace SyntaxHelperUtilities
 {
     public static class SyntaxExtensions
     {
@@ -13,7 +13,7 @@ namespace MIL.Visitors
 
         public static bool CollectionContainsClassName<T>(this IEnumerable<T> collection, string name) where T : BaseTypeDeclarationSyntax
         {
-            return collection.Any(x => x.GetClassName() == name);
+            return collection.Any(x => GetClassName(x) == name);
         }
          
     }

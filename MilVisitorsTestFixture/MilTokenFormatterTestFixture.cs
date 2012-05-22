@@ -11,8 +11,8 @@ namespace MilVisitorsTestFixture
 		protected MilToken sut;
 		protected string result;
 
-        [Fact]
-	    public abstract void returns_properly_formatted_string();
+		[Fact]
+		public abstract void returns_properly_formatted_string();
 
 		protected void AssertStringTokenBase()
 		{

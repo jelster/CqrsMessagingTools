@@ -11,29 +11,34 @@ namespace MIL.Services
 {
     public class AnalysisService
     {
-        // TODO: Parameterize this name
-        private const string ProcessIfxName = "IProcess";
+        private readonly string ProcessIfxName;
 
-        private readonly Func<NamedTypeSymbol, NamedTypeSymbol> defaultStateDiscoveryStrategy = procSym => procSym.GetMembers().OfType<NamedTypeSymbol>().FirstOrDefault(x => x.TypeKind == TypeKind.Enum); 
+        private readonly Func<NamedTypeSymbol, NamedTypeSymbol> defaultStateDiscoveryStrategy = procSym => procSym.GetMembers().OfType<NamedTypeSymbol>().FirstOrDefault(x => x.TypeKind == TypeKind.Enum);
+
+        public AnalysisService(string processInterfaceName = "IProcess")
+        {
+            ProcessIfxName = processInterfaceName;
+        }
 
         public IEnumerable<string> GetProcessStateNames(Compilation appCompilation, string process)
         {
-            var nestedEnum = ExtractProcessFromCompiledSource(appCompilation, process);
+            var processDefinition = ExtractProcessFromCompiledSource(appCompilation, process);
 
-            if (nestedEnum == null) return null;
-             
-            return nestedEnum.StateEnum.MemberNames;
+            if (processDefinition == null) return null;
+
+            return processDefinition.StateEnum.MemberNames;
         }
 
         public MilToken GetProcessToken(Compilation appCompilation, string process)
         {
-           var p = ExtractProcessFromCompiledSource(appCompilation, process);
-            return p.GetToken();
-
+            var p = ExtractProcessFromCompiledSource(appCompilation, process);
+            return ProcessDefinition.GetTokenFromDefinition(p);
         }
 
         private ProcessDefinition ExtractProcessFromCompiledSource(Compilation compilation, string processName)
         {
+            if (string.IsNullOrWhiteSpace(processName)) return null;
+
             var processType =
                 from glob in compilation.Assembly.GlobalNamespace
                     .GetMembers()
@@ -52,13 +57,13 @@ namespace MIL.Services
 
             var p = new ProcessDefinition(processSymbol, ProcessIfxName);
             p.SetStateEnumUsingStrategy(defaultStateDiscoveryStrategy);
+            
             return p;
         }
     }
 
     class ProcessDefinition
     {
-        
         public ProcessDefinition(NamedTypeSymbol process, string ifxName)
         {
             ProcessInterface = process.Interfaces.First(x => x.Name.Contains(ifxName));
@@ -67,8 +72,9 @@ namespace MIL.Services
             ProcessType = process;
         }
 
+        public bool IsDefinitionComplete { get { return StateEnum != null && StateProperty != null && ProcessType != null && ProcessInterface != null; } }
         public NamedTypeSymbol StateEnum { get; private set; }
-        public PropertySymbol StateProperty { get; private set;}
+        public PropertySymbol StateProperty { get; private set; }
         public NamedTypeSymbol ProcessType { get; private set; }
         public NamedTypeSymbol ProcessInterface { get; private set; }
 
@@ -80,9 +86,12 @@ namespace MIL.Services
             StateEnum = strategy(ProcessType);
             StateProperty = ProcessType.GetMembers().OfType<PropertySymbol>().First(x => x.Type == StateEnum);
         }
-        public MilToken GetToken()
+
+        public static MilToken GetTokenFromDefinition(ProcessDefinition definition)
         {
-            return TokenFactory.GetStateDefinition(ProcessName, StateProperty.Name, StateEnum.MemberNames);
+            return (definition == null || !definition.IsDefinitionComplete) ? 
+                TokenFactory.GetStatementTerminator() 
+                : TokenFactory.GetStateDefinition(definition.ProcessName, definition.StateProperty.Name, definition.StateEnum.MemberNames);
         }
     }
 }

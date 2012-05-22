@@ -63,7 +63,7 @@ namespace MIL.Visitors
 
         public static MilToken GetStateDefinition(string processName, string statePropertyName, IEnumerable<string> stateFlags)
         {
-            return new MilToken(MilTypeConstant.StateDefinitionToken, string.Format("{0}, {1}:[{2}]", processName, statePropertyName, string.Join(",", stateFlags)));
+            return new MilToken(MilTypeConstant.StateDefinitionToken, string.Format("{0}, {1}:[{2}]", processName, statePropertyName, string.Join(", ", stateFlags)));
         }
     }
 }

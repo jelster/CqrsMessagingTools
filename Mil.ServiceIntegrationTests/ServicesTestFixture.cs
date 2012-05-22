@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MIL.Services;
 using MIL.Visitors;
 using Roslyn.Compilers;
@@ -122,9 +123,21 @@ namespace Foo.Web
             [Fact]
             public void when_process_analyzed_gets_state_tokens()
             {
-                MilToken tokens = sut.GetProcessToken(AppCompilation, Shortprocess);
-                Assert.NotNull(tokens);
+                MilToken token = sut.GetProcessToken(AppCompilation, Shortprocess);
+                Assert.NotNull(token);
+                 
+                Assert.True(token.MemberName == "ShortProcess, State:[NoState, StateA, DifferentState]");
+                Assert.True(token.Token == MilTypeConstant.StateDefinitionToken);
+                Assert.True(token.ToString() == "%ShortProcess, State:[NoState, StateA, DifferentState]");
+            }
 
+            [Fact]
+            public void when_process_incomplete_returns_empty_token()
+            {
+                var otherSut = new AnalysisService();
+                var otherToken = otherSut.GetProcessToken(AppCompilation, "");
+
+                Assert.True(otherToken.Token == MilTypeConstant.EndOfStatementToken);
             }
         }
     }
