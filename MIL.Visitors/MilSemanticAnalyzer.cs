@@ -13,7 +13,21 @@ namespace MIL.Visitors
         public MilSemanticAnalyzer(Compilation compilation)
         {
             _compilation = compilation;
-            
+            ValidateCompilation();
+        }
+
+        private void ValidateCompilation()
+        {
+            const int CSErrorRoslynUnimplemented = 8000;
+            var diags = _compilation.GetDeclarationDiagnostics().Where(x => x.Info.Code != CSErrorRoslynUnimplemented).ToList();
+            if (!diags.Any())
+            {
+                return;
+            }
+            var msg = string.Format("Errors exist in the compilation. Correct these issues and try again{1}{0}",
+                                    string.Join(Environment.NewLine, diags.Select(x => x.ToString())),
+                                    Environment.NewLine);
+            throw new InvalidOperationException(msg);
         }
 
         public MilSyntaxWalker ExtractMessagingSyntax()
@@ -30,30 +44,29 @@ namespace MIL.Visitors
 
         public IEnumerable<MilToken> GetMessagePublicationData()
         {
-            if (walker == null)
-            {
-                ExtractMessagingSyntax();
-            }
+            ExtractMessagingSyntax();
             var pubs = walker.PublicationCalls;
-            var model = _compilation.GetSemanticModel(_compilation.SyntaxTrees.First());
+            
             List<MilToken> tokens = new List<MilToken>();
             foreach (var stmt in pubs)
             {
-                var dataFlow = model.AnalyzeRegionDataFlow(stmt.FullSpan);
-                var send = (LocalSymbol)dataFlow.ReadOutside.First();
+                var model = _compilation.GetSemanticModel(_compilation.SyntaxTrees.Single(x => x.Root.DescendentNodesAndSelf().Contains(stmt)));
+                var info = model.GetSemanticInfo(stmt.Expression);
 
-                var cmdDef = walker.Commands.FirstOrDefault(x => x.Identifier.GetText().Contains(send.Type.Name));
-                if (cmdDef != null)
-                {
-                    var handler = walker.CommandHandlersWithCommands.First(x => x.Value.Any(g => g.TypeArgumentList.Arguments.Select(ar => ar.PlainName).Contains(send.Type.Name))).Key;
-                    if (handler != null)
-                    {
-                        tokens.Add(TokenFactory.GetCommand(send.Type.Name));
-                        tokens.Add(TokenFactory.GetPublish());
-                        tokens.Add(TokenFactory.GetCommandHandler(handler.Identifier.GetText()));
-                        tokens.Add(TokenFactory.GetStatementTerminator());
-                    }
-                }
+                
+                var sendSymbols = info.Type;
+               
+                    var cmdDef = walker.Commands.FirstOrDefault(x => x.Identifier.GetText() == sendSymbols.Name);
+                    if (cmdDef == null) continue;
+
+                    var handler = walker.CommandHandlersWithCommands.First(x => x.Value.Any(g => g.TypeArgumentList.Arguments.Select(ar => ar.PlainName).Contains(sendSymbols.Name))).Key;
+                    if (handler == null) continue;
+
+                    tokens.Add(TokenFactory.GetCommand(sendSymbols.Name));
+                    tokens.Add(TokenFactory.GetPublish());
+                    tokens.Add(TokenFactory.GetCommandHandler(handler.Identifier.GetText()));
+                    tokens.Add(TokenFactory.GetStatementTerminator());
+                
 
                 // TODO: add discrimination logic for events/commands
                 // TODO: find handler from command

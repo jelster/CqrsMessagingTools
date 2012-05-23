@@ -127,7 +127,7 @@ namespace MilGenerator
             ISolution sln = null;
             try
             {
-                sln = Solution.Load(slnPath);
+                sln = Solution.Load(slnPath, "Debug", "AnyCPU");
             }
             catch (Exception ex)
             {
@@ -142,24 +142,34 @@ namespace MilGenerator
             //    messagePump.OnError(new ArgumentException(msg));
             //    return;
             //}
-            SendMessage(string.Format("Using {0} for process discovery", processTypeName ?? processIName));
+            SendMessage(string.Format("Using {0} for process discovery{1}", processTypeName ?? processIName, Environment.NewLine));
             
             var token = new CancellationToken();
             var analyzer = new MIL.Services.ProcessAnalysisService(processIName);
+             
             ProcessDefinition processDefinition = null;
             foreach (var proj in sln.Projects)
             {
                 //if (proj.AssemblyName == externalProject.AssemblyName)
                 //    continue;
-
-                var compilation = proj.GetCompilation(token);
                 
-                processDefinition = analyzer.GetProcessDefinition((Compilation)compilation, processTypeName);
-                if (processDefinition == null) continue;
+                var compilation = (Compilation) proj.GetCompilation(token);
+                processDefinition = analyzer.GetProcessDefinition(compilation, processTypeName);
+                
+                var semantics = new MilSemanticAnalyzer(compilation);
+                var pub = semantics.ExtractMessagingSyntax();
 
-                var procToke = ProcessDefinition.GetTokenFromDefinition(processDefinition);
-                if (procToke.Token != MilTypeConstant.EmptyToken)
-                    SendMessage(processDefinition.ToString());
+                if (processDefinition != null)
+                {
+                    var procToke = ProcessDefinition.GetTokenFromDefinition(processDefinition);
+
+                    if (procToke.Token != MilTypeConstant.EmptyToken)
+                        SendMessage(procToke.ToString());
+                }
+                foreach (var pubCall in semantics.GetMessagePublicationData())
+                {
+                    SendMessage(pubCall.ToString());
+                }
             }
 
             messagePump.OnCompleted();

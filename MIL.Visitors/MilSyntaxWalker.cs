@@ -110,7 +110,9 @@ namespace MIL.Visitors
         private void LookForCommandHandlers(ClassDeclarationSyntax node)
         {
             var handles = _cmdHandlerDeclarationVisitor.Visit(node);
-            if (handles.Any())
+
+            // TODO: how should duplicate keys be handled? Error condition, or normal (uncommon) condition?
+            if (handles.Any() && !CommandHandlersWithCommands.ContainsKey(node))
             {
                 CommandHandlersWithCommands.Add(node, handles.ToList());
             }

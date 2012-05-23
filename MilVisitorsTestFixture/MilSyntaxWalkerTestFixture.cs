@@ -13,12 +13,12 @@ namespace MilVisitorsTestFixture
     {
         #region Code string
 
-        private const string Code =
-            @"
-namespace TestCode 
+        private const string infraCode = @"
+namespace TestCode.Infrastructure
 {
-    using System;  
+    using System;
     
+    public interface IBus { void Send(ICommand cmd); }
     public interface ICommand {}
     public interface IEvent {}
     public interface ICommandHandler<T> where T : ICommand
@@ -26,16 +26,50 @@ namespace TestCode
         void Handles(T command);
     }
     public interface IEventHandler<T> where T : IEvent {}
+}";
+
+        private const string programCode = @"
+namespace TestCode.Program
+{	
+    using TestCode.Infrastructure;
+    using TestCode.Logic;
+
+    public class Program
+    {		
+        public Program()
+        {
+              
+        }
+        public static void Main()
+        {
+            IBus bus = new MyBus();
+            var handler = new FoomandHandler();
+            var cmd = new Foo();
+            
+            bus.Send(cmd);             
+        }         
+    }
+
+    
+    public class MyBus : IBus
+    {
+        public void Send(ICommand cmd) {}
+    }
+                            
+}";
+        private const string Code = @"
+namespace TestCode.Logic
+{
+    using System;
+    using TestCode.Infrastructure;
 
     public class Foo : ICommand { }	                           
     public class FoomandHandler : ICommandHandler<Foo>
     {
         public void Handles(Foo command)
         {
-            Console.Write(""Foomand handled {0}"", command.Name);
-        }
-
-        public void Send(ICommand cmd) { Handles(cmd); }
+            Console.Write(""Foomand handled {0}"", command.GetType().Name);
+        }		
     }   
     public class BadFooHandler : ICommandHandler<Foo> 
     { 
@@ -44,45 +78,27 @@ namespace TestCode
     public class Bar : IEvent {}
     public class Foobar : IEvent {}
     public class BarventHandler : IEventHandler<Bar> {}
-    public class OtherventHandler : IEventHandler<Bar>, IEventHandler<Foobar> {}               
-    public class Program
-    {
-        IBus bus;
-        public Program()
-        {
-            bus = new MyBus();
-        }
-        public static void Main()
-        {
-            var handler = new FoomandHandler();
-            var cmd = new Foo();
-            
-            bus.Send(cmd);
-            Send(cmd);
-        }
-        public void Send(ICommand cmd) { }		
-    }
-
-    public interface IBus { void Send(ICommand cmd); }
-    public class MyBus : IBus
-    {
-        public void Send(ICommand cmd) {}
-    }
-                            
+    public class OtherventHandler : IEventHandler<Bar>, IEventHandler<Foobar> {}
 }";
         #endregion
 
         public class given_a_syntax_tree
         {
-            protected SyntaxTree tree;
+            protected SyntaxTree declarationTree;
             private readonly MilSyntaxWalker sut;
             protected Compilation compilation;
+            private SyntaxTree infraTree;
+            private SyntaxTree logicTree;
+
             public given_a_syntax_tree()
             {
-                tree = SyntaxTree.ParseCompilationUnit(Code);
+                declarationTree = SyntaxTree.ParseCompilationUnit(Code);
+                logicTree = SyntaxTree.ParseCompilationUnit(programCode);
+                infraTree = SyntaxTree.ParseCompilationUnit(infraCode);
                 compilation = Compilation.Create("test.exe")
-                    .AddSyntaxTrees(tree)
-                    .UpdateOptions(new CompilationOptions("TestCode.Program", "Program"))
+                    .AddSyntaxTrees(infraTree)
+                    .AddSyntaxTrees(declarationTree)
+                    .AddSyntaxTrees(logicTree)
                     .AddReferences(new AssemblyFileReference(typeof(object).Assembly.Location));
 
                 sut = new MilSyntaxWalker();
@@ -91,7 +107,7 @@ namespace TestCode
             [Fact]
             public void when_walker_visits_command_class_declaration_adds_to_command_list()
             {
-                SyntaxNode node = tree.Root;
+                SyntaxNode node = declarationTree.Root;
                 sut.Visit(node);
 
                 Assert.NotEmpty(sut.Commands);
@@ -102,7 +118,7 @@ namespace TestCode
             [Fact]
             public void when_walker_visits_command_handler_class_declaration_added_to_cmd_handler_list()
             {
-                var node = tree.Root;
+                var node = declarationTree.Root;
                 sut.Visit(node);
 
                 Assert.NotEmpty(sut.CommandHandlers);
@@ -113,7 +129,7 @@ namespace TestCode
             [Fact]
             public void when_walker_visits_node_with_publish_operation_adds_to_publication_list()
             {
-                var node = tree.Root;
+                var node = logicTree.Root;
                 sut.Visit(node);
 
                 Assert.NotEmpty(sut.PublicationCalls);
@@ -123,7 +139,7 @@ namespace TestCode
             [Fact]
             public void when_walker_visits_event_class_declaration_adds_to_event_list()
             {
-                var node = tree.Root;
+                var node = declarationTree.Root;
                 sut.Visit(node);
 
                 Assert.NotEmpty(sut.Events);
@@ -134,7 +150,7 @@ namespace TestCode
             [Fact]
             public void when_walker_visits_event_handler_class_adds_to_event_handlers_list()
             {
-                var node = tree.Root;
+                var node = declarationTree.Root;
                 sut.Visit(node);
 
                 Assert.NotEmpty(sut.EventHandlers);
@@ -152,7 +168,7 @@ namespace TestCode
             [Fact]
             public void when_multiple_event_handlers_for_same_event_walker_finds_all()
             {
-                var node = tree.Root;
+                var node = declarationTree.Root;
                 sut.Visit(node);
                 
                 var handles = sut.EventToEventHandlersMapping.Single(x => x.Key == "Bar");
@@ -167,7 +183,6 @@ namespace TestCode
                 var analysis = new MilSemanticAnalyzer(compilation);
                 var walker = analysis.ExtractMessagingSyntax();
                 Assert.True(walker.PublicationCalls.Count == 1);
-                 
             }
         }
     }
