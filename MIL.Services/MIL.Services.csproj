@@ -42,8 +42,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AnalysisService.cs" />
+    <Compile Include="ProcessAnalysisService.cs" />
+    <Compile Include="ProcessDefinition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Walk.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MIL.Visitors\MIL.Visitors.csproj">

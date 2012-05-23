@@ -65,5 +65,10 @@ namespace MIL.Visitors
         {
             return new MilToken(MilTypeConstant.StateDefinitionToken, string.Format("{0}, {1}:[{2}]", processName, statePropertyName, string.Join(", ", stateFlags)));
         }
+
+        public static MilToken GetEmptyToken()
+        {
+            return new MilToken(MilTypeConstant.EmptyToken);
+        }
     }
 }

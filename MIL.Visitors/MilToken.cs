@@ -19,6 +19,7 @@ namespace MIL.Visitors
 
         private readonly string tokenFormat;
 
+        public static readonly MilTypeConstant EmptyToken;
         public static IEnumerable<MilTypeConstant> AllTokens;
 
         /// <summary>
@@ -91,7 +92,7 @@ namespace MIL.Visitors
             var tokenList = new List<MilTypeConstant>();
             
             // Note on convention: first arg ({0}) will always be MemberName. Second ({1}) is the token string
-
+            EmptyToken = new MilTypeConstant(MilTokenType.LanguageElement, "", "{0}{1}");
             CommandToken = new MilTypeConstant(MilTokenType.Command, strCommandToken, "{0}{1}");
             tokenList.Add(CommandToken);
             
@@ -129,6 +130,7 @@ namespace MIL.Visitors
             tokenList.Add(DelaySend);
 
             StateDefinitionToken = new MilTypeConstant(MilTokenType.LanguageElement, strProcessingHintToken, "{1}{0}");
+            tokenList.Add(StateDefinitionToken);
             AllTokens = tokenList;
         }
 

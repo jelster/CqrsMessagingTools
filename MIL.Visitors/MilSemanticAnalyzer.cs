@@ -8,17 +8,12 @@ namespace MIL.Visitors
     public class MilSemanticAnalyzer
     {
         private readonly Compilation _compilation;
-        private readonly Func<NamespaceOrTypeSymbol, IEnumerable<Symbol>> nameExtractor;
         private MilSyntaxWalker walker;
+
         public MilSemanticAnalyzer(Compilation compilation)
         {
             _compilation = compilation;
-            nameExtractor = name =>
-                                {
-                                    var members = name.GetMembers().ToList();
-                                    return members.Concat(members.OfType<NamespaceSymbol>()
-                                                              .SelectMany(x => nameExtractor(x)));
-                                };
+            
         }
 
         public MilSyntaxWalker ExtractMessagingSyntax()

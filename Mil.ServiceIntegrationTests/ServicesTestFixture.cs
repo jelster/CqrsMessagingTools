@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using MIL.Services;
 using MIL.Visitors;
 using Roslyn.Compilers;
@@ -13,8 +14,8 @@ namespace Mil.ServiceIntegrationTests
         public class given_a_compiled_application
         {
             protected Compilation AppCompilation;
-            private const string code = @"
-namespace Foo.Message
+            private const string infraCode = @"
+namespace Foo.Infrastructure
 {
     using System.Collections.Generic;
     
@@ -22,6 +23,13 @@ namespace Foo.Message
     public interface ICommand {}
     public interface IProcess {}
     public interface ICommandHandler<T> where T : ICommand { void Handles(T cmd); }
+
+}";
+            private const string code = @"
+namespace Foo.Message
+{
+    using System.Collections.Generic;
+    using Foo.Infrastructure;    
 
     public class BarMessage : ICommand {}
     
@@ -41,10 +49,13 @@ namespace Foo.Message
         }
     
         public ShortState State { get; set; }
-        public ShortProcess() { State = ShortState.StateA; }
+        public ShortProcess() {  }
         public void Handles(BarMessage cmd)
         {
-            
+            if (State == ShortState.NoState)
+            {
+                State = ShortState.StateA;   
+            }
         }
     }
     
@@ -53,6 +64,7 @@ namespace Foo.Web
     {
         using System;
         using Foo.Message;
+        using Foo.Infrastructure;
 
         public class ExternalSite
         {
@@ -82,7 +94,7 @@ namespace Foo.Web
     }
 ";
             private const string Shortprocess = "ShortProcess";
-            private readonly AnalysisService sut;
+            private readonly ProcessAnalysisService sut;
             private string[] expectedStates;
 
             public given_a_compiled_application()
@@ -96,9 +108,9 @@ namespace Foo.Web
                 //Assert.NotEmpty(assemblies);
                 
                 //Assert.True(assemblies.Count == 7); // # of assemblies in resource file
-                var tree = SyntaxTree.ParseCompilationUnit(code);
                 AppCompilation = Compilation.Create("test.dll")
-                    .AddSyntaxTrees(tree)
+                    .AddSyntaxTrees(SyntaxTree.ParseCompilationUnit(infraCode))
+                    .AddSyntaxTrees(SyntaxTree.ParseCompilationUnit(code))
                     .AddReferences(new AssemblyFileReference(typeof (object).Assembly.Location))
                     .AddReferences(new AssemblyFileReference(typeof (IEnumerable<>).Assembly.Location));
                   //  .AddReferences(assemblies.Select(x => new AssemblyBytesReference(x)));
@@ -106,7 +118,7 @@ namespace Foo.Web
                 var diag = AppCompilation.GetDiagnostics();
                 Assert.Empty(diag);
                 
-                sut = new AnalysisService();
+                sut = new ProcessAnalysisService();
             }
 
             [Fact]
@@ -125,20 +137,63 @@ namespace Foo.Web
             {
                 MilToken token = sut.GetProcessToken(AppCompilation, Shortprocess);
                 Assert.NotNull(token);
-                 
+               
                 Assert.True(token.MemberName == "ShortProcess, State:[NoState, StateA, DifferentState]");
                 Assert.True(token.Token == MilTypeConstant.StateDefinitionToken);
                 Assert.True(token.ToString() == "%ShortProcess, State:[NoState, StateA, DifferentState]");
             }
 
             [Fact]
-            public void when_process_incomplete_returns_empty_token()
+            public void service_throws_when_compilation_null()
             {
-                var otherSut = new AnalysisService();
-                var otherToken = otherSut.GetProcessToken(null, null);
-
-                Assert.True(otherToken.Token == MilTypeConstant.EndOfStatementToken);
+                Assert.Throws(typeof(ArgumentNullException), () => sut.GetProcessToken(null, null));
             }
+
+            [Fact]
+            public void when_process_name_null_returns_first_type_implementing_ifx()
+            {
+                var token = sut.GetProcessToken(AppCompilation, null);
+
+                Assert.True(token.MemberName == "ShortProcess, State:[NoState, StateA, DifferentState]");
+            }
+
+            [Fact]
+            public void when_no_state_definition_found_does_not_throw()
+            {
+                var otherComp = AppCompilation
+                    .RemoveSyntaxTrees(AppCompilation.SyntaxTrees)
+                    .AddSyntaxTrees(SyntaxTree.ParseCompilationUnit(""));
+                var otherSut = new ProcessAnalysisService();
+                ProcessDefinition definition = null;
+                Assert.DoesNotThrow(() => definition = otherSut.GetProcessDefinition(otherComp));
+                Assert.Null(definition);
+            }
+        }
+    }
+
+    public class TypeSymbolWalkerFixture
+    {
+        Walk sut = new Walk();
+
+        [Fact]
+        public void when_walk_nested_namespaces_with_types_returns_all_unnested_classes()
+        {
+            var code = @"
+namespace Bar { 
+    public class FooA {} 
+    public class BarB {} 
+    namespace BarB { 
+        public class FooB { public class NestedFoo {} } 
+        public class FooC {}
+    }
+}";
+            var tree = SyntaxTree.ParseCompilationUnit(code);
+            var comp = Compilation.Create("testA.dll").AddSyntaxTrees(tree);
+
+            var result = sut.Visit(comp.GlobalNamespace);
+
+            Assert.NotEmpty(result);
+            Assert.True(result.Count() == 4);
         }
     }
 }

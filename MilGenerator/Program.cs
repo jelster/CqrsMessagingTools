@@ -5,6 +5,8 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
+using MIL.Services;
+using MIL.Visitors;
 using NDesk.Options;
 using Roslyn.Compilers.CSharp;
 using Roslyn.Services;
@@ -17,24 +19,22 @@ namespace MilGenerator
         {
             var resetEvent = new ManualResetEvent(false);
             var runner = new CommandRunner();
-            Action<ManualResetEvent, string, bool> exitMethod = (rest, msg, fail) =>
+            Action<ManualResetEvent, string> exitMethod = (rest, msg) =>
                                                                     {
                                                                         Console.WriteLine(msg);
                                                                         Console.WriteLine();
                                                                         rest.Set();
                                                                     };
 
-            runner.MessagePump.Subscribe(HandleRunnerMessage, 
-                ex => exitMethod(resetEvent, ex.Message, true),
-                () => exitMethod(resetEvent, "Complete.", false));
+            runner.MessagePump.Subscribe(HandleRunnerMessage,
+                ex => exitMethod(resetEvent, ex.Message),
+                () => exitMethod(resetEvent, "Complete."));
 
             Initialize(args, runner);
             runner.Run();
-            
-            while (!resetEvent.WaitOne(1500))
-            {
-                ;
-            }
+
+            resetEvent.WaitOne(10000);
+
             Exit("Exiting...");
         }
 
@@ -54,7 +54,7 @@ namespace MilGenerator
                                      x => { runner.processIName = x; }
                                      },
                                  {
-                                     "x|externalNs=",
+                                     "x|externalNs:",
                                      "namespace for eXternal-facing component (used to aid discovery of command/event initiators and sequences"
                                      ,
                                      x => { runner.externalNs = x; }
@@ -62,8 +62,13 @@ namespace MilGenerator
                                  {
                                      "?|h|help",
                                      "this message",
-                                     (bool v) => showHelp = v
-                                     }
+                                     v => showHelp = (v != null)
+                                    }, 
+                                 {
+                                       "t|processType:",
+                                       "name of a concrete class implementing a process",
+                                       x => runner.processTypeName = x
+                                    }
                              };
             try
             {
@@ -71,7 +76,7 @@ namespace MilGenerator
                 runner.ValidateData();
 
             }
-            catch (OptionException ex)
+            catch (Exception ex)
             {
                 Console.WriteLine("MilGenerator ");
                 Console.WriteLine(ex.Message);
@@ -92,7 +97,7 @@ namespace MilGenerator
         {
             Console.WriteLine(message ?? "Exiting...");
             Console.WriteLine();
-            Environment.Exit(failCondition ? -1 : 0);
+            //Environment.Exit(failCondition ? -1 : 0);
         }
         private static void PrintHelp(OptionSet opts)
         {
@@ -109,6 +114,7 @@ namespace MilGenerator
     {
         public const string DefaultProcessIfxName = "IProcess";
         public string processIName = DefaultProcessIfxName;
+        public string processTypeName = null;
         public string slnPath = null;
         public string externalNs = null;
 
@@ -128,24 +134,34 @@ namespace MilGenerator
                 messagePump.OnError(ex);
                 return;
             }
-            
-            var externalProject = sln.Projects.FirstOrDefault(x => x.AssemblyName == externalNs);
-            if (externalProject == null)
-            {
-                var msg = string.Format("Project for given external-facing namespace of {0} not found.", externalNs);
-                messagePump.OnError(new ArgumentException(msg));
-                return;
-            }
-            SendMessage(string.Format("Using {0} for process discovery", processIName));
-            var token = new CancellationToken();
 
-            var compilation = externalProject.GetCompilation(token);
-            token.WaitHandle.WaitOne(10000);
-            var analyzer = new MIL.Services.AnalysisService(processIName);
-            var processDefinition = analyzer.GetProcessToken((Compilation) compilation);
+            //var externalProject = sln.Projects.FirstOrDefault(x => x.AssemblyName == externalNs);
+            //if (externalProject == null)
+            //{
+            //    var msg = string.Format("Project for given external-facing namespace of {0} not found.", externalNs);
+            //    messagePump.OnError(new ArgumentException(msg));
+            //    return;
+            //}
+            SendMessage(string.Format("Using {0} for process discovery", processTypeName ?? processIName));
             
-            SendMessage(string.Format("MIL output: {1}{0}", processDefinition.ToString() ?? "(none found)", Environment.NewLine));
-            
+            var token = new CancellationToken();
+            var analyzer = new MIL.Services.ProcessAnalysisService(processIName);
+            ProcessDefinition processDefinition = null;
+            foreach (var proj in sln.Projects)
+            {
+                //if (proj.AssemblyName == externalProject.AssemblyName)
+                //    continue;
+
+                var compilation = proj.GetCompilation(token);
+                
+                processDefinition = analyzer.GetProcessDefinition((Compilation)compilation, processTypeName);
+                if (processDefinition == null) continue;
+
+                var procToke = ProcessDefinition.GetTokenFromDefinition(processDefinition);
+                if (procToke.Token != MilTypeConstant.EmptyToken)
+                    SendMessage(processDefinition.ToString());
+            }
+
             messagePump.OnCompleted();
 
         }
@@ -153,7 +169,7 @@ namespace MilGenerator
         public void ValidateData()
         {
             if (slnPath == null) throw new OptionException("Missing path to sln file", "-s");
-            if (externalNs == null) throw new OptionException("Missing external-facing component namespace", "-ex");
+            //if (externalNs == null) throw new OptionException("Missing external-facing component namespace", "-ex");
         }
 
         private void SendMessage(string message, bool signalError = false)
