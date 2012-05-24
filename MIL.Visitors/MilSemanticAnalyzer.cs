@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using Roslyn.Compilers;
 using Roslyn.Compilers.CSharp;
-
+using SyntaxHelperUtilities;
 namespace MIL.Visitors
 {
     public class MilSemanticAnalyzer
@@ -45,24 +47,36 @@ namespace MIL.Visitors
         public IEnumerable<MilToken> GetMessagePublicationData()
         {
             ExtractMessagingSyntax();
-            var pubs = walker.PublicationCalls;
+            var pubs = walker.Publications;
             
             List<MilToken> tokens = new List<MilToken>();
+            
             foreach (var stmt in pubs)
             {
-                var model = _compilation.GetSemanticModel(_compilation.SyntaxTrees.Single(x => x.Root.DescendentNodesAndSelf().Contains(stmt)));
-                var info = model.GetSemanticInfo(stmt.Expression);
-
+                var syntax = stmt.Expression;
+                var model = _compilation.GetSemanticModel(_compilation.SyntaxTrees.First(x => x.Root.DescendentNodesAndSelf().Any(r => r == syntax)));
+                var info = model.GetSemanticInfo(syntax);
+                if (info == null || info.Symbol == null) continue;
                 
-                var sendSymbols = info.Type;
-               
-                    var cmdDef = walker.Commands.FirstOrDefault(x => x.Identifier.GetText() == sendSymbols.Name);
-                    if (cmdDef == null) continue;
+                var methodSymbol = (MethodSymbol)info.Symbol;
+                if (methodSymbol.Parameters.IsNullOrEmpty || methodSymbol.MethodKind != MethodKind.Ordinary)
+                    continue;
 
-                    var handler = walker.CommandHandlersWithCommands.First(x => x.Value.Any(g => g.TypeArgumentList.Arguments.Select(ar => ar.PlainName).Contains(sendSymbols.Name))).Key;
+                var dout = model.AnalyzeRegionDataFlow(stmt.Parent.Span);
+                var par =
+                    dout.ReadOutside.Concat(dout.ReadInside).Concat(dout.DataFlowsOut).Concat(dout.WrittenInside).Select(x => 
+                        x.ToMinimalDisplayParts(x.Locations.First(), model).First().GetText(CultureInfo.InvariantCulture));
+
+                var cmdMatches = par.FirstOrDefault(x => walker.Commands.Select(w => w.Identifier.GetText()).Contains(x));
+                if (cmdMatches == null) continue;
+
+                var cmdName = cmdMatches;
+                 
+                var handler = walker.CommandHandlers.FirstOrDefault(x => x.BaseListOpt.Types.Any(a => ((GenericNameSyntax)a).TypeArgumentList.Arguments.CollectionContainsClass(cmdName)));
+
                     if (handler == null) continue;
 
-                    tokens.Add(TokenFactory.GetCommand(sendSymbols.Name));
+                    tokens.Add(TokenFactory.GetCommand(cmdName));
                     tokens.Add(TokenFactory.GetPublish());
                     tokens.Add(TokenFactory.GetCommandHandler(handler.Identifier.GetText()));
                     tokens.Add(TokenFactory.GetStatementTerminator());

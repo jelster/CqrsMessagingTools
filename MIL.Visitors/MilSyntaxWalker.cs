@@ -12,40 +12,37 @@ namespace MIL.Visitors
         protected const string EventHandlerPlainIfx = "IEventHandler";
         protected const string CommandHandlerPlainIfx = "ICommandHandler";
 
-        private readonly HandlerDeclarationSyntaxVisitor _cmdHandlerDeclarationVisitor =
-            new HandlerDeclarationSyntaxVisitor(CommandHandlerPlainIfx);
-
-        private readonly HandlerDeclarationSyntaxVisitor _eventHandlerDeclarationVisitor =
-            new HandlerDeclarationSyntaxVisitor(EventHandlerPlainIfx);
+        private readonly HandlerDeclarationSyntaxVisitor _cmdHandlerDeclarationVisitor = new HandlerDeclarationSyntaxVisitor(CommandHandlerPlainIfx);
+        private readonly HandlerDeclarationSyntaxVisitor _eventHandlerDeclarationVisitor = new HandlerDeclarationSyntaxVisitor(EventHandlerPlainIfx);
 
         public MilSyntaxWalker() : base(visitIntoStructuredTrivia: true)
         {
             Commands = new List<ClassDeclarationSyntax>();
             Events = new List<ClassDeclarationSyntax>();
-            CommandHandlersWithCommands = new Dictionary<ClassDeclarationSyntax, List<GenericNameSyntax>>();
             PublicationCalls = new List<MemberAccessExpressionSyntax>();
-            EventToEventHandlersMapping = new Dictionary<string, List<ClassDeclarationSyntax>>();
+            EventHandlers = new List<ClassDeclarationSyntax>();
+            CommandHandlers = new List<ClassDeclarationSyntax>();
+            Publications = new List<InvocationExpressionSyntax>();
         }
 
-        public IList<ClassDeclarationSyntax> Commands { get; private set; }
-        public IList<ClassDeclarationSyntax> Events { get; private set; }
-
-        public IDictionary<string, List<ClassDeclarationSyntax>> EventToEventHandlersMapping { get; set; }
-        public IEnumerable<ClassDeclarationSyntax> EventHandlers { get { return EventToEventHandlersMapping.Values.SelectMany(x => x).AsEnumerable(); } }
-
-        public IEnumerable<ClassDeclarationSyntax> CommandHandlers { get { return CommandHandlersWithCommands.Keys.AsEnumerable(); } }
-        public IDictionary<ClassDeclarationSyntax, List<GenericNameSyntax>> CommandHandlersWithCommands { get; private set; }
-
+        public List<InvocationExpressionSyntax> Publications { get; private set; }
+        public List<ClassDeclarationSyntax> Commands { get; private set; }
+        public List<ClassDeclarationSyntax> Events { get; private set; }
+        public List<ClassDeclarationSyntax> EventHandlers { get; private set; } 
+        public List<ClassDeclarationSyntax> CommandHandlers { get; private set; }
         public List<MemberAccessExpressionSyntax> PublicationCalls { get; private set; }
 
         protected override void VisitMemberAccessExpression(MemberAccessExpressionSyntax node)
         {
-            if (node.Name.GetText() == PublishKeyword)
-            {
-                PublicationCalls.Add(node);
-            }
-        }
+            if (node.Name.GetText() != PublishKeyword) return;
 
+            PublicationCalls.Add(node);
+            Publications.Add(node.Ancestors().OfType<InvocationExpressionSyntax>().Last());
+        }
+        //protected override void VisitInvocationExpression(InvocationExpressionSyntax node)
+        //{
+           
+        //}
         protected override void VisitNamespaceDeclaration(NamespaceDeclarationSyntax node)
         {
             foreach (var type in node.DescendentNodes().OfType<ClassDeclarationSyntax>())
@@ -90,20 +87,10 @@ namespace MIL.Visitors
         private void LookForEventHandlers(ClassDeclarationSyntax node)
         {
             var handles = _eventHandlerDeclarationVisitor.Visit(node);
+            
             if (handles.Any())
             {
-                foreach (var eventTypeName in handles.SelectMany(x => x.TypeArgumentList.Arguments))
-                {
-                    var name = eventTypeName.PlainName;
-                    if (EventToEventHandlersMapping.ContainsKey(name))
-                    {
-                        EventToEventHandlersMapping[eventTypeName.PlainName].Add(node);
-                    }
-                    else
-                    {
-                        EventToEventHandlersMapping.Add(eventTypeName.PlainName, new List<ClassDeclarationSyntax> {node});
-                    }
-                }
+                EventHandlers.Add(node);
             }
         }
 
@@ -111,10 +98,9 @@ namespace MIL.Visitors
         {
             var handles = _cmdHandlerDeclarationVisitor.Visit(node);
 
-            // TODO: how should duplicate keys be handled? Error condition, or normal (uncommon) condition?
-            if (handles.Any() && !CommandHandlersWithCommands.ContainsKey(node))
+            if (handles.Any())
             {
-                CommandHandlersWithCommands.Add(node, handles.ToList());
+                CommandHandlers.Add(node);
             }
         }
     }

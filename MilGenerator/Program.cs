@@ -10,6 +10,7 @@ using MIL.Visitors;
 using NDesk.Options;
 using Roslyn.Compilers.CSharp;
 using Roslyn.Services;
+using SyntaxHelperUtilities;
 
 namespace MilGenerator
 {
@@ -18,32 +19,30 @@ namespace MilGenerator
         static void Main(string[] args)
         {
             var resetEvent = new ManualResetEvent(false);
-            var runner = new CommandRunner();
             Action<ManualResetEvent, string> exitMethod = (rest, msg) =>
                                                                     {
-                                                                        Console.WriteLine(msg);
                                                                         Console.WriteLine();
+                                                                        Console.WriteLine(msg);
                                                                         rest.Set();
                                                                     };
-
+            var runner = new CommandRunner();
             runner.MessagePump.Subscribe(HandleRunnerMessage,
                 ex => exitMethod(resetEvent, ex.Message),
-                () => exitMethod(resetEvent, "Complete."));
+                () => exitMethod(resetEvent, ""));
 
             Initialize(args, runner);
             runner.Run();
 
             resetEvent.WaitOne(10000);
-
-            Exit("Exiting...");
         }
 
         private static void Initialize(IEnumerable<string> args, CommandRunner runner)
         {
             bool showHelp = false;
-            var clArgs = new OptionSet()
-                             {
-                                 {
+            bool dumpInfo = false;
+            var clArgs = new OptionSet
+            {
+            {
                                      "s|sln=",
                                      "full path of target Solution file (.sln) to be analyzed",
                                      x => { runner.slnPath = Path.GetFullPath(x); }
@@ -68,8 +67,13 @@ namespace MilGenerator
                                        "t|processType:",
                                        "name of a concrete class implementing a process",
                                        x => runner.processTypeName = x
-                                    }
-                             };
+                                       }, 
+                                       {
+                                              "d|dump",
+                                              "Perform discovery and simply dump results without analysis",
+                                              d => runner.dumpInfo = (d != null)
+                                              }
+            };
             try
             {
                 var otherArgs = clArgs.Parse(args);
@@ -95,7 +99,7 @@ namespace MilGenerator
         }
         private static void Exit(string message = null, bool failCondition = false)
         {
-            Console.WriteLine(message ?? "Exiting...");
+            Console.WriteLine(message);
             Console.WriteLine();
             //Environment.Exit(failCondition ? -1 : 0);
         }
@@ -120,6 +124,7 @@ namespace MilGenerator
 
         public IObservable<RunnerEventArg> MessagePump { get { return messagePump.AsObservable(); } }
         private readonly ISubject<RunnerEventArg> messagePump = new Subject<RunnerEventArg>();
+        public bool dumpInfo;
 
         public void Run()
         {
@@ -134,7 +139,7 @@ namespace MilGenerator
                 messagePump.OnError(ex);
                 return;
             }
-
+            
             //var externalProject = sln.Projects.FirstOrDefault(x => x.AssemblyName == externalNs);
             //if (externalProject == null)
             //{
@@ -143,21 +148,59 @@ namespace MilGenerator
             //    return;
             //}
             SendMessage(string.Format("Using {0} for process discovery{1}", processTypeName ?? processIName, Environment.NewLine));
-            
+
             var token = new CancellationToken();
             var analyzer = new MIL.Services.ProcessAnalysisService(processIName);
-             
+
             ProcessDefinition processDefinition = null;
             foreach (var proj in sln.Projects)
             {
+                var compilation = (Compilation)proj.GetCompilation(token);
+                var semantics = new MilSemanticAnalyzer(compilation);
+                var treeData = semantics.ExtractMessagingSyntax();
+
+                if (dumpInfo)
+                {
+                    if (treeData.Commands.Any())
+                    {
+                        foreach (var cmd in treeData.Commands)
+                        {
+                            var t = TokenFactory.GetCommand(cmd.GetClassName()).ToString() +
+                                    TokenFactory.GetPublish();
+
+                            var t1 = treeData.CommandHandlers.FirstOrDefault(x => x.BaseListOpt.Types.OfType<GenericNameSyntax>()
+                                                                             .Any(y => y.TypeArgumentList.Arguments.Any(z => z.GetClassName().Contains(cmd.GetClassName()))));
+                            var h = TokenFactory.GetCommandHandler(t1 == null ? TokenFactory.GetEmptyToken().ToString() : t1.GetClassName()).ToString();
+                                
+                            SendMessage(t + h);
+                        }
+                    }
+                   
+                    if (treeData.Events.Any())
+                    {
+                        foreach (var cmd in treeData.Events)
+                        {
+                            
+                         
+                            var t = TokenFactory.GetEvent(cmd.GetClassName()).ToString() +
+                                    TokenFactory.GetPublish() + TokenFactory.GetStatementTerminator() + "    ";
+
+                            var t1 = treeData.EventHandlers.Where(x => x.BaseListOpt.Types.OfType<GenericNameSyntax>()
+                                                                             .Any(y => y.TypeArgumentList.Arguments.Any(z => z.GetClassName().Contains(cmd.GetClassName()))));
+                            foreach (var evHand in t1)
+                            {
+                                var h = TokenFactory.GetEventHandler(evHand.GetClassName()).ToString();
+                                SendMessage(t + h);
+                            }
+                        }
+                    }
+                    continue;
+                }
                 //if (proj.AssemblyName == externalProject.AssemblyName)
                 //    continue;
-                
-                var compilation = (Compilation) proj.GetCompilation(token);
+
                 processDefinition = analyzer.GetProcessDefinition(compilation, processTypeName);
-                
-                var semantics = new MilSemanticAnalyzer(compilation);
-                var pub = semantics.ExtractMessagingSyntax();
+
 
                 if (processDefinition != null)
                 {

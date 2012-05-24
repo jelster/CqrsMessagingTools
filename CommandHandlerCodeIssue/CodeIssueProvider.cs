@@ -44,7 +44,7 @@ namespace CommandHandlerCodeIssue
            
             if (!allCommandHandlersInProject.Any() && !allCommandHandlersInProject.Contains(node)) return null;
 
-            var dupes = walker.CommandHandlersWithCommands.SelectMany(x => x.Value).FindDuplicates();
+            var dupes = walker.CommandHandlers.SelectMany(x => x.BaseListOpt.Types).FindDuplicates();
 
             if (!dupes.Any())
             {
@@ -52,7 +52,7 @@ namespace CommandHandlerCodeIssue
                 var issues = new List<CodeIssue>();
                 foreach (var dupe in dupes)
                 {
-                    var listing = FormatHandlerListing(dupe.Identifier.GetText(), allCommandHandlersInProject.ToDictionary(x => x, syntax => syntax.BaseListOpt.Types.OfType<GenericNameSyntax>()));
+                    var listing = FormatHandlerListing(dupe.GetClassName(), allCommandHandlersInProject.ToDictionary(x => x, syntax => syntax.BaseListOpt.Types.OfType<GenericNameSyntax>()));
                     var text = string.Format(desc, dupe, Environment.NewLine, string.Join(Environment.NewLine, listing));
                     issues.Add(new CodeIssue(CodeIssue.Severity.Warning, classNode.Identifier.FullSpan, text));
                 }

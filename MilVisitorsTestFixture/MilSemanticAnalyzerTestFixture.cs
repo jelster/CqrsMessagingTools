@@ -21,8 +21,8 @@ namespace MilVisitorsTestFixture
         [Fact]
         public void semantic_analysis_of_outer_pub_action_yields_mil_statement()
         {
-            var pubOps = sut.GetMessagePublicationData();
-            pubOps.ToList().ForEach(x => Console.WriteLine(x.ToString()));
+            var pubOps = sut.GetMessagePublicationData().ToList();
+            pubOps.ForEach(x => Console.WriteLine(x.ToString()));
             Assert.NotEmpty(pubOps);
             Assert.True(pubOps.Count() == 4);
             Assert.NotNull(pubOps.FirstOrDefault(x => x.Token.MilTokenType == MilTokenType.Command));

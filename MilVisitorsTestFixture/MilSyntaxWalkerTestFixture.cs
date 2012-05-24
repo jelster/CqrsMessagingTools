@@ -123,7 +123,7 @@ namespace TestCode.Logic
 
                 Assert.NotEmpty(sut.CommandHandlers);
                 Assert.True(sut.CommandHandlers.Count() == 2);
-                Assert.True(sut.CommandHandlers.CollectionContainsClassName("FoomandHandler"));
+                Assert.True(sut.CommandHandlers.CollectionContainsClassDeclaration("FoomandHandler"));
             }
 
             [Fact]
@@ -154,7 +154,7 @@ namespace TestCode.Logic
                 sut.Visit(node);
 
                 Assert.NotEmpty(sut.EventHandlers);
-                Assert.True(sut.EventHandlers.CollectionContainsClassName("BarventHandler"));
+                Assert.True(sut.EventHandlers.CollectionContainsClassDeclaration("BarventHandler"));
             }
 
             [Fact]
@@ -171,10 +171,10 @@ namespace TestCode.Logic
                 var node = declarationTree.Root;
                 sut.Visit(node);
                 
-                var handles = sut.EventToEventHandlersMapping.Single(x => x.Key == "Bar");
-                Assert.True(handles.Value.Count == 2);
-                Assert.True(handles.Value.CollectionContainsClassName("BarventHandler"));
-                Assert.True(handles.Value.CollectionContainsClassName("OtherventHandler"));
+                var handles = sut.EventHandlers.Where(x => x.BaseListOpt.Types.OfType<GenericNameSyntax>().Any(y => y.TypeArgumentList.Arguments.Any(z => z.GetClassName() == "Bar"))).ToList();
+                Assert.True(handles.Count == 2);
+                Assert.True(handles.CollectionContainsClassDeclaration("BarventHandler"));
+                Assert.True(handles.CollectionContainsClassDeclaration("OtherventHandler"));
             }
 
             [Fact]

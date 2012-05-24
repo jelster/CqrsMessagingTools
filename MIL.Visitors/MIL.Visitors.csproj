@@ -50,6 +50,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TokenFactory.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SyntaxHelperUtilities\SyntaxHelperUtilities.csproj">
+      <Project>{1F6911AD-8DFB-4888-9EB2-16E4B3195A11}</Project>
+      <Name>SyntaxHelperUtilities</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

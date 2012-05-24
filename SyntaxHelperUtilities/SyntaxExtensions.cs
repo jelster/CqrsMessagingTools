@@ -11,7 +11,17 @@ namespace SyntaxHelperUtilities
             return classDec.Identifier.GetText();
         }
 
-        public static bool CollectionContainsClassName<T>(this IEnumerable<T> collection, string name) where T : BaseTypeDeclarationSyntax
+        public static bool CollectionContainsClassDeclaration<T>(this IEnumerable<T> collection, string name) where T : BaseTypeDeclarationSyntax
+        {
+            return collection.Any(x => GetClassName(x) == name);
+        }
+
+        public static string GetClassName(this TypeSyntax classDec)
+        {
+            return classDec.PlainName;
+        }
+
+        public static bool CollectionContainsClass<T>(this IEnumerable<T> collection, string name) where T : TypeSyntax
         {
             return collection.Any(x => GetClassName(x) == name);
         }
