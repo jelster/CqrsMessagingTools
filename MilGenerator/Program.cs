@@ -161,62 +161,42 @@ namespace MilGenerator
 
                 if (dumpInfo)
                 {
-                    if (treeData.Commands.Any())
-                    {
-                        foreach (var cmd in treeData.Commands)
-                        {
-                            var t = TokenFactory.GetCommand(cmd.GetClassName()).ToString() +
-                                    TokenFactory.GetPublish();
+                    var cmdOutput = treeData.DumpCommandData();
+                    if (cmdOutput.Any())
+                        SendMessage(cmdOutput);
 
-                            var t1 = treeData.CommandHandlers.FirstOrDefault(x => x.BaseListOpt.Types.OfType<GenericNameSyntax>()
-                                                                             .Any(y => y.TypeArgumentList.Arguments.Any(z => z.GetClassName().Contains(cmd.GetClassName()))));
-                            var h = TokenFactory.GetCommandHandler(t1 == null ? TokenFactory.GetEmptyToken().ToString() : t1.GetClassName()).ToString();
-                                
-                            SendMessage(t + h);
-                        }
-                    }
-                   
-                    if (treeData.Events.Any())
-                    {
-                        foreach (var cmd in treeData.Events)
-                        {
-                            
-                         
-                            var t = TokenFactory.GetEvent(cmd.GetClassName()).ToString() +
-                                    TokenFactory.GetPublish() + TokenFactory.GetStatementTerminator() + "    ";
-
-                            var t1 = treeData.EventHandlers.Where(x => x.BaseListOpt.Types.OfType<GenericNameSyntax>()
-                                                                             .Any(y => y.TypeArgumentList.Arguments.Any(z => z.GetClassName().Contains(cmd.GetClassName()))));
-                            foreach (var evHand in t1)
-                            {
-                                var h = TokenFactory.GetEventHandler(evHand.GetClassName()).ToString();
-                                SendMessage(t + h);
-                            }
-                        }
-                    }
-                    continue;
+                    var eventOutput = treeData.DumpEventData();
+                    if (eventOutput.Any())
+                        SendMessage(eventOutput);
+                    
+                     
                 }
                 //if (proj.AssemblyName == externalProject.AssemblyName)
                 //    continue;
 
-                processDefinition = analyzer.GetProcessDefinition(compilation, processTypeName);
+                //processDefinition = analyzer.GetProcessDefinition(compilation, processTypeName);
 
 
-                if (processDefinition != null)
-                {
-                    var procToke = ProcessDefinition.GetTokenFromDefinition(processDefinition);
+                //if (processDefinition != null)
+                //{
+                //    var procToke = ProcessDefinition.GetTokenFromDefinition(processDefinition);
 
-                    if (procToke.Token != MilTypeConstant.EmptyToken)
-                        SendMessage(procToke.ToString());
-                }
-                foreach (var pubCall in semantics.GetMessagePublicationData())
-                {
-                    SendMessage(pubCall.ToString());
-                }
+                //    if (procToke.Token != MilTypeConstant.EmptyToken)
+                //        SendMessage(procToke.ToString());
+                //}
+                //foreach (var pubCall in semantics.GetMessagePublicationData())
+                //{
+                //    SendMessage(pubCall.ToString());
+                //}
             }
 
             messagePump.OnCompleted();
 
+        }
+
+        private void SendMessage(IEnumerable<MilToken> messageLines)
+        {
+            SendMessage(string.Join("", messageLines.Select(x => x.ToString())));
         }
 
         public void ValidateData()
@@ -228,6 +208,14 @@ namespace MilGenerator
         private void SendMessage(string message, bool signalError = false)
         {
             messagePump.OnNext(new RunnerEventArg(message, signalError));
+        }
+
+        private void SendMessage(IEnumerable<string> messageLines)
+        {
+            foreach (var msg in messageLines)
+            {
+                SendMessage(msg);
+            }
         }
     }
 

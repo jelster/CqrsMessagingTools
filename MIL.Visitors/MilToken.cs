@@ -85,6 +85,8 @@ namespace MIL.Visitors
 
         public static readonly MilTypeConstant StateDefinitionToken;
 
+        public static readonly MilTypeConstant IndentToken;
+
         static MilTypeConstant()
         {
             // TODO: initialize these services in some other way...
@@ -92,6 +94,7 @@ namespace MIL.Visitors
             var tokenList = new List<MilTypeConstant>();
             
             // Note on convention: first arg ({0}) will always be MemberName. Second ({1}) is the token string
+            IndentToken = new MilTypeConstant(MilTokenType.LanguageElement,strIndentToken, "{0}{1}");
             EmptyToken = new MilTypeConstant(MilTokenType.LanguageElement, "", "{0}{1}");
             CommandToken = new MilTypeConstant(MilTokenType.Command, strCommandToken, "{0}{1}");
             tokenList.Add(CommandToken);
@@ -142,6 +145,7 @@ namespace MIL.Visitors
         }
 
         private static readonly string strStatementToken = Environment.NewLine;
+        private const string strIndentToken = "    ";
         private const string strHandlerToken = "";
         private const string strCommandToken = "?";
         private const string strEventToken = "!";

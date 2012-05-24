@@ -57,7 +57,7 @@ namespace TestCode.Program
     }
                             
 }";
-        private const string Code = @"
+        private const string declarationCode = @"
 namespace TestCode.Logic
 {
     using System;
@@ -92,7 +92,7 @@ namespace TestCode.Logic
 
             public given_a_syntax_tree()
             {
-                declarationTree = SyntaxTree.ParseCompilationUnit(Code);
+                declarationTree = SyntaxTree.ParseCompilationUnit(declarationCode);
                 logicTree = SyntaxTree.ParseCompilationUnit(programCode);
                 infraTree = SyntaxTree.ParseCompilationUnit(infraCode);
                 compilation = Compilation.Create("test.exe")
@@ -183,6 +183,24 @@ namespace TestCode.Logic
                 var analysis = new MilSemanticAnalyzer(compilation);
                 var walker = analysis.ExtractMessagingSyntax();
                 Assert.True(walker.PublicationCalls.Count == 1);
+            }
+
+            [Fact]
+            public void when_command_data_dumped_contains_command_and_handler_mil()
+            {
+                sut.Visit(declarationTree.Root);
+                var data = sut.DumpCommandData().ToList();
+                Assert.NotEmpty(data);
+                Assert.True(string.Join("", data) == "Foo? -> FoomandHandler" + Environment.NewLine);
+            }
+
+            [Fact]
+            public void when_multiple_command_handlers_dumped_lists_all()
+            {
+                sut.Visit(declarationTree.Root);
+                var data = sut.DumpCommandData();
+                Assert.NotEmpty(data);
+                Assert.True(data.Count() == 2);
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Roslyn.Compilers.CSharp;
+using SyntaxHelperUtilities;
 
 namespace MIL.Visitors
 {
@@ -101,6 +102,53 @@ namespace MIL.Visitors
             if (handles.Any())
             {
                 CommandHandlers.Add(node);
+            }
+        }
+
+        public IEnumerable<MilToken> DumpCommandData()
+        {
+            foreach (var cmd in Commands)
+            {
+                yield return TokenFactory.GetCommand(cmd.GetClassName());
+                yield return TokenFactory.GetPublish();
+
+                var t1 = CommandHandlers.FirstOrDefault(x => x.BaseListOpt.Types.OfType<GenericNameSyntax>()
+                                                                 .Any(y => y.TypeArgumentList.Arguments.Any(z => z.GetClassName().Contains(cmd.GetClassName()))));
+
+                if (t1 == null)
+                {
+                    yield return TokenFactory.GetStatementTerminator();
+                    continue;
+                }
+                yield return TokenFactory.GetCommandHandler(t1 == null ? TokenFactory.GetEmptyToken().ToString() : t1.GetClassName());
+                yield return TokenFactory.GetStatementTerminator();
+            }
+        }
+
+        public IEnumerable<MilToken> DumpEventData()
+        {
+            foreach (var ev in Events)
+            {
+                var eventClassName = ev.GetClassName();
+                yield return TokenFactory.GetEvent(ev.GetClassName());
+                yield return TokenFactory.GetPublish();
+                yield return TokenFactory.GetStatementTerminator();
+
+                var t1 = EventHandlers.Where(x => x.BaseListOpt.Types.OfType<GenericNameSyntax>()
+                                                           .Any(y => y.TypeArgumentList.Arguments.Any(z => z.GetClassName().Contains(eventClassName)))).Distinct();
+                if (!t1.Any())
+                {
+                    continue;
+                }
+                foreach (var evHand in t1)
+                {
+                    var handleName = evHand.GetClassName();
+                    yield return TokenFactory.GetIndentationToken();
+                    yield return TokenFactory.GetReceive();
+                    yield return TokenFactory.GetEventHandler(handleName);
+                    yield return TokenFactory.GetStatementTerminator();
+                }
+                yield return TokenFactory.GetStatementTerminator();
             }
         }
     }

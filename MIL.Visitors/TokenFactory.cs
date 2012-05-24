@@ -70,5 +70,10 @@ namespace MIL.Visitors
         {
             return new MilToken(MilTypeConstant.EmptyToken);
         }
+
+        public static MilToken GetIndentationToken()
+        {
+            return new MilToken(MilTypeConstant.IndentToken);
+        }
     }
 }
