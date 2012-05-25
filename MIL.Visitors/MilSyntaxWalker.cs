@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Roslyn.Compilers.CSharp;
 using SyntaxHelperUtilities;
@@ -149,6 +150,15 @@ namespace MIL.Visitors
                     yield return TokenFactory.GetStatementTerminator();
                 }
                 yield return TokenFactory.GetStatementTerminator();
+            }
+        }
+
+        public IEnumerable<string> DumpPublicationData()
+        {
+            yield return Environment.NewLine;
+            foreach (var pub in Publications)
+            {
+                yield return pub.GetText();
             }
         }
     }

@@ -200,7 +200,8 @@ namespace TestCode.Logic
                 sut.Visit(declarationTree.Root);
                 var data = sut.DumpCommandData();
                 Assert.NotEmpty(data);
-                Assert.True(data.Count() == 2);
+                Console.WriteLine(data.Count());
+                Assert.True(data.Count() == 4);
             }
         }
     }

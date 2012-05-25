@@ -168,8 +168,10 @@ namespace MilGenerator
                     var eventOutput = treeData.DumpEventData();
                     if (eventOutput.Any())
                         SendMessage(eventOutput);
-                    
-                     
+
+                    var pubOps = treeData.DumpPublicationData();
+                    if (pubOps.Any())
+                        SendMessage(pubOps);
                 }
                 //if (proj.AssemblyName == externalProject.AssemblyName)
                 //    continue;
