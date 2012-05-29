@@ -13,9 +13,11 @@ namespace MIL.Visitors
         protected const string EventIfx = "IEvent";
         protected const string EventHandlerPlainIfx = "IEventHandler";
         protected const string CommandHandlerPlainIfx = "ICommandHandler";
+        protected const string AggregateRootPlainIfx = "IEventSourced";
 
         private readonly HandlerDeclarationSyntaxVisitor _cmdHandlerDeclarationVisitor = new HandlerDeclarationSyntaxVisitor(CommandHandlerPlainIfx);
         private readonly HandlerDeclarationSyntaxVisitor _eventHandlerDeclarationVisitor = new HandlerDeclarationSyntaxVisitor(EventHandlerPlainIfx);
+        private readonly HandlerDeclarationSyntaxVisitor _aggregateDeclarationVisitor = new HandlerDeclarationSyntaxVisitor(AggregateRootPlainIfx);
 
         public MilSyntaxWalker() : base(visitIntoStructuredTrivia: true)
         {
@@ -25,6 +27,7 @@ namespace MIL.Visitors
             EventHandlers = new List<ClassDeclarationSyntax>();
             CommandHandlers = new List<ClassDeclarationSyntax>();
             Publications = new List<InvocationExpressionSyntax>();
+            AggregateRoots = new List<ClassDeclarationSyntax>();
         }
 
         public List<InvocationExpressionSyntax> Publications { get; private set; }
@@ -33,6 +36,7 @@ namespace MIL.Visitors
         public List<ClassDeclarationSyntax> EventHandlers { get; private set; } 
         public List<ClassDeclarationSyntax> CommandHandlers { get; private set; }
         public List<MemberAccessExpressionSyntax> PublicationCalls { get; private set; }
+        public List<ClassDeclarationSyntax> AggregateRoots { get; private set; } 
 
         protected override void VisitMemberAccessExpression(MemberAccessExpressionSyntax node)
         {
@@ -57,6 +61,7 @@ namespace MIL.Visitors
         {
             foreach (var classNode in node.DescendentNodesAndSelf().OfType<ClassDeclarationSyntax>())
             {
+                LookForAggregates(classNode);
                 LookForCommands(classNode);
                 LookForCommandHandlers(classNode);
                 LookForEvents(classNode);
@@ -68,6 +73,14 @@ namespace MIL.Visitors
                     Visit(method);
                 }
             }
+        }
+
+        private void LookForAggregates(ClassDeclarationSyntax classNode)
+        {
+            if (classNode.Modifiers.Any(SyntaxKind.AbstractKeyword) || classNode.BaseListOpt == null || !classNode.BaseListOpt.Types.Any()) return;
+
+            if (classNode.BaseListOpt.Types.Any(x => x.PlainName == AggregateRootPlainIfx)) AggregateRoots.Add(classNode);
+            
         }
 
         private void LookForEvents(ClassDeclarationSyntax node)
@@ -139,7 +152,7 @@ namespace MIL.Visitors
                                                            .Any(y => y.TypeArgumentList.Arguments.Any(z => z.GetClassName().Contains(eventClassName)))).Distinct();
                 if (!t1.Any())
                 {
-                    continue;
+                    yield break;
                 }
                 foreach (var evHand in t1)
                 {
@@ -155,11 +168,24 @@ namespace MIL.Visitors
 
         public IEnumerable<string> DumpPublicationData()
         {
-            yield return Environment.NewLine;
+            if (!PublicationCalls.Any()) yield break;
+
             foreach (var pub in Publications)
             {
-                yield return pub.GetText();
+                yield return Environment.NewLine;
+                yield return string.Format("{0}.{1}.{2}:{3}{4}", 
+                    pub.FirstAncestorOrSelf<NamespaceDeclarationSyntax>().Name.GetText(), 
+                    pub.FirstAncestorOrSelf<ClassDeclarationSyntax>().Identifier.GetText(),
+                    pub.FirstAncestorOrSelf<MethodDeclarationSyntax>().Identifier.GetFullText(),
+                    pub.Span.ToString(), 
+                    Environment.NewLine);
             }
+            yield return Environment.NewLine;
+        }
+
+        public IEnumerable<MilToken> DumpAggregateRoots()
+        {
+            return AggregateRoots.Select(x => TokenFactory.GetAggregateRoot(x.Identifier.GetText()));
         }
     }
 }

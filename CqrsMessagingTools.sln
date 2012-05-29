@@ -22,9 +22,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MilVisitorsTestFixture", "MilVisitorsTestFixture\MilVisitorsTestFixture.csproj", "{4D9E091E-4DA8-4ED1-9E3E-DB1ACBA248C8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{8E200F6D-A15F-4773-8A7A-0F2CC3C922B0}"
-	ProjectSection(SolutionItems) = preProject
-		README.markdown = README.markdown
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MIL.Services", "MIL.Services\MIL.Services.csproj", "{79807141-C84F-4593-9950-C6F73A150E43}"
 EndProject

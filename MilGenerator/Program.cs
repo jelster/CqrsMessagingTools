@@ -95,7 +95,7 @@ namespace MilGenerator
         }
         private static void HandleRunnerMessage(RunnerEventArg msg)
         {
-            Console.WriteLine(msg.Message);
+            Console.Write(msg.Message);
         }
         private static void Exit(string message = null, bool failCondition = false)
         {
@@ -139,7 +139,7 @@ namespace MilGenerator
                 messagePump.OnError(ex);
                 return;
             }
-            
+
             //var externalProject = sln.Projects.FirstOrDefault(x => x.AssemblyName == externalNs);
             //if (externalProject == null)
             //{
@@ -153,26 +153,23 @@ namespace MilGenerator
             var analyzer = new MIL.Services.ProcessAnalysisService(processIName);
 
             ProcessDefinition processDefinition = null;
-            foreach (var proj in sln.Projects)
+            List<MilSyntaxWalker> analytics = new List<MilSyntaxWalker>();
+            foreach (var proj in sln.Projects.ToList())
             {
+                SendMessage("* " + proj.AssemblyName + Environment.NewLine);
                 var compilation = (Compilation)proj.GetCompilation(token);
                 var semantics = new MilSemanticAnalyzer(compilation);
                 var treeData = semantics.ExtractMessagingSyntax();
+                analytics.Add(treeData);
+                SendMessage("** Aggregate roots" + Environment.NewLine);
+                SendMessage(treeData.DumpAggregateRoots());
+                SendMessage("** Commands" + Environment.NewLine);
+                SendMessage(treeData.DumpCommandData());
+                SendMessage("** Events" + Environment.NewLine);
+                SendMessage(treeData.DumpEventData());
+                SendMessage("** Message publications" + Environment.NewLine);
+                SendMessage(treeData.DumpPublicationData());
 
-                if (dumpInfo)
-                {
-                    var cmdOutput = treeData.DumpCommandData();
-                    if (cmdOutput.Any())
-                        SendMessage(cmdOutput);
-
-                    var eventOutput = treeData.DumpEventData();
-                    if (eventOutput.Any())
-                        SendMessage(eventOutput);
-
-                    var pubOps = treeData.DumpPublicationData();
-                    if (pubOps.Any())
-                        SendMessage(pubOps);
-                }
                 //if (proj.AssemblyName == externalProject.AssemblyName)
                 //    continue;
 
@@ -191,9 +188,9 @@ namespace MilGenerator
                 //    SendMessage(pubCall.ToString());
                 //}
             }
+           
 
             messagePump.OnCompleted();
-
         }
 
         private void SendMessage(IEnumerable<MilToken> messageLines)

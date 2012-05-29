@@ -17,7 +17,7 @@ namespace MilVisitorsTestFixture
 namespace TestCode.Infrastructure
 {
     using System;
-    
+    public interface IEventSourced {}
     public interface IBus { void Send(ICommand cmd); }
     public interface ICommand {}
     public interface IEvent {}
@@ -75,6 +75,7 @@ namespace TestCode.Logic
     { 
         public void Handles(Foo command) { throw new NotImplementedException(); }
     } 
+    public class FooRoot : IEventSourced {}
     public class Bar : IEvent {}
     public class Foobar : IEvent {}
     public class BarventHandler : IEventHandler<Bar> {}
@@ -202,6 +203,14 @@ namespace TestCode.Logic
                 Assert.NotEmpty(data);
                 Console.WriteLine(data.Count());
                 Assert.True(data.Count() == 4);
+            }
+
+            [Fact]
+            public void when_walked_discovers_aggregate_roots()
+            {
+                sut.Visit(declarationTree.Root);
+                Assert.NotEmpty(sut.AggregateRoots);
+                
             }
         }
     }
