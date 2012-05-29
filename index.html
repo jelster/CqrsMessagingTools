@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Cqrsmessagingtools : " />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Cqrsmessagingtools</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/jelster/CqrsMessagingTools">View on GitHub</a>
+
+          <h1 id="project_title">Cqrsmessagingtools</h1>
+          <h2 id="project_tagline"></h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/jelster/CqrsMessagingTools/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/jelster/CqrsMessagingTools/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>CQRS Messaging Tools</h1>
+
+<h2>Readme</h2>
+
+<p>These concepts wouldn't have happened without the <a href="http://cqrsjourney.github.com/">Microsoft Patterns &amp; Practices group's CQRS-Journey</a> project and team. See below for instructions and warnings</p>
+
+<h1>NEW! MilGenerator command-line tool</h1>
+
+<p>The MilGenerator.exe utility will analyze a given solution file, outputting (optionally) a raw dump of messaging information to the console. </p>
+
+<h2>Basic Usage:</h2>
+
+<ol>
+<li>the -s parameter is the full path to the VS 2010 .SLN file of the target application</li>
+<li>(recommended) pass the -d option to get a full dump of data. Otherwise, there isn't much to see :)</li>
+<li>help on options is available by passing -?, -h, or --help as a parameter</li>
+</ol><h1>Tool Installation Instructions and Walkthrough</h1>
+
+<p>These tools are the product of a week's spent poking around a lot of unfamiliar territory, so be warned: Your Mileage May Vary!</p>
+
+<ol>
+<li>Clone or download project source</li>
+<li> Although the LINQPad scripts do not require it, the Roslyn CTP must be installed in order to install and run the tools for Visual Studio.</li>
+<li> Open the CqrsMessagingTools solution in VS. You should be able to Ctrl+F5 to build and run the tools. A new instance of VS will start up. It distinguishes itself from other instances by having (Roslyn) in the title bars. The tools are now loaded and listening. </li>
+<li> (optional, but best supported) Open the CQRS Journey Conference solution in the Roslyn instance of VS. Browse to the ReigstrationController.cs in the public conference registration website project and observe syntax highlighting in action!</li>
+<li> (use at your own risk!) Go to the View -&gt; Other Windows -&gt; Roslyn Syntax Visualizer. The tools window has two tabs: one for the syntax visualizer sample for reference and troubleshooting, and the other is the command listing. </li>
+<li> (use at your own risk!) If you don't see anything in the interface drop-down box, click the refresh button and try again. Make sure you have a solution loaded. Select an interface in your solution from the drop-down, and you'll see a list of classes implementing that interface. These are all of the possible commands that are known to this solution and projects. </li>
+</ol><h1>Making the case: Here's the issue</h1>
+
+<ul>
+<li>First: Definitions in context
+
+<ul>
+<li>Messaging: Command and event publication grouped together, usually by means of a bus, queue, or some other pub/sub delivery service(s)</li>
+<li>PaaS: Platform-as-a-service, e.g. Azure, AppHarbor, Amazon E3, etc</li>
+</ul>
+</li>
+<li>Challenges
+
+<ol>
+<li>   Loose coupling slows knowledge production
+
+<ul>
+<li>Easy: Component-level understanding with focused, simple object diagrams</li>
+<li>Hard: Understanding how the various components interact with each other in source code</li>
+<li>Easy: Comprehending domain interactions within an AR using sequence diagrams</li>
+<li>Hard: Conceptualizing the message flow of a distributed business in source code</li>
+</ul>
+</li>
+<li>   Hidden requirements add complexity
+
+<ul>
+<li> Availability, idempotency, transactionality, are technical specifications that fulfill a business requirement, but are not a part of the business domain</li>
+<li> PaaS is virtually a necessity to achieve some architectural requirements, which adds more to the pile</li>
+</ul>
+</li>
+<li>   Advanced concepts raise barriers to entry
+
+<ul>
+<li> It's not enough to have quality, stable, code if only a few devs are comfortable with it in an organization</li>
+</ul>
+</li>
+</ol>
+</li>
+</ul><h1>What the tools can accomplish</h1>
+
+<ul>
+<li>Source code assistance and intervention
+
+<ol>
+<li>Syntax highlighting and classification</li>
+<li>Code Issues and Refactoring</li>
+<li>Intellisense and AutoCompletion</li>
+</ol>
+</li>
+<li>Visualization
+
+<ol>
+<li>Diagramming, e.g. DGML</li>
+<li>Message Flow Explorer</li>
+</ol>
+</li>
+<li>Code generation and 'f'rameworks
+
+<ol>
+<li>Messaging Intermediate Language (DSL)</li>
+<li>Auto-discovery and wiring components</li>
+<li>Automated generation and integration of infrastructure components with Domain</li>
+</ol>
+</li>
+</ul><h1>Current components of the tools</h1>
+
+<ul>
+<li>Syntax Highlighting
+
+<ul>
+<li>Highlights source code where commands are being instantiated and sent</li>
+</ul>
+</li>
+<li>MessageFlow Explorer (prototype - you've been warned!)
+
+<ul>
+<li>Provides a facile means of navigating and discovering messaging interactions</li>
+</ul>
+</li>
+<li>Code Issue
+
+<ul>
+<li>Raises code error if more than one class handles a command. Currently uses ICommand and ICommandHandler  as hard-coded interfaces (for now)</li>
+</ul>
+</li>
+</ul><h1>Messaging Intermediate (or -ary) Language (MIL)</h1>
+
+<p>For a detailed walkthrough of MIL, click <a href="https://github.com/jelster/CqrsMessagingTools/wiki/MIL-Walkthrough">here</a></p>
+
+<h2>Goals:</h2>
+
+<ul>
+<li>Simple plain-text DSL (Domain-Specific-Language)</li>
+<li>Readable and understandable by flesh and silicone alike (the format is self-describing and already tokenized)</li>
+<li>Goal is to provide minimum immediate detail necessary for comprehension in order to avoid information saturation</li>
+<li>Provides flexibility in presentation (format can be adapted to output to almost any rendering format) </li>
+<li>Can be used to make assertions when proving code (format can be directly processed into data and logic in the domain of the application)</li>
+</ul><h2>MIL Example</h2>
+
+<pre><code>1.  MakeSeatReservation? -&gt; SeatsAvailabilityHandler 
+2.     @SeatsAvailability:SeatsReserved! -&gt; 
+3.           -&gt; RegistrationProcessRouter::RegistrationProcess
+4.           *RegistrationProcess.State = AwaitingPayment
+5.           :MarkSeatsReserved? -&gt; 
+6.           :ExpireRegistrationProcess? -&gt; [Delay]
+7.
+8.   MarkSeatsReserved? -&gt; OrderCommandHandler
+9.     @Order::OrderPartiallyReserved! -&gt;
+10.     -&gt; OrderViewModelGenerator
+</code></pre>
+
+<ul>
+<li>Line 1 - a command (note the ?) is published to the bus and handled by the <code>SeatsAvailabilityHandler</code>
+</li>
+<li>Line 2 - as a result of the message being handled by the <code>SeatsAvailabilityHandler</code>, the Aggregate Route <code>@SeatsAvailability</code> pushes the <code>SeatsReserved!</code> event to listeners</li>
+<li>Line 3 - The RegistrationProcessRouter receives the <code>SeatsReserved!</code> event and routes it to the appropriate <code>RegistrationProcess</code> instance. </li>
+<li>Line 4 - <code>RegistrationProcess</code> changes state in response to event</li>
+<li>Line 5 - The <code>RegistrationProcess</code> publishes the <code>MarkSeatsReserved?</code> command to the bus</li>
+<li>Line 6 - An additional command is issued and published, but this time with the optional <code>[Delay]</code> token, denoting that the message will not immediately be processed or handled</li>
+<li>Line 9 - The <code>Order</code> Aggregate Root raises and publishes the <code>OrderPartiallyReserved</code> event to the bus in response to the <code>OrderCommandHandler</code>'s command processing.</li>
+<li>Line 10 - The event is picked up and handled by the <code>OrderViewModelGenerator</code>. The handler doesn't perform any messaging-relevant activities as a result of this, and so the interaction concludes</li>
+</ul>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Cqrsmessagingtools maintained by <a href="https://github.com/jelster">jelster</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-22811415-3");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+
+  </body>
+</html>
