@@ -39,40 +39,47 @@ namespace MilGenerator
         private static void Initialize(IEnumerable<string> args, CommandRunner runner)
         {
             bool showHelp = false;
-            bool dumpInfo = false;
+            bool? dumpInfo;
+
             var clArgs = new OptionSet
-            {
-            {
-                                     "s|sln=",
-                                     "full path of target Solution file (.sln) to be analyzed",
-                                     x => { runner.slnPath = Path.GetFullPath(x); }
-                                     },
-                                 {
-                                     "p|proccessIfx:",
-                                     "name of the interface used to mark a Process",
-                                     x => { runner.processIName = x; }
-                                     },
-                                 {
-                                     "x|externalNs:",
-                                     "namespace for eXternal-facing component (used to aid discovery of command/event initiators and sequences"
-                                     ,
-                                     x => { runner.externalNs = x; }
-                                     },
-                                 {
+                            {
+                                {
+                                    "s|sln=",
+                                    "full path of target Solution file (.sln) to be analyzed",
+                                    x => { runner.slnPath = Path.GetFullPath(x); }
+                                },
+                                {
+                                    "p|proccessIfx:",
+                                    "name of the interface used to mark a Process",
+                                    x => { runner.processIName = x; }
+                                },
+                                {
+                                    "x|externalNs:",
+                                    "namespace for eXternal-facing component (used to aid discovery of command/event initiators and sequences"
+                                    ,
+                                    x => { runner.externalNs = x; }
+                                },
+                                {
                                      "?|h|help",
                                      "this message",
                                      v => showHelp = (v != null)
-                                    }, 
-                                 {
-                                       "t|processType:",
-                                       "name of a concrete class implementing a process",
-                                       x => runner.processTypeName = x
-                                       }, 
-                                       {
-                                              "d|dump",
-                                              "Perform discovery and simply dump results without analysis",
-                                              d => runner.dumpInfo = (d != null)
-                                              }
+                                }, 
+                                {
+                                    "t|processType:",
+                                    "name of a concrete class implementing a process",
+                                    x => runner.processTypeName = x
+                                }, 
+                                {
+                                    "d|dump:",
+                                    "Default action. Performs discovery and dumps results without attempting analysis (use -d- to disable).",
+                                    (bool d) => runner.dumpInfo = d
+                                },
+                                {
+                                    "<>",
+                                    "List of assembly names to exclude from discovery and analysis.",
+                                    v => runner.ExcludedAssemblies.AddRange(v.Split(' '))
+                                },
+                                 
             };
             try
             {
@@ -121,7 +128,7 @@ namespace MilGenerator
         public string processTypeName = null;
         public string slnPath = null;
         public string externalNs = null;
-
+        public readonly List<string> ExcludedAssemblies = new List<string>();
         public IObservable<RunnerEventArg> MessagePump { get { return messagePump.AsObservable(); } }
         private readonly ISubject<RunnerEventArg> messagePump = new Subject<RunnerEventArg>();
         public bool dumpInfo;
@@ -154,21 +161,39 @@ namespace MilGenerator
 
             ProcessDefinition processDefinition = null;
             List<MilSyntaxWalker> analytics = new List<MilSyntaxWalker>();
-            foreach (var proj in sln.Projects.ToList())
+
+            if (ExcludedAssemblies.Any())
             {
-                SendMessage("* " + proj.AssemblyName + Environment.NewLine);
-                var compilation = (Compilation)proj.GetCompilation(token);
-                var semantics = new MilSemanticAnalyzer(compilation);
+                SendMessage(string.Format("Ignoring {0} Assemblies{1}", ExcludedAssemblies.Count, Environment.NewLine));
+            }
+            foreach (var proj in sln.Projects.ToList().Where(x => !ExcludedAssemblies.Contains(x.AssemblyName)))
+            {
+                SendMessage(Environment.NewLine + "# Processing assembly " + proj.AssemblyName + Environment.NewLine);
+
+                Compilation compilation = null;
+                MilSemanticAnalyzer semantics = null;
+
+                try
+                {
+                    compilation = (Compilation)proj.GetCompilation(token);
+                    semantics = new MilSemanticAnalyzer(compilation);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    continue;
+                }
+
                 var treeData = semantics.ExtractMessagingSyntax();
                 analytics.Add(treeData);
-                SendMessage("** Aggregate roots" + Environment.NewLine);
-                SendMessage(treeData.DumpAggregateRoots());
-                SendMessage("** Commands" + Environment.NewLine);
-                SendMessage(treeData.DumpCommandData());
-                SendMessage("** Events" + Environment.NewLine);
-                SendMessage(treeData.DumpEventData());
-                SendMessage("** Message publications" + Environment.NewLine);
-                SendMessage(treeData.DumpPublicationData());
+                SendMessage(Environment.NewLine + "# Aggregate roots" + Environment.NewLine);
+
+                SendMessage((treeData.AggregateRoots.Any() ? treeData.DumpAggregateRoots() : new[] { "-- none --" } as dynamic));
+                SendMessage(Environment.NewLine + "# Commands" + Environment.NewLine);
+                SendMessage((treeData.Commands.Any() || treeData.CommandHandlers.Any() ? treeData.DumpCommandData() : new[] { "-- none --" } as dynamic));
+                SendMessage(Environment.NewLine + "# Events" + Environment.NewLine);
+                SendMessage((treeData.Events.Any() || treeData.EventHandlers.Any() ? treeData.DumpEventData() : new[] { "-- none --" } as dynamic));
+                SendMessage(Environment.NewLine + "# Message publications" + Environment.NewLine);
+                SendMessage(treeData.PublicationCalls.Any() ? treeData.DumpPublicationData() : new[] { "-- none --" });
 
                 //if (proj.AssemblyName == externalProject.AssemblyName)
                 //    continue;
@@ -188,7 +213,7 @@ namespace MilGenerator
                 //    SendMessage(pubCall.ToString());
                 //}
             }
-           
+
 
             messagePump.OnCompleted();
         }
@@ -206,6 +231,7 @@ namespace MilGenerator
 
         private void SendMessage(string message, bool signalError = false)
         {
+            if (string.IsNullOrEmpty(message)) return;
             messagePump.OnNext(new RunnerEventArg(message, signalError));
         }
 

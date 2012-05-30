@@ -172,7 +172,6 @@ namespace MIL.Visitors
 
             foreach (var pub in Publications)
             {
-                yield return Environment.NewLine;
                 yield return string.Format("{0}.{1}.{2}:{3}{4}", 
                     pub.FirstAncestorOrSelf<NamespaceDeclarationSyntax>().Name.GetText(), 
                     pub.FirstAncestorOrSelf<ClassDeclarationSyntax>().Identifier.GetText(),
@@ -180,7 +179,6 @@ namespace MIL.Visitors
                     pub.Span.ToString(), 
                     Environment.NewLine);
             }
-            yield return Environment.NewLine;
         }
 
         public IEnumerable<MilToken> DumpAggregateRoots()
