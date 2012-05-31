@@ -26,6 +26,7 @@ namespace TestCode.Infrastructure
         void Handles(T command);
     }
     public interface IEventHandler<T> where T : IEvent {}
+    public class EventSourced : IEventSourced {}
 }";
 
         private const string programCode = @"
@@ -75,7 +76,7 @@ namespace TestCode.Logic
     { 
         public void Handles(Foo command) { throw new NotImplementedException(); }
     } 
-    public class FooRoot : IEventSourced {}
+    public class FooRoot : EventSourced {}
     public class Bar : IEvent {}
     public class Foobar : IEvent {}
     public class BarventHandler : IEventHandler<Bar> {}

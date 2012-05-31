@@ -13,7 +13,7 @@ namespace MIL.Visitors
         protected const string EventIfx = "IEvent";
         protected const string EventHandlerPlainIfx = "IEventHandler";
         protected const string CommandHandlerPlainIfx = "ICommandHandler";
-        protected const string AggregateRootPlainIfx = "IEventSourced";
+        protected const string AggregateRootPlainIfx = "EventSourced";
 
         private readonly HandlerDeclarationSyntaxVisitor _cmdHandlerDeclarationVisitor = new HandlerDeclarationSyntaxVisitor(CommandHandlerPlainIfx);
         private readonly HandlerDeclarationSyntaxVisitor _eventHandlerDeclarationVisitor = new HandlerDeclarationSyntaxVisitor(EventHandlerPlainIfx);
@@ -78,7 +78,7 @@ namespace MIL.Visitors
         {
             if (classNode.Modifiers.Any(SyntaxKind.AbstractKeyword) || classNode.BaseListOpt == null || !classNode.BaseListOpt.Types.Any()) return;
 
-            if (classNode.BaseListOpt.Types.Any(x => x.PlainName == AggregateRootPlainIfx)) AggregateRoots.Add(classNode);
+            if (classNode.BaseListOpt.Types.Any(x => AggregateRootPlainIfx.Contains(x.PlainName))) AggregateRoots.Add(classNode);
             
         }
 
@@ -172,7 +172,12 @@ namespace MIL.Visitors
 
         public IEnumerable<MilToken> DumpAggregateRoots()
         {
-            return AggregateRoots.Select(x => TokenFactory.GetAggregateRoot(x.Identifier.GetText()));
+            var r = AggregateRoots.Select(x => TokenFactory.GetAggregateRoot(x.Identifier.GetText()));
+            foreach (var agg in r)
+            {
+                yield return agg;
+                yield return TokenFactory.GetStatementTerminator();
+            }
         }
     }
 }

@@ -205,7 +205,6 @@ namespace MilGenerator
                 //}
             }
             SendMessage(Environment.NewLine + "# Aggregate roots" + Environment.NewLine);
-
             SendMessage((treeData.AggregateRoots.Any() ? treeData.DumpAggregateRoots() : new[] { "-- none --" } as dynamic));
             SendMessage(Environment.NewLine + "# Commands" + Environment.NewLine);
             SendMessage((treeData.Commands.Any() || treeData.CommandHandlers.Any() ? treeData.DumpCommandData() : new[] { "-- none --" } as dynamic));
