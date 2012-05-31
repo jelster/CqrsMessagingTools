@@ -154,46 +154,37 @@ namespace MilGenerator
             //    messagePump.OnError(new ArgumentException(msg));
             //    return;
             //}
-            SendMessage(string.Format("Using {0} for process discovery{1}", processTypeName ?? processIName, Environment.NewLine));
+            SendMessage(string.Format("{1}Using {0} for process discovery{1}", processTypeName ?? processIName, Environment.NewLine));
 
             var token = new CancellationToken();
             var analyzer = new MIL.Services.ProcessAnalysisService(processIName);
 
             ProcessDefinition processDefinition = null;
-            List<MilSyntaxWalker> analytics = new List<MilSyntaxWalker>();
 
             if (ExcludedAssemblies.Any())
             {
-                SendMessage(string.Format("Ignoring {0} Assemblies{1}", ExcludedAssemblies.Count, Environment.NewLine));
+                SendMessage(string.Format("Ignoring {0} Assemblies{1}", sln.Projects.Count(x => !ExcludedAssemblies.Any(e => x.AssemblyName.Contains(e))), Environment.NewLine));
             }
-            foreach (var proj in sln.Projects.ToList().Where(x => !ExcludedAssemblies.Contains(x.AssemblyName)))
-            {
-                SendMessage(Environment.NewLine + "# Processing assembly " + proj.AssemblyName + Environment.NewLine);
 
-                Compilation compilation = null;
+            MilSyntaxWalker treeData = new MilSyntaxWalker();
+            foreach (var proj in sln.Projects.ToList().Where(x => !ExcludedAssemblies.Any(e => x.AssemblyName.Contains(e))))
+            {
+                SendMessage("# Processing assembly " + proj.AssemblyName + Environment.NewLine);
+
                 MilSemanticAnalyzer semantics = null;
 
                 try
                 {
-                    compilation = (Compilation)proj.GetCompilation(token);
+                    Compilation compilation = (Compilation)proj.GetCompilation(token);
                     semantics = new MilSemanticAnalyzer(compilation);
                 }
                 catch (InvalidOperationException ex)
                 {
+                    SendMessage("    Skipping due to compilation errors in assembly" + Environment.NewLine);
                     continue;
                 }
 
-                var treeData = semantics.ExtractMessagingSyntax();
-                analytics.Add(treeData);
-                SendMessage(Environment.NewLine + "# Aggregate roots" + Environment.NewLine);
-
-                SendMessage((treeData.AggregateRoots.Any() ? treeData.DumpAggregateRoots() : new[] { "-- none --" } as dynamic));
-                SendMessage(Environment.NewLine + "# Commands" + Environment.NewLine);
-                SendMessage((treeData.Commands.Any() || treeData.CommandHandlers.Any() ? treeData.DumpCommandData() : new[] { "-- none --" } as dynamic));
-                SendMessage(Environment.NewLine + "# Events" + Environment.NewLine);
-                SendMessage((treeData.Events.Any() || treeData.EventHandlers.Any() ? treeData.DumpEventData() : new[] { "-- none --" } as dynamic));
-                SendMessage(Environment.NewLine + "# Message publications" + Environment.NewLine);
-                SendMessage(treeData.PublicationCalls.Any() ? treeData.DumpPublicationData() : new[] { "-- none --" });
+                semantics.ExtractMessagingSyntax(treeData);
 
                 //if (proj.AssemblyName == externalProject.AssemblyName)
                 //    continue;
@@ -213,7 +204,15 @@ namespace MilGenerator
                 //    SendMessage(pubCall.ToString());
                 //}
             }
+            SendMessage(Environment.NewLine + "# Aggregate roots" + Environment.NewLine);
 
+            SendMessage((treeData.AggregateRoots.Any() ? treeData.DumpAggregateRoots() : new[] { "-- none --" } as dynamic));
+            SendMessage(Environment.NewLine + "# Commands" + Environment.NewLine);
+            SendMessage((treeData.Commands.Any() || treeData.CommandHandlers.Any() ? treeData.DumpCommandData() : new[] { "-- none --" } as dynamic));
+            SendMessage(Environment.NewLine + "# Events" + Environment.NewLine);
+            SendMessage((treeData.Events.Any() || treeData.EventHandlers.Any() ? treeData.DumpEventData() : new[] { "-- none --" } as dynamic));
+            SendMessage(Environment.NewLine + "# Message publications" + Environment.NewLine);
+            SendMessage(treeData.PublicationCalls.Any() ? treeData.DumpPublicationData() : new[] { "-- none --" });
 
             messagePump.OnCompleted();
         }

@@ -32,9 +32,12 @@ namespace MIL.Visitors
             throw new InvalidOperationException(msg);
         }
 
-        public MilSyntaxWalker ExtractMessagingSyntax()
+        public MilSyntaxWalker ExtractMessagingSyntax(MilSyntaxWalker walk = null)
         {
-            walker = new MilSyntaxWalker();
+            if (walk == null && walker == null)
+                walker = new MilSyntaxWalker();
+            else
+                walker = walk;
 
             foreach (var tree in _compilation.SyntaxTrees)
             {

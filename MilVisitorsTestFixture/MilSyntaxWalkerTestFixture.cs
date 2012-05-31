@@ -163,7 +163,7 @@ namespace TestCode.Logic
             {
                 var analysis = new MilSemanticAnalyzer(compilation);
                 var walker = analysis.ExtractMessagingSyntax();
-                Assert.NotEmpty(walker.PublicationCalls);
+                Assert.NotEmpty(walker.Publications);
             }
 
             [Fact]
@@ -209,8 +209,22 @@ namespace TestCode.Logic
             public void when_walked_discovers_aggregate_roots()
             {
                 sut.Visit(declarationTree.Root);
-                Assert.NotEmpty(sut.AggregateRoots);
-                
+                Assert.NotEmpty(sut.AggregateRoots);    
+            }
+
+            [Fact]
+            public void when_event_data_dumped_contains_event_and_handlers_mil()
+            {
+                sut.Visit(declarationTree.Root);
+                sut.Visit(logicTree.Root);
+                sut.Visit(infraTree.Root);
+
+                Assert.NotEmpty(sut.Events);
+                Assert.NotEmpty(sut.EventHandlers);
+                var data = sut.DumpEventData();
+                Assert.NotEmpty(data);
+                data.ToList().ForEach(x => Console.Write(x.ToString()));
+                 
             }
         }
     }

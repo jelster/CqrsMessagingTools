@@ -59,20 +59,19 @@ namespace MIL.Visitors
 
         protected override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            foreach (var classNode in node.DescendentNodesAndSelf().OfType<ClassDeclarationSyntax>())
-            {
-                LookForAggregates(classNode);
-                LookForCommands(classNode);
-                LookForCommandHandlers(classNode);
-                LookForEvents(classNode);
-                LookForEventHandlers(classNode);
+             
+                LookForAggregates(node);
+                LookForCommands(node);
+                LookForCommandHandlers(node);
+                LookForEvents(node);
+                LookForEventHandlers(node);
 
                 var methods = node.DescendentNodes().OfType<MethodDeclarationSyntax>();
                 foreach (var method in methods.Where(x => x.BodyOpt != null))
                 {
                     Visit(method);
                 }
-            }
+            
         }
 
         private void LookForAggregates(ClassDeclarationSyntax classNode)
@@ -129,11 +128,6 @@ namespace MIL.Visitors
                 var t1 = CommandHandlers.FirstOrDefault(x => x.BaseListOpt.Types.OfType<GenericNameSyntax>()
                                                                  .Any(y => y.TypeArgumentList.Arguments.Any(z => z.GetClassName().Contains(cmd.GetClassName()))));
 
-                if (t1 == null)
-                {
-                    yield return TokenFactory.GetStatementTerminator();
-                    continue;
-                }
                 yield return TokenFactory.GetCommandHandler(t1 == null ? TokenFactory.GetEmptyToken().ToString() : t1.GetClassName());
                 yield return TokenFactory.GetStatementTerminator();
             }
@@ -149,11 +143,7 @@ namespace MIL.Visitors
                 yield return TokenFactory.GetStatementTerminator();
 
                 var t1 = EventHandlers.Where(x => x.BaseListOpt.Types.OfType<GenericNameSyntax>()
-                                                           .Any(y => y.TypeArgumentList.Arguments.Any(z => z.GetClassName().Contains(eventClassName)))).Distinct();
-                if (!t1.Any())
-                {
-                    yield break;
-                }
+                                                           .Any(y => y.TypeArgumentList.Arguments.Any(z => z.GetClassName().Contains(eventClassName)))).ToList();
                 foreach (var evHand in t1)
                 {
                     var handleName = evHand.GetClassName();
@@ -162,7 +152,6 @@ namespace MIL.Visitors
                     yield return TokenFactory.GetEventHandler(handleName);
                     yield return TokenFactory.GetStatementTerminator();
                 }
-                yield return TokenFactory.GetStatementTerminator();
             }
         }
 
