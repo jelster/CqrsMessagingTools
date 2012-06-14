@@ -3,12 +3,17 @@
 
 These concepts wouldn't have happened without the [Microsoft Patterns & Practices group's CQRS-Journey](http://cqrsjourney.github.com/) project and team. See below for instructions and warnings
 
+##6-14-2012 IMPORTANT UPDATE:
+* The new CTP of the Roslyn tooling introduces a ton of new features as well as reworked API's. As a consequence, the tooling will not currently build using the new tooling. I'm hoping to correct this in the near future, but for now the CqrsMessagingTools (SawMIL sound like a good name?) do not support it. 
+* Questions, comments, feedback, etc are all welcome - visit the [https://github.com/jelster/CqrsMessagingTools/issues](issue tracker) to do so.
+
 # NEW! MilGenerator command-line tool
 The MilGenerator.exe utility will analyze a given solution file, outputting (optionally) a raw dump of messaging information to the console. 
 ##Basic Usage:
 1. the -s parameter is the full path to the VS 2010 .SLN file of the target application
 2. (recommended) pass the -d option to get a full dump of data. Otherwise, there isn't much to see :)
 3. help on options is available by passing -?, -h, or --help as a parameter
+
 
 # Tool Installation Instructions and Walkthrough
 These tools are the product of a week's spent poking around a lot of unfamiliar territory, so be warned: Your Mileage May Vary!
