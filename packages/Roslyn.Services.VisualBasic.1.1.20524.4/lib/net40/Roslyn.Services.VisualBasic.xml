@@ -1,0 +1,254 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+Roslyn.Services.VisualBasic
+</name>
+</assembly>
+<members>
+<member name="T:Roslyn.Services.VisualBasic.VisualBasicSyntaxTreeFactoryService.PositionalSyntaxReference">
+	<summary>
+ Represents a syntax reference that doesn't actually hold onto the referenced node.
+ Instead, enough data is held onto so that the node can be recovered and returned if
+ necessary.
+ </summary>
+</member><member name="T:Roslyn.Services.VisualBasic.VisualBasicSyntaxTreeFactoryService.NullSyntaxReference">
+	<summary>
+ Represents a syntax reference that was passed a null
+ reference to a node. In this case, we just hold onto the
+ weak tree reference and throw if any invalid properties
+ are accessed.
+ </summary>
+</member><member name="M:Roslyn.Services.VisualBasic.Extensions.SyntaxTreeExtensions.FindTriviaToLeft(Roslyn.Compilers.VisualBasic.SyntaxTree,System.Int32)">
+	<summary>
+ Finds the token being touched by this position. Unlike the normal FindTrivia helper, this helper will prefer
+ trivia to the left rather than the right if the position is on the border.
+ </summary>
+	<param name="syntaxTree">The syntaxTree to search.</param>
+	<param name="position">The position to find trivia.</param>
+</member><member name="M:Roslyn.Services.VisualBasic.Extensions.SyntaxTreeExtensions.FindTokenToLeftOfPosition(Roslyn.Compilers.VisualBasic.SyntaxTree,System.Int32,System.Boolean)">
+	<summary>
+ Finds the token being touched by this position. Unlike the normal FindToken helper, this helper will prefer
+ token to the left rather than at the given position if the position is on the border.
+ </summary>
+	<param name="syntaxTree">The syntaxTree to search.</param>
+	<param name="position">The position to find trivia.</param>
+</member><member name="M:Roslyn.Services.VisualBasic.Extensions.SyntaxTreeExtensions.FindTokenOnRightOfPosition(Roslyn.Compilers.VisualBasic.SyntaxTree,System.Int32,System.Boolean)">
+	<summary>
+ If the position is inside of token, return that token; otherwise, return the token to right.
+ </summary>
+</member><member name="M:Roslyn.Services.VisualBasic.Extensions.SyntaxTreeExtensions.FindTokenOnLeftOfPosition(Roslyn.Compilers.VisualBasic.SyntaxTree,System.Int32,System.Boolean)">
+	<summary>
+ If the position is inside of token, return that token; otherwise, return the token to left. 
+ </summary>
+</member><member name="M:Roslyn.Services.VisualBasic.Extensions.SyntaxTokenExtensions.IsChildToken``1(Roslyn.Compilers.VisualBasic.SyntaxToken,System.Func{``0,Roslyn.Compilers.VisualBasic.SyntaxToken})">
+	<summary>
+ Returns true if is a given token is a child token of of a certain type of parent node.
+ </summary>
+	<typeparam name="TParent">The type of the parent node.</typeparam>
+	<param name="token">The token that we are testing.</param>
+	<param name="childGetter">A function that, when given the parent node, returns the child token we are interested in.</param>
+</member><member name="M:Roslyn.Services.VisualBasic.Extensions.SyntaxTokenExtensions.IsChildSeparatorToken``2(Roslyn.Compilers.VisualBasic.SyntaxToken,System.Func{``0,Roslyn.Compilers.VisualBasic.SeparatedSyntaxList{``1}})">
+	<summary>
+ Returns true if is a given token is a seperator token in a given parent list.
+ </summary>
+	<typeparam name="TParent">The type of the parent node containing the separated list.</typeparam>
+	<param name="token">The token that we are testing.</param>
+	<param name="childGetter">A function that, when given the parent node, returns the separated list.</param>
+</member><member name="M:Roslyn.Services.VisualBasic.Extensions.SyntaxTokenExtensions.IsFirstTokenOnLine(Roslyn.Compilers.VisualBasic.SyntaxToken,Roslyn.Compilers.IText)">
+	<summary>
+ Determines whether the given SyntaxToken is the first token on a line in the specified IText
+ </summary>
+</member><member name="M:Roslyn.Services.VisualBasic.Extensions.SyntaxNodeExtensions.SplitNodesOnPreprocessorBoundaries``1(System.Collections.Generic.IEnumerable{``0},System.Threading.CancellationToken)">
+	<summary>
+ Breaks up the list of provided nodes, based on how they are 
+ interspersed with pp directives, into groups.  Within these groups
+ nodes can be moved around safely, without breaking any pp 
+ constructs.
+ </summary>
+</member><member name="M:Roslyn.Services.VisualBasic.Extensions.SyntaxNodeExtensions.ContainsInterleavedDirective(Roslyn.Compilers.VisualBasic.SyntaxNode,System.Threading.CancellationToken)">
+	<summary>
+ Returns true if the passed in node contains an interleaved pp 
+ directive.
+ 
+ i.e. The following returns false:
+ 
+   void Foo() {
+ #if true
+ #endif
+   }
+ 
+ #if true
+   void Foo() {
+   }
+ #endif
+ 
+ but these return true:
+ 
+ #if true
+   void Foo() {
+ #endif
+   }
+ 
+   void Foo() {
+ #if true
+   }
+ #endif
+ 
+ #if true
+   void Foo() {
+ #else
+   }
+ #endif
+ 
+ i.e. the method returns true if it contains a PP directive that 
+ belongs to a grouping constructs (like #if/#endif or 
+ #region/#endregion), but the grouping construct isn't entirely c
+ contained within the span of the node.
+ </summary>
+</member><member name="M:Roslyn.Services.VisualBasic.Extensions.SyntaxNodeExtensions.FindTokenOnRightOfPosition(Roslyn.Compilers.VisualBasic.SyntaxNode,System.Int32,System.Boolean,System.Boolean)">
+	<summary>
+ If the position is inside of token, return that token; otherwise, return the token to right.
+ </summary>
+</member><member name="M:Roslyn.Services.VisualBasic.Extensions.SyntaxNodeExtensions.FindTokenOnLeftOfPosition(Roslyn.Compilers.VisualBasic.SyntaxNode,System.Int32,System.Boolean,System.Boolean)">
+	<summary>
+ If the position is inside of token, return that token; otherwise, return the token to left. 
+ </summary>
+</member><member name="M:Roslyn.Services.VisualBasic.Extensions.SyntaxNodeExtensions.FindSkippedToken(Roslyn.Compilers.VisualBasic.SyntaxTriviaList,System.Int32)">
+	<summary>
+ Look inside a trivia list for a skipped token that contains the given position.
+ </summary>
+</member><member name="M:Roslyn.Services.VisualBasic.Extensions.ISemanticModelExtensions.GenerateNameForExpression(Roslyn.Compilers.Common.ISemanticModel,Roslyn.Compilers.VisualBasic.ExpressionSyntax)">
+	<summary>
+ Given an expression node, tries to generate an appropriate name that can be used for
+ that expression.
+ </summary>
+</member><member name="M:Roslyn.Services.VisualBasic.Extensions.ExpressionSyntaxExtensions.DecomposeName(Roslyn.Compilers.VisualBasic.ExpressionSyntax,Roslyn.Compilers.VisualBasic.ExpressionSyntax@,System.String@,System.Int32@)">
+	<summary>
+ Decompose a name or member access expression into its component parts.
+ </summary>
+	<param name="expression">The name or member access expression.</param>
+	<param name="qualifier">The qualifier (or left-hand-side) of the name expression. This may be null if there is no qualifier.</param>
+	<param name="name">The name of the expression.</param>
+	<param name="arity">The number of generic type parameters.</param>
+</member><member name="P:Roslyn.Services.VisualBasic.Extensions.DirectiveSyntaxExtensions.DirectiveInfo.StartEndMap">
+	<summary>
+ Returns a map which maps from a DirectiveStatementSyntax to it's corresponding start/end directive.
+ Directives like #ElseIf which exist in the middle of a start/end pair are not included.
+ </summary>
+</member><member name="P:Roslyn.Services.VisualBasic.Extensions.DirectiveSyntaxExtensions.DirectiveInfo.ConditionalMap">
+	<summary>
+ Maps a #If/#ElseIf/#Else/#EndIf directive to its list of matching #If/#ElseIf/#Else/#End directives.
+ </summary>
+</member><member name="M:Roslyn.Services.VisualBasic.Extensions.DirectiveSyntaxExtensions.GetMatchingStartOrEndDirective(Roslyn.Compilers.VisualBasic.DirectiveStatementSyntax,System.Threading.CancellationToken)">
+	<summary>
+ Given a starting or ending directive, return the matching directive, if it exists. For directives that live
+ the "middle" of a start/end pair, such as #ElseIf or #Else, this method will throw.
+ </summary>
+</member><member name="M:Roslyn.Services.VisualBasic.Extensions.DirectiveSyntaxExtensions.GetMatchingConditionalDirectives(Roslyn.Compilers.VisualBasic.DirectiveStatementSyntax,System.Threading.CancellationToken)">
+	<summary>
+ Given a conditional directive (#If, #ElseIf, #Else, or #End If), returns a IEnumerable of all directives in
+ the set.
+ </summary>
+</member><member name="M:Roslyn.Services.VisualBasic.RemoveUnnecessaryImports.VisualBasicRemoveUnnecessaryImportsService.Visitor.ShouldCheck``1(System.Collections.Generic.Dictionary{System.String,System.Collections.Generic.HashSet{``0}},System.String)">
+	<summary>
+ There is no point binding to a node with name 'N' if we already think the imports
+ that brought in 'N' are 'used'.  We should only bind the names for things that are
+ coming from imports that are still potentially unused that we want to know more
+ about.
+ </summary>
+</member><member name="T:Roslyn.Services.VisualBasic.RemoveUnnecessaryImports.VisualBasicRemoveUnnecessaryImportsService.Visitor">
+	<summary>
+ TODO(cyrusn): 
+ 
+ 1) Handle queries.  They may bind to extension methods and should cause extensions to be
+    considered used.
+ 2) Currently we will mark a using as used if an identifier binds to a member of that
+     namespace that the using pulls.  This is valid in most cases except for when we're also
+     *inside* that namespace.  i.e. "using Foo; namespace Foo { ... }".  In this case we do
+     want to remove the "using Foo;" as it's not actually removed. 
+ 3) Handle extern aliases.  We want to remove them as well if they're not used.
+ 4) Async/Await/GetAwaiter.
+ 5) Extension methods in foreach.  (Check on this.)
+ 6) Extension methods in Collection initializers.  (Check on this.)
+ 7) Dispose method in using.  (Check on this.)
+ </summary>
+</member><member name="T:Roslyn.Services.VisualBasic.VisualBasicSyntaxTreeFactoryService.RecoverableSyntaxTree">
+	<summary>
+ Represents a syntax tree that only has a weak reference to its 
+ underlying data.  This way it can be passed around without forcing
+ the underlying full tree to stay alive.  Think of it more as a 
+ key that can be used to identify a tree rather than the tree itself.
+ </summary>
+</member><member name="T:Roslyn.Services.VisualBasic.VisualBasicSyntaxTreeFactoryService.PathSyntaxReference">
+	<summary>
+ Represents a syntax reference that doesn't actually hold onto the 
+ referenced node.  Instead, enough data is held onto so that the node
+ can be recovered and returned if necessary.
+ </summary>
+</member><member name="T:Roslyn.Services.VisualBasic.Formatting.TriviaDataFactory">
+	<summary>
+ trivia factory.
+ 
+ it will cache some commonly used trivia to reduce memory footprint and heap allocation
+ </summary>
+</member><member name="T:Roslyn.Services.VisualBasic.Formatting.TriviaDataFactory.LineContinuationTrivia">
+	<summary>   
+ represents a general trivia between two tokens. slightly more expensive than others since it
+ needs to calculate stuff unlike other cases
+ </summary>
+</member><member name="T:Roslyn.Services.VisualBasic.Formatting.TriviaDataFactory.ComplexTrivia">
+	<summary>   
+ represents a general trivia between two tokens. slightly more expensive than others since it
+ needs to calculate stuff unlike other cases
+ </summary>
+</member><member name="T:Roslyn.Services.VisualBasic.Formatting.TriviaDataFactory.AfterStatementTerminatorTokenTrivia">
+	<summary>   
+ represents a general trivia between two tokens. slightly more expensive than others since it
+ needs to calculate stuff unlike other cases
+ </summary>
+</member><member name="T:Roslyn.Services.VisualBasic.Formatting.FormattingResult">
+	<summary>
+ this holds onto changes made by formatting engine.
+ 
+ currently it only has an ability to apply those changes to buffer. but it could be expanded to
+ support other cases as well such as tree or etc.
+ </summary>
+</member><member name="M:Roslyn.Services.VisualBasic.Extensions.IMethodSymbolExtensions.IsAggregateFunction(Roslyn.Compilers.Common.IMethodSymbol)">
+	<summary>
+ Determines whether the given IMethodSymbol can be used as an aggregate function
+ in a Group..By..Into or an Aggregate..Into clause.
+ </summary>
+</member><member name="M:Roslyn.Services.VisualBasic.Extensions.ContextQuery.SyntaxTreeExtensions.IsSingleLineStatementContext(Roslyn.Compilers.VisualBasic.SyntaxTree,System.Int32)">
+	<summary>
+ The specified position is where I could start a statement in a place where exactly one
+ statement could exist.
+ </summary>
+</member><member name="M:Roslyn.Services.VisualBasic.Extensions.ContextQuery.SyntaxTreeExtensions.IsMultiLineStatementStartContext(Roslyn.Compilers.VisualBasic.SyntaxTree,System.Int32)">
+	<summary>
+ The specified position is where I could start a statement in a place where one or more
+ statements could exist.
+ </summary>
+</member><member name="M:Roslyn.Services.VisualBasic.Extensions.ContextQuery.SyntaxTreeExtensions.IsTypeDeclarationContext(Roslyn.Compilers.VisualBasic.SyntaxTree,System.Int32)">
+	<summary>
+ The specified position is where we can declare some .NET type, such as classes, structures, etc.
+ </summary>
+</member><member name="M:Roslyn.Services.VisualBasic.Extensions.ContextQuery.SyntaxTreeExtensions.IsTypeMemberDeclarationKeywordContext(Roslyn.Compilers.VisualBasic.SyntaxTree,System.Int32)">
+	<summary>
+ The specified position is where a keyword can go like "Sub", "Function", etc. in a classes, structures, and modules
+ </summary>
+</member><member name="M:Roslyn.Services.VisualBasic.Extensions.ContextQuery.SyntaxTreeExtensions.IsInterfaceMemberDeclarationKeywordContext(Roslyn.Compilers.VisualBasic.SyntaxTree,System.Int32)">
+	<summary>
+ The specified position is where a keyword can go like "Sub", "Function" in an interface
+ </summary>
+</member><member name="M:Roslyn.Services.VisualBasic.Extensions.ContextQuery.SyntaxTreeExtensions.IsTypeDeclarationKeywordContext(Roslyn.Compilers.VisualBasic.SyntaxTree,System.Int32)">
+	<summary>
+ The specified position is where we can declare some .NET type, such as classes, structures, etc.
+ </summary>
+</member><member name="M:Roslyn.Services.VisualBasic.Extensions.ContextQuery.SyntaxTreeExtensions.IsAfterStatementOfKind(Roslyn.Compilers.VisualBasic.SyntaxTree,System.Int32,Roslyn.Compilers.VisualBasic.SyntaxKind[])">
+	<summary>
+ The specified position is immediately following a statement of one of the given kinds.
+ </summary>
+</member>
+</members>
+</doc>

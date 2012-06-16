@@ -38,7 +38,7 @@ namespace MIL.Visitors
         public List<MemberAccessExpressionSyntax> PublicationCalls { get; private set; }
         public List<ClassDeclarationSyntax> AggregateRoots { get; private set; } 
 
-        protected override void VisitMemberAccessExpression(MemberAccessExpressionSyntax node)
+        public override void VisitMemberAccessExpression(MemberAccessExpressionSyntax node)
         {
             if (node.Name.GetText() != PublishKeyword) return;
 
@@ -49,15 +49,15 @@ namespace MIL.Visitors
         //{
            
         //}
-        protected override void VisitNamespaceDeclaration(NamespaceDeclarationSyntax node)
+        public override void VisitNamespaceDeclaration(NamespaceDeclarationSyntax node)
         {
-            foreach (var type in node.DescendentNodes().OfType<ClassDeclarationSyntax>())
+            foreach (var type in node.DescendantNodes().OfType<ClassDeclarationSyntax>())
             {
                 Visit(type);
             }
         }
 
-        protected override void VisitClassDeclaration(ClassDeclarationSyntax node)
+        public override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
              
                 LookForAggregates(node);
@@ -66,8 +66,8 @@ namespace MIL.Visitors
                 LookForEvents(node);
                 LookForEventHandlers(node);
 
-                var methods = node.DescendentNodes().OfType<MethodDeclarationSyntax>();
-                foreach (var method in methods.Where(x => x.BodyOpt != null))
+                var methods = node.DescendantNodes().OfType<MethodDeclarationSyntax>();
+                foreach (var method in methods.Where(x => x.Body != null))
                 {
                     Visit(method);
                 }
@@ -76,15 +76,15 @@ namespace MIL.Visitors
 
         private void LookForAggregates(ClassDeclarationSyntax classNode)
         {
-            if (classNode.Modifiers.Any(SyntaxKind.AbstractKeyword) || classNode.BaseListOpt == null || !classNode.BaseListOpt.Types.Any()) return;
+            if (classNode.Modifiers.Any(SyntaxKind.AbstractKeyword) || classNode.BaseList == null || !classNode.BaseList.Types.Any()) return;
 
-            if (classNode.BaseListOpt.Types.Any(x => AggregateRootPlainIfx.Contains(x.PlainName))) AggregateRoots.Add(classNode);
+            if (classNode.BaseList.Types.Any(x => AggregateRootPlainIfx.Contains(x.PlainName))) AggregateRoots.Add(classNode);
             
         }
 
         private void LookForEvents(ClassDeclarationSyntax node)
         {
-            if (node.BaseListOpt != null && node.BaseListOpt.Types.Any(t => t.PlainName == EventIfx))
+            if (node.BaseList != null && node.BaseList.Types.Any(t => t.PlainName == EventIfx))
             {
                 Events.Add(node);
             }
@@ -92,7 +92,7 @@ namespace MIL.Visitors
 
         private void LookForCommands(ClassDeclarationSyntax node)
         {
-            if (node.BaseListOpt != null && node.BaseListOpt.Types.Any(t => t.PlainName == CommandIfx))
+            if (node.BaseList != null && node.BaseList.Types.Any(t => t.PlainName == CommandIfx))
             {
                 Commands.Add(node);
             }
@@ -125,7 +125,7 @@ namespace MIL.Visitors
                 yield return TokenFactory.GetCommand(cmd.GetClassName());
                 yield return TokenFactory.GetPublish();
 
-                var t1 = CommandHandlers.FirstOrDefault(x => x.BaseListOpt.Types.OfType<GenericNameSyntax>()
+                var t1 = CommandHandlers.FirstOrDefault(x => x.BaseList.Types.OfType<GenericNameSyntax>()
                                                                  .Any(y => y.TypeArgumentList.Arguments.Any(z => z.GetClassName().Contains(cmd.GetClassName()))));
 
                 yield return TokenFactory.GetCommandHandler(t1 == null ? TokenFactory.GetEmptyToken().ToString() : t1.GetClassName());
@@ -142,7 +142,7 @@ namespace MIL.Visitors
                 yield return TokenFactory.GetPublish();
                 yield return TokenFactory.GetStatementTerminator();
 
-                var t1 = EventHandlers.Where(x => x.BaseListOpt.Types.OfType<GenericNameSyntax>()
+                var t1 = EventHandlers.Where(x => x.BaseList.Types.OfType<GenericNameSyntax>()
                                                            .Any(y => y.TypeArgumentList.Arguments.Any(z => z.GetClassName().Contains(eventClassName)))).ToList();
                 foreach (var evHand in t1)
                 {
