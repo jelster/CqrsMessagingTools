@@ -40,13 +40,13 @@ governing permissions and limitations under the License.
         defining some of the constants that we will use inside the file. -->
 
   <!--This is the file that defines the IDs for all the commands exposed by VisualStudio. -->
-  <Extern href="stdidcmd.h"/>
+  <Extern href="stdidcmd.h" />
 
   <!--This header contains the command ids for the menus provided by the shell. -->
-  <Extern href="vsshlids.h"/>
+  <Extern href="vsshlids.h" />
 
   <!--Definition of some VSCT specific constants. In this sample we use it for the IDs inside the guidOfficeIcon group. -->
-  <Extern href="msobtnid.h"/>
+  <!--<Extern href="msobtnid.h" xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" />-->
 
   <!--The Commands section is where we the commands, menus and menu groups are defined.
       This section uses a Guid to identify the package that provides the command defined inside it. -->
@@ -80,7 +80,7 @@ governing permissions and limitations under the License.
           If you do not want an image next to your command, remove the Icon node or set it to <Icon guid="guidOfficeIcon" id="msotcidNoIcon" /> -->
 
       <Button guid="guidSyntaxVisualizerExtensionCmdSet" id="cmdidRoslynSyntaxVisualizer" priority="0x0100" type="Button">
-        <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1" />
         <Icon guid="guidImages" id="bmpSyntaxTree" />
         <Strings>
           <CommandName>cmdidRoslynSyntaxVisualizer</CommandName>
@@ -96,7 +96,7 @@ governing permissions and limitations under the License.
             bitmap strip containing the bitmaps and then there are the numeric ids of the elements used 
             inside a button definition. An important aspect of this declaration is that the element id 
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
-      <Bitmap guid="guidImages" href="SyntaxTree.bmp" usedList="bmpSyntaxTree"/>
+      <Bitmap guid="guidImages" href="SyntaxTree.bmp" usedList="bmpSyntaxTree" />
     </Bitmaps>
   </Commands>
 
@@ -109,8 +109,8 @@ governing permissions and limitations under the License.
       <IDSymbol name="cmdidRoslynSyntaxVisualizer" value="0x0101" />
     </GuidSymbol>
     
-    <GuidSymbol name="guidImages" value="{5b3999b1-c46b-4560-b7d5-7085a55c3dcc}" >
-      <IDSymbol name="bmpSyntaxTree" value="1"/>
+    <GuidSymbol name="guidImages" value="{5b3999b1-c46b-4560-b7d5-7085a55c3dcc}">
+      <IDSymbol name="bmpSyntaxTree" value="1" />
     </GuidSymbol>
   </Symbols>
 </CommandTable>

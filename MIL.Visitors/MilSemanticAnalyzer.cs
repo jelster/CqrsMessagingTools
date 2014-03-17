@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -41,7 +42,7 @@ namespace MIL.Visitors
 
             foreach (var tree in _compilation.SyntaxTrees)
             {
-                walker.Visit(tree.Root);
+                walker.Visit(tree.GetRoot());
             }
 
             return walker;
@@ -57,15 +58,15 @@ namespace MIL.Visitors
             foreach (var stmt in pubs)
             {
                 var syntax = stmt.Expression;
-                var model = _compilation.GetSemanticModel(_compilation.SyntaxTrees.First(x => x.Root.DescendentNodesAndSelf().Any(r => r == syntax)));
-                var info = model.GetSemanticInfo(syntax);
-                if (info == null || info.Symbol == null) continue;
+                var model = _compilation.GetSemanticModel(_compilation.SyntaxTrees.First(x => x.GetRoot().DescendantNodesAndSelf().Any(r => r == syntax)));
+                var info = model.GetSymbolInfo(syntax);
+                if (info.Symbol == null) continue;
                 
-                var methodSymbol = (MethodSymbol)info.Symbol;
-                if (methodSymbol.Parameters.IsNullOrEmpty || methodSymbol.MethodKind != MethodKind.Ordinary)
-                    continue;
+                //var methodSymbol = (MethodSymbol)info.Symbol;
+                //if (methodSymbol.Parameters.IsNullOrEmpty || methodSymbol.MethodKind != MethodKind.Ordinary)
+                //    continue;
 
-                var dout = model.AnalyzeRegionDataFlow(stmt.Parent.Span);
+                var dout = model.AnalyzeExpressionDataFlow(syntax);
                 var par =
                     dout.ReadOutside.Concat(dout.ReadInside).Concat(dout.DataFlowsOut).Concat(dout.WrittenInside).Select(x => 
                         x.ToMinimalDisplayParts(x.Locations.First(), model).First().GetText(CultureInfo.InvariantCulture));
@@ -75,7 +76,7 @@ namespace MIL.Visitors
 
                 var cmdName = cmdMatches;
                  
-                var handler = walker.CommandHandlers.FirstOrDefault(x => x.BaseListOpt.Types.Any(a => ((GenericNameSyntax)a).TypeArgumentList.Arguments.CollectionContainsClass(cmdName)));
+                var handler = walker.CommandHandlers.FirstOrDefault(x => x.BaseList.Types.OfType<GenericNameSyntax>().Any(a => a.TypeArgumentList.Arguments.CollectionContainsClass(cmdName)));
 
                     if (handler == null) continue;
 

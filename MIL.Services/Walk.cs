@@ -6,7 +6,7 @@ namespace MIL.Services
     public class Walk : SymbolVisitor<NamespaceSymbol, IEnumerable<NamedTypeSymbol>>
     {
 
-        protected override IEnumerable<NamedTypeSymbol> VisitNamespace(NamespaceSymbol symbol, NamespaceSymbol argument)
+        public override IEnumerable<NamedTypeSymbol> VisitNamespace(NamespaceSymbol symbol, NamespaceSymbol argument)
         {
             var types = new List<NamedTypeSymbol>();
 
@@ -14,7 +14,7 @@ namespace MIL.Services
             {
                 var closeTypes = types;
                 closeTypes.AddRange(Visit(ns));
-                closeTypes.AddRange(ns.GetTypeMembers());
+                closeTypes.AddRange(ns.GetTypeMembers().AsEnumerable());
             }
             return types;
         }

@@ -13,9 +13,9 @@ namespace MIL.Visitors
             _handlerInterfaceName = handlerInterfaceName;
         }
 
-        protected override IEnumerable<GenericNameSyntax> VisitClassDeclaration(ClassDeclarationSyntax node)
+        public override IEnumerable<GenericNameSyntax> VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            return node.BaseListOpt != null ? node.BaseListOpt.Types.OfType<GenericNameSyntax>().Where(x => x.PlainName == _handlerInterfaceName) : Enumerable.Empty<GenericNameSyntax>();
+            return node.BaseList != null ? node.BaseList.Types.OfType<GenericNameSyntax>().Where(x => x.PlainName == _handlerInterfaceName) : Enumerable.Empty<GenericNameSyntax>();
         }
         
     }

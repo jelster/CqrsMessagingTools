@@ -39,14 +39,13 @@ namespace MilGenerator
         private static void Initialize(IEnumerable<string> args, CommandRunner runner)
         {
             bool showHelp = false;
-            bool? dumpInfo;
-
+            
             var clArgs = new OptionSet
                             {
                                 {
                                     "s|sln=",
-                                    "full path of target Solution file (.sln) to be analyzed",
-                                    x => { runner.slnPath = Path.GetFullPath(x); }
+                                    "path to target Solution file (.sln) to be analyzed",
+                                    v => { runner.slnPath = Path.GetFullPath(v); }
                                 },
                                 {
                                     "p|proccessIfx:",
@@ -70,9 +69,9 @@ namespace MilGenerator
                                     x => runner.processTypeName = x
                                 }, 
                                 {
-                                    "d|dump:",
-                                    "Default action. Performs discovery and dumps results without attempting analysis (use -d- to disable).",
-                                    (bool d) => runner.dumpInfo = d
+                                    "v|verbose",
+                                    "Output more detail during execution",
+                                    v => runner.Verbose = (v != null)
                                 },
                                 {
                                     "<>",
@@ -108,7 +107,7 @@ namespace MilGenerator
         {
             Console.WriteLine(message);
             Console.WriteLine();
-            //Environment.Exit(failCondition ? -1 : 0);
+            Environment.Exit(failCondition ? -1 : 0);
         }
         private static void PrintHelp(OptionSet opts)
         {
@@ -131,21 +130,12 @@ namespace MilGenerator
         public readonly List<string> ExcludedAssemblies = new List<string>();
         public IObservable<RunnerEventArg> MessagePump { get { return messagePump.AsObservable(); } }
         private readonly ISubject<RunnerEventArg> messagePump = new Subject<RunnerEventArg>();
-        public bool dumpInfo;
+        
+        public bool Verbose;
 
         public void Run()
         {
-            SendMessage(string.Format("Loading solution {0}", slnPath));
-            ISolution sln = null;
-            try
-            {
-                sln = Solution.Load(slnPath, "Debug", "AnyCPU");
-            }
-            catch (Exception ex)
-            {
-                messagePump.OnError(ex);
-                return;
-            }
+            ISolution sln = LoadSolution();
 
             //var externalProject = sln.Projects.FirstOrDefault(x => x.AssemblyName == externalNs);
             //if (externalProject == null)
@@ -154,33 +144,34 @@ namespace MilGenerator
             //    messagePump.OnError(new ArgumentException(msg));
             //    return;
             //}
-            SendMessage(string.Format("{1}Using {0} for process discovery{1}", processTypeName ?? processIName, Environment.NewLine));
+
+            SendMessage(string.Format("{1}Using {0} for process discovery{1}", processTypeName ?? DefaultProcessIfxName, Environment.NewLine));
 
             var token = new CancellationToken();
             var analyzer = new MIL.Services.ProcessAnalysisService(processIName);
 
-            ProcessDefinition processDefinition = null;
-
-            if (ExcludedAssemblies.Any())
+            //ProcessDefinition processDefinition = null;
+            var excludeList = sln.Projects.Where(x => ExcludedAssemblies.Any(e => x.AssemblyName.Contains(e))).ToList();
+            if (excludeList.Any())
             {
-                SendMessage(string.Format("Ignoring {0} Assemblies{1}", sln.Projects.Count(x => !ExcludedAssemblies.Any(e => x.AssemblyName.Contains(e))), Environment.NewLine));
+                SendMessage(string.Format("Ignoring {0} Assemblies{1}", excludeList.Count, Environment.NewLine), 
+                    () => "Ignored assemblies: " + Environment.NewLine + string.Join(Environment.NewLine, excludeList.Select(x => x.AssemblyName)) + Environment.NewLine);
             }
 
             MilSyntaxWalker treeData = new MilSyntaxWalker();
-            foreach (var proj in sln.Projects.ToList().Where(x => !ExcludedAssemblies.Any(e => x.AssemblyName.Contains(e))))
+            foreach (var proj in sln.Projects.Except(excludeList))
             {
-                SendMessage("# Processing assembly " + proj.AssemblyName + Environment.NewLine);
+                SendMessage(".", () => "# Processing assembly " + proj.AssemblyName + Environment.NewLine);
 
                 MilSemanticAnalyzer semantics = null;
-
+                Compilation compilation = (Compilation)proj.GetCompilation(token);
                 try
-                {
-                    Compilation compilation = (Compilation)proj.GetCompilation(token);
+                {                    
                     semantics = new MilSemanticAnalyzer(compilation);
                 }
                 catch (InvalidOperationException ex)
                 {
-                    SendMessage("    Skipping due to compilation errors in assembly" + Environment.NewLine);
+                    SendMessage("x", () => string.Join(Environment.NewLine, compilation.GetDeclarationDiagnostics().Select(x => x.ToString())));
                     continue;
                 }
 
@@ -204,8 +195,30 @@ namespace MilGenerator
                 //    SendMessage(pubCall.ToString());
                 //}
             }
-            SendMessage(Environment.NewLine + "# Aggregate roots" + Environment.NewLine);
 
+            DumpSyntaxData(treeData);
+
+            messagePump.OnCompleted();
+        }
+
+        private ISolution LoadSolution()
+        {
+            SendMessage(string.Format("Loading solution {0}", slnPath));
+            ISolution sln = null;
+            try
+            {
+                sln = Solution.Load(slnPath, "Debug", "AnyCPU");
+            }
+            catch (Exception ex)
+            {
+                messagePump.OnError(ex);
+            }
+            return sln;
+        }
+
+        private void DumpSyntaxData(MilSyntaxWalker treeData)
+        {
+            SendMessage(Environment.NewLine + "# Aggregate roots" + Environment.NewLine);
             SendMessage((treeData.AggregateRoots.Any() ? treeData.DumpAggregateRoots() : new[] { "-- none --" } as dynamic));
             SendMessage(Environment.NewLine + "# Commands" + Environment.NewLine);
             SendMessage((treeData.Commands.Any() || treeData.CommandHandlers.Any() ? treeData.DumpCommandData() : new[] { "-- none --" } as dynamic));
@@ -213,8 +226,6 @@ namespace MilGenerator
             SendMessage((treeData.Events.Any() || treeData.EventHandlers.Any() ? treeData.DumpEventData() : new[] { "-- none --" } as dynamic));
             SendMessage(Environment.NewLine + "# Message publications" + Environment.NewLine);
             SendMessage(treeData.PublicationCalls.Any() ? treeData.DumpPublicationData() : new[] { "-- none --" });
-
-            messagePump.OnCompleted();
         }
 
         private void SendMessage(IEnumerable<MilToken> messageLines)
@@ -225,13 +236,22 @@ namespace MilGenerator
         public void ValidateData()
         {
             if (slnPath == null) throw new OptionException("Missing path to sln file", "-s");
-            //if (externalNs == null) throw new OptionException("Missing external-facing component namespace", "-ex");
         }
 
-        private void SendMessage(string message, bool signalError = false)
+        private void SendMessage(string message, Func<string> detailSelector = null)
         {
-            if (string.IsNullOrEmpty(message)) return;
-            messagePump.OnNext(new RunnerEventArg(message, signalError));
+            string txt = null;
+            if (Verbose && detailSelector != null)
+            {
+                txt = detailSelector() ?? message;
+            }
+            else
+            {
+                txt = message;
+            }
+            if (string.IsNullOrEmpty(txt)) return;
+
+            messagePump.OnNext(new RunnerEventArg(txt));            
         }
 
         private void SendMessage(IEnumerable<string> messageLines)

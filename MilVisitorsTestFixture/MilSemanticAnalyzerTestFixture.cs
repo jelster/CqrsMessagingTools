@@ -4,7 +4,7 @@ using System.Linq;
 using MIL.Visitors;
 using Roslyn.Compilers;
 using Roslyn.Compilers.CSharp;
-using Roslyn.Services;
+
 using Xunit;
 
 namespace MilVisitorsTestFixture

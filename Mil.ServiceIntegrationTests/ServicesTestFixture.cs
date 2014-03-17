@@ -161,7 +161,7 @@ namespace Foo.Web
             public void when_no_state_definition_found_does_not_throw()
             {
                 var otherComp = AppCompilation
-                    .RemoveSyntaxTrees(AppCompilation.SyntaxTrees)
+                    .RemoveSyntaxTrees(AppCompilation.SyntaxTrees.AsEnumerable())
                     .AddSyntaxTrees(SyntaxTree.ParseCompilationUnit(""));
                 var otherSut = new ProcessAnalysisService();
                 ProcessDefinition definition = null;
