@@ -10,10 +10,123 @@ These concepts wouldn't have happened without the [Microsoft Patterns & Practice
 # NEW! MilGenerator command-line tool
 The MilGenerator.exe utility will analyze a given solution file, outputting (optionally) a raw dump of messaging information to the console. 
 ##Basic Usage:
-1. the -s parameter is the full path to the VS 2010 .SLN file of the target application
-2. (recommended) pass the -d option to get a full dump of data. Otherwise, there isn't much to see :)
-3. help on options is available by passing -?, -h, or --help as a parameter
+1. the -s parameter is the full path to the VS .SLN file of the target application
+2. pass the -v option for greater detail
+3. pass in (after all other options) the name(s) of assemblies you want ignored in the analysis. Separate assembly names with a single empty space (" ")
+4. help on options is available by passing -?, -h, or --help as a parameter
 
+##Sample MilGenerator output
+Below is a sample of output obtained by executing the MilGenerator against the [CQRS-Journey Code](//github.com/mspnp/cqrs-journey-code). The output has been edited to remove messages relating to missing Azure SDK assemblies on the local system where it was ran. The output has been edited to remove erroneously reported data on test assemblies.
+````
+>.\milgenerator.exe -s "c:\users\josh\documents\github\cqrs-journey-code\source\conference.noazuresdk.sln" -v Registration.Tests Registration.IntegrationTests Conference.Web.Public.Tests Azure.IntegrationTests Conference.IntegrationTests Payments.Tests Infrastructure.Sql.IntegrationTests Infrastructure.Tests
+
+Loading solution C:\users\josh\documents\github\cqrs-journey-code\source\conference.noazuresdk.sln
+Using IProcess for process discovery
+Ignored assemblies: 
+Registration.Tests
+Registration.IntegrationTests
+Conference.Web.Public.Tests
+Azure.IntegrationTests
+Conference.IntegrationTests
+Payments.Tests
+Infrastructure.Sql.IntegrationTests
+Infrastructure.Tests
+
+# Processing assembly Registration
+
+# Processing assembly Infrastructure.Azure
+
+# Processing assembly Conference.Web.Public
+<messages elided>
+
+# Processing assembly Azure.Tests
+
+# Processing assembly Conference.Web.Admin
+<messages elided>
+
+# Processing assembly Conference
+
+# Processing assembly Conference.Contracts
+
+# Processing assembly Payments
+
+# Processing assembly Payments.Contracts
+
+# Processing assembly Infrastructure
+
+# Processing assembly Infrastructure.Sql
+
+# Processing assembly Conference.Common
+
+# Processing assembly CommandProcessor
+<messages elided>
+
+# Processing assembly DatabaseInitializer
+
+# Processing assembly Registration.Contracts
+
+# Aggregate roots
+@Order
+@SeatAssignments
+@SeatsAvailability
+
+# Commands
+AssignRegistrantDetails? -> OrderCommandHandler
+ConfirmOrder? -> OrderCommandHandler
+SeatsAvailabilityCommand? -> 
+UnassignSeat? -> SeatAssignmentsHandler
+AssignSeat? -> SeatAssignmentsHandler
+ExpireRegistrationProcess? -> RegistrationProcessManagerRouter
+RejectOrder? -> OrderCommandHandler
+MarkSeatsAsReserved? -> OrderCommandHandler
+RegisterToConference? -> OrderCommandHandler
+FooCommand? -> 
+CommandA? -> 
+CommandB? -> 
+CommandC? -> 
+FooCommand? -> 
+CancelThirdPartyProcessorPayment? -> ThirdPartyProcessorPaymentCommandHandler
+CompleteThirdPartyProcessorPayment? -> ThirdPartyProcessorPaymentCommandHandler
+InitiateInvoicePayment? -> 
+InitiateThirdPartyProcessorPayment? -> ThirdPartyProcessorPaymentCommandHandler
+
+# Events
+FakeEvent! -> 
+ConferenceEvent! -> 
+ConferencePublished! -> 
+     -> ConferenceViewModelGenerator
+ConferenceUnpublished! -> 
+     -> ConferenceViewModelGenerator
+SeatUpdated! -> 
+     -> ConferenceViewModelGenerator
+     -> PricedOrderViewModelGenerator
+SeatCreated! -> 
+     -> ConferenceViewModelGenerator
+     -> PricedOrderViewModelGenerator
+PaymentAccepted! -> 
+PaymentCompleted! -> 
+     -> RegistrationProcessManagerRouter
+PaymentInitiated! -> 
+PaymentRejected! -> 
+
+# Message publications
+Registration.Handlers.ConferenceViewModelGenerator.Handle:[6850..7155)
+Registration.Handlers.ConferenceViewModelGenerator.Handle:[8048..8369)
+Registration.Handlers.ConferenceViewModelGenerator.Handle:[8468..8800)
+Infrastructure.Azure.Messaging.CommandBus.Send:[2265..2310)
+Infrastructure.Azure.Messaging.CommandBus.Send:[2483..2501)
+Infrastructure.Azure.Messaging.EventBus.Publish:[2628..2672)
+Infrastructure.Azure.Messaging.SynchronousCommandBusDecorator.Send:[2257..2286)
+Infrastructure.Azure.Messaging.SynchronousCommandBusDecorator.Send:[2963..2992)
+Infrastructure.Messaging.CommandBusExtensions.Send:[1457..1498)
+Infrastructure.Messaging.CommandBusExtensions.Send:[1624..1681)
+Infrastructure.Sql.Messaging.CommandBus.Send:[2434..2459)
+Infrastructure.Sql.Messaging.CommandBus.Send:[2647..2673)
+Infrastructure.Sql.Messaging.EventBus.Publish:[2407..2432)
+Infrastructure.Sql.Messaging.EventBus.Publish:[2702..2728)
+Infrastructure.Sql.Processes.SqlProcessManagerDataContext.DispatchMessages:[8859..8909)
+
+````
 
 # Tool Installation Instructions and Walkthrough
 These tools are the product of a week's spent poking around a lot of unfamiliar territory, so be warned: Your Mileage May Vary!
