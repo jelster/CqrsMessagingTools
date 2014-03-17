@@ -161,7 +161,7 @@ namespace MilGenerator
             MilSyntaxWalker treeData = new MilSyntaxWalker();
             foreach (var proj in sln.Projects.Except(excludeList))
             {
-                SendMessage(".", () => "# Processing assembly " + proj.AssemblyName + Environment.NewLine);
+                SendMessage(".", () => Environment.NewLine + "# Processing assembly " + proj.AssemblyName + Environment.NewLine);
 
                 MilSemanticAnalyzer semantics = null;
                 Compilation compilation = (Compilation)proj.GetCompilation(token);
@@ -171,7 +171,7 @@ namespace MilGenerator
                 }
                 catch (InvalidOperationException ex)
                 {
-                    SendMessage("x", () => string.Join(Environment.NewLine, compilation.GetDeclarationDiagnostics().Select(x => x.ToString())));
+                    SendMessage("x", () => string.Join(Environment.NewLine, compilation.GetDeclarationDiagnostics().Select(x => x.ToString())) + Environment.NewLine);
                     continue;
                 }
 
