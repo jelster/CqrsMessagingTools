@@ -3,9 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Roslyn.Compilers;
-using Roslyn.Compilers.CSharp;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SyntaxHelperUtilities;
+
 namespace MIL.Visitors
 {
     public class MilSemanticAnalyzer
@@ -21,8 +22,10 @@ namespace MIL.Visitors
 
         private void ValidateCompilation()
         {
-            const int CSErrorRoslynUnimplemented = 8000;
-            var diags = _compilation.GetDeclarationDiagnostics().Where(x => x.Info.Code != CSErrorRoslynUnimplemented).ToList();
+            var diags = _compilation.GetDeclarationDiagnostics();
+
+            return;
+
             if (!diags.Any())
             {
                 return;
@@ -52,39 +55,39 @@ namespace MIL.Visitors
         {
             ExtractMessagingSyntax();
             var pubs = walker.Publications;
-            
+
             List<MilToken> tokens = new List<MilToken>();
-            
+
             foreach (var stmt in pubs)
             {
                 var syntax = stmt.Expression;
                 var model = _compilation.GetSemanticModel(_compilation.SyntaxTrees.First(x => x.GetRoot().DescendantNodesAndSelf().Any(r => r == syntax)));
                 var info = model.GetSymbolInfo(syntax);
                 if (info.Symbol == null) continue;
-                
+
                 //var methodSymbol = (MethodSymbol)info.Symbol;
                 //if (methodSymbol.Parameters.IsNullOrEmpty || methodSymbol.MethodKind != MethodKind.Ordinary)
                 //    continue;
 
-                var dout = model.AnalyzeExpressionDataFlow(syntax);
+                var dout = model.AnalyzeDataFlow(stmt);
                 var par =
-                    dout.ReadOutside.Concat(dout.ReadInside).Concat(dout.DataFlowsOut).Concat(dout.WrittenInside).Select(x => 
-                        x.ToMinimalDisplayParts(x.Locations.First(), model).First().GetText(CultureInfo.InvariantCulture));
+                    dout.ReadOutside.Concat(dout.ReadInside).Concat(dout.DataFlowsOut).Concat(dout.WrittenInside).Select(x =>
+                        x.ToMinimalDisplayParts(model, x.Locations.First().SourceSpan.Start).First().ToString());
 
-                var cmdMatches = par.FirstOrDefault(x => walker.Commands.Select(w => w.Identifier.GetText()).Contains(x));
+                var cmdMatches = par.FirstOrDefault(x => walker.Commands.Select(w => w.Identifier.Text).Contains(x));
                 if (cmdMatches == null) continue;
 
                 var cmdName = cmdMatches;
-                 
+
                 var handler = walker.CommandHandlers.FirstOrDefault(x => x.BaseList.Types.OfType<GenericNameSyntax>().Any(a => a.TypeArgumentList.Arguments.CollectionContainsClass(cmdName)));
 
-                    if (handler == null) continue;
+                if (handler == null) continue;
 
-                    tokens.Add(TokenFactory.GetCommand(cmdName));
-                    tokens.Add(TokenFactory.GetPublish());
-                    tokens.Add(TokenFactory.GetCommandHandler(handler.Identifier.GetText()));
-                    tokens.Add(TokenFactory.GetStatementTerminator());
-                
+                tokens.Add(TokenFactory.GetCommand(cmdName));
+                tokens.Add(TokenFactory.GetPublish());
+                tokens.Add(TokenFactory.GetCommandHandler(handler.Identifier.Text));
+                tokens.Add(TokenFactory.GetStatementTerminator());
+
 
                 // TODO: add discrimination logic for events/commands
                 // TODO: find handler from command

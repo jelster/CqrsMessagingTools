@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Roslyn.Compilers.CSharp;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SyntaxHelperUtilities;
 
 namespace MIL.Visitors
 {
-    public class MilSyntaxWalker : SyntaxWalker
+    public class MilSyntaxWalker : CSharpSyntaxWalker
     {
         protected const string CommandIfx = "ICommand";
         protected const string PublishKeyword = "Send";
@@ -19,7 +21,8 @@ namespace MIL.Visitors
         private readonly HandlerDeclarationSyntaxVisitor _eventHandlerDeclarationVisitor = new HandlerDeclarationSyntaxVisitor(EventHandlerPlainIfx);
         private readonly HandlerDeclarationSyntaxVisitor _aggregateDeclarationVisitor = new HandlerDeclarationSyntaxVisitor(AggregateRootPlainIfx);
 
-        public MilSyntaxWalker() : base(visitIntoStructuredTrivia: true)
+        // Dong Xie: replace (visitIntoStructuredTrivia: true) after base
+        public MilSyntaxWalker() : base(SyntaxWalkerDepth.StructuredTrivia)
         {
             Commands = new List<ClassDeclarationSyntax>();
             Events = new List<ClassDeclarationSyntax>();
@@ -40,7 +43,8 @@ namespace MIL.Visitors
 
         public override void VisitMemberAccessExpression(MemberAccessExpressionSyntax node)
         {
-            if (node.Name.GetText() != PublishKeyword) return;
+            // Dong Xie: node.Name.GetText() 
+            if (node.Name.GetText().ToString() != PublishKeyword) return;
 
             PublicationCalls.Add(node);
             Publications.Add(node.Ancestors().OfType<InvocationExpressionSyntax>().Last());
@@ -78,13 +82,13 @@ namespace MIL.Visitors
         {
             if (classNode.Modifiers.Any(SyntaxKind.AbstractKeyword) || classNode.BaseList == null || !classNode.BaseList.Types.Any()) return;
 
-            if (classNode.BaseList.Types.Any(x => AggregateRootPlainIfx.Contains(x.PlainName))) AggregateRoots.Add(classNode);
-            
+            // Dong Xie: Need review:
+            if (classNode.BaseList.Types.Any<TypeSyntax>(x => AggregateRootPlainIfx.Contains(x.ToString()))) AggregateRoots.Add(classNode);   
         }
 
         private void LookForEvents(ClassDeclarationSyntax node)
         {
-            if (node.BaseList != null && node.BaseList.Types.Any(t => t.PlainName == EventIfx))
+            if (node.BaseList != null && node.BaseList.Types.Any<TypeSyntax>(t => t.ToString() == EventIfx))
             {
                 Events.Add(node);
             }
@@ -92,7 +96,7 @@ namespace MIL.Visitors
 
         private void LookForCommands(ClassDeclarationSyntax node)
         {
-            if (node.BaseList != null && node.BaseList.Types.Any(t => t.PlainName == CommandIfx))
+            if (node.BaseList != null && node.BaseList.Types.Any<TypeSyntax>(t => t.ToString() == CommandIfx))
             {
                 Commands.Add(node);
             }
@@ -163,8 +167,8 @@ namespace MIL.Visitors
             {
                 yield return string.Format("{0}.{1}.{2}:{3}{4}", 
                     pub.FirstAncestorOrSelf<NamespaceDeclarationSyntax>().Name.GetText(), 
-                    pub.FirstAncestorOrSelf<ClassDeclarationSyntax>().Identifier.GetText(),
-                    pub.FirstAncestorOrSelf<MethodDeclarationSyntax>().Identifier.GetFullText(),
+                    pub.FirstAncestorOrSelf<ClassDeclarationSyntax>().Identifier.Text,
+                    pub.FirstAncestorOrSelf<MethodDeclarationSyntax>().Identifier.Text,
                     pub.Span.ToString(), 
                     Environment.NewLine);
             }
@@ -172,7 +176,7 @@ namespace MIL.Visitors
 
         public IEnumerable<MilToken> DumpAggregateRoots()
         {
-            var r = AggregateRoots.Select(x => TokenFactory.GetAggregateRoot(x.Identifier.GetText()));
+            var r = AggregateRoots.Select(x => TokenFactory.GetAggregateRoot(x.Identifier.Text));
             foreach (var agg in r)
             {
                 yield return agg;

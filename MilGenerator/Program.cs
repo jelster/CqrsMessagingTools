@@ -5,12 +5,10 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
-using MIL.Services;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.MSBuild;
 using MIL.Visitors;
 using NDesk.Options;
-using Roslyn.Compilers.CSharp;
-using Roslyn.Services;
-using SyntaxHelperUtilities;
 
 namespace MilGenerator
 {
@@ -39,7 +37,7 @@ namespace MilGenerator
         private static void Initialize(IEnumerable<string> args, CommandRunner runner)
         {
             bool showHelp = false;
-            
+
             var clArgs = new OptionSet
                             {
                                 {
@@ -62,12 +60,12 @@ namespace MilGenerator
                                      "?|h|help",
                                      "this message",
                                      v => showHelp = (v != null)
-                                }, 
+                                },
                                 {
                                     "t|processType:",
                                     "name of a concrete class implementing a process",
                                     x => runner.processTypeName = x
-                                }, 
+                                },
                                 {
                                     "v|verbose",
                                     "Output more detail during execution",
@@ -78,13 +76,13 @@ namespace MilGenerator
                                     "List of assembly names to exclude from discovery and analysis.",
                                     v => runner.ExcludedAssemblies.AddRange(v.Split(' '))
                                 },
-                                 
+
             };
+
             try
             {
                 var otherArgs = clArgs.Parse(args);
                 runner.ValidateData();
-
             }
             catch (Exception ex)
             {
@@ -93,6 +91,7 @@ namespace MilGenerator
                 PrintHelp(clArgs);
                 Exit();
             }
+
             if (showHelp)
             {
                 PrintHelp(clArgs);
@@ -130,12 +129,12 @@ namespace MilGenerator
         public readonly List<string> ExcludedAssemblies = new List<string>();
         public IObservable<RunnerEventArg> MessagePump { get { return messagePump.AsObservable(); } }
         private readonly ISubject<RunnerEventArg> messagePump = new Subject<RunnerEventArg>();
-        
+
         public bool Verbose;
 
         public void Run()
         {
-            ISolution sln = LoadSolution();
+            Solution sln = LoadSolution();
 
             //var externalProject = sln.Projects.FirstOrDefault(x => x.AssemblyName == externalNs);
             //if (externalProject == null)
@@ -154,7 +153,7 @@ namespace MilGenerator
             var excludeList = sln.Projects.Where(x => ExcludedAssemblies.Any(e => x.AssemblyName.Contains(e))).ToList();
             if (excludeList.Any())
             {
-                SendMessage(string.Format("Ignoring {0} Assemblies{1}", excludeList.Count, Environment.NewLine), 
+                SendMessage(string.Format("Ignoring {0} Assemblies{1}", excludeList.Count, Environment.NewLine),
                     () => "Ignored assemblies: " + Environment.NewLine + string.Join(Environment.NewLine, excludeList.Select(x => x.AssemblyName)) + Environment.NewLine);
             }
 
@@ -164,9 +163,13 @@ namespace MilGenerator
                 SendMessage(".", () => Environment.NewLine + "# Processing assembly " + proj.AssemblyName + Environment.NewLine);
 
                 MilSemanticAnalyzer semantics = null;
-                Compilation compilation = (Compilation)proj.GetCompilation(token);
+                MetadataFileReferenceProvider provider = new MetadataFileReferenceProvider();
+                Compilation compilation = (Compilation)proj.GetCompilationAsync(token).Result
+                    .AddReferences(new MetadataFileReference(typeof(object).Assembly.Location))
+                    .AddReferences(new MetadataFileReference(typeof(IEnumerable<>).Assembly.Location)); ;
+
                 try
-                {                    
+                {
                     semantics = new MilSemanticAnalyzer(compilation);
                 }
                 catch (InvalidOperationException ex)
@@ -201,18 +204,26 @@ namespace MilGenerator
             messagePump.OnCompleted();
         }
 
-        private ISolution LoadSolution()
+        private Solution LoadSolution()
         {
             SendMessage(string.Format("Loading solution {0}", slnPath));
-            ISolution sln = null;
+
+            Dictionary<string, string> dict = new Dictionary<string, string>(2);
+            dict.Add("Configuration", "Debug");
+            dict.Add("Platform", "Any CPU");
+
+            MSBuildWorkspace workspace = MSBuildWorkspace.Create(dict);
+
+            Solution sln = null;
             try
             {
-                sln = Solution.Load(slnPath, "Debug", "AnyCPU");
+                sln = workspace.OpenSolutionAsync(slnPath).Result;
             }
             catch (Exception ex)
             {
                 messagePump.OnError(ex);
             }
+
             return sln;
         }
 
@@ -251,7 +262,7 @@ namespace MilGenerator
             }
             if (string.IsNullOrEmpty(txt)) return;
 
-            messagePump.OnNext(new RunnerEventArg(txt));            
+            messagePump.OnNext(new RunnerEventArg(txt));
         }
 
         private void SendMessage(IEnumerable<string> messageLines)

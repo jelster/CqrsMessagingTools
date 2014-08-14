@@ -1,7 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Roslyn.Compilers;
-using Roslyn.Compilers.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace SyntaxHelperUtilities
 {
@@ -9,7 +9,7 @@ namespace SyntaxHelperUtilities
     {
         public static string GetClassName(this BaseTypeDeclarationSyntax classDec)
         {
-            return classDec.Identifier.GetText();
+            return classDec.Identifier.Text;
         }
 
         public static bool CollectionContainsClassDeclaration<T>(this IEnumerable<T> collection, string name) where T : BaseTypeDeclarationSyntax
@@ -19,13 +19,16 @@ namespace SyntaxHelperUtilities
 
         public static string GetClassName(this TypeSyntax classDec)
         {
-            return classDec.PlainName;
+            // Dong Xie: not really sure what's this for? REVIEW
+
+            return classDec.ToString();
+
+            //return classDec.PlainName;
         }
 
         public static bool CollectionContainsClass<T>(this IEnumerable<T> collection, string name) where T : TypeSyntax
         {
             return collection.Any(x => GetClassName(x) == name);
         }
-         
     }
 }

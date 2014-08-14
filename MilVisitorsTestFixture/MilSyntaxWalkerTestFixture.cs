@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
-using System.Text;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using MIL.Visitors;
-using Roslyn.Compilers;
-using Roslyn.Compilers.CSharp;
 using SyntaxHelperUtilities;
 using Xunit;
 
@@ -94,14 +94,14 @@ namespace TestCode.Logic
 
             public given_a_syntax_tree()
             {
-                declarationTree = SyntaxTree.ParseCompilationUnit(declarationCode);
-                logicTree = SyntaxTree.ParseCompilationUnit(programCode);
-                infraTree = SyntaxTree.ParseCompilationUnit(infraCode);
-                compilation = Compilation.Create("test.exe")
+                declarationTree = SyntaxFactory.ParseSyntaxTree(declarationCode);
+                logicTree = SyntaxFactory.ParseSyntaxTree(programCode);
+                infraTree = SyntaxFactory.ParseSyntaxTree(infraCode);
+                compilation = CSharpCompilation.Create("test.exe")
                     .AddSyntaxTrees(infraTree)
                     .AddSyntaxTrees(declarationTree)
                     .AddSyntaxTrees(logicTree)
-                    .AddReferences(new AssemblyFileReference(typeof(object).Assembly.Location));
+                    .AddReferences(new MetadataFileReference(typeof(object).Assembly.Location));
 
                 sut = new MilSyntaxWalker();
             }
@@ -172,7 +172,7 @@ namespace TestCode.Logic
             {
                 var node = declarationTree.GetRoot();
                 sut.Visit(node);
-                
+
                 var handles = sut.EventHandlers.Where(x => x.BaseList.Types.OfType<GenericNameSyntax>().Any(y => y.TypeArgumentList.Arguments.Any(z => z.GetClassName() == "Bar"))).ToList();
                 Assert.True(handles.Count == 2);
                 Assert.True(handles.CollectionContainsClassDeclaration("BarventHandler"));
@@ -210,7 +210,7 @@ namespace TestCode.Logic
             public void when_walked_discovers_aggregate_roots()
             {
                 sut.Visit(declarationTree.GetRoot());
-                Assert.NotEmpty(sut.AggregateRoots);    
+                Assert.NotEmpty(sut.AggregateRoots);
             }
 
             [Fact]
@@ -225,7 +225,6 @@ namespace TestCode.Logic
                 var data = sut.DumpEventData();
                 Assert.NotEmpty(data);
                 data.ToList().ForEach(x => Console.Write(x.ToString()));
-                 
             }
         }
     }
