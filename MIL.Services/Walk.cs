@@ -13,7 +13,7 @@ namespace MIL.Services
             {
                 var closeTypes = types;
                 closeTypes.AddRange(Visit(ns));
-                closeTypes.AddRange(ns.GetTypeMembers() as IEnumerable<INamedTypeSymbol>);
+                closeTypes.AddRange(ns.GetTypeMembers());
             }
             return types;
         }
