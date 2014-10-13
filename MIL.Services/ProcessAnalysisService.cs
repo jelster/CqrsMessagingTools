@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Roslyn.Compilers;
-using Roslyn.Compilers.CSharp;
-using SyntaxHelperUtilities;
+using Microsoft.CodeAnalysis;
 using MIL.Visitors;
 
 namespace MIL.Services
@@ -13,7 +10,7 @@ namespace MIL.Services
     {
         private readonly string ProcessIfxName;
 
-        private readonly Func<NamedTypeSymbol, NamedTypeSymbol> defaultStateDiscoveryStrategy = procSym => procSym.GetMembers().OfType<NamedTypeSymbol>().FirstOrDefault(x => x.TypeKind == TypeKind.Enum);
+        private readonly Func<INamedTypeSymbol, INamedTypeSymbol> defaultStateDiscoveryStrategy = procSym => procSym.GetMembers().OfType<INamedTypeSymbol>().FirstOrDefault(x => x.TypeKind == TypeKind.Enum);
 
         public ProcessAnalysisService(string processInterfaceName = "IProcess")
         {
@@ -47,11 +44,11 @@ namespace MIL.Services
         private ProcessDefinition ExtractProcessFromCompiledSource(Compilation compilation, string processName)
         {
             var w = new Walk();
-            var processType = w.Visit(compilation.SourceModule.GlobalNamespace).ToList();
+            var processType = w.Visit(compilation.SourceModule.GlobalNamespace);
 
             if (!processType.Any()) return null;
 
-            NamedTypeSymbol processSymbol = null;
+            INamedTypeSymbol processSymbol = null;
             if (string.IsNullOrWhiteSpace(processName))
             {
                 processSymbol = processType.FirstOrDefault(x => x.Interfaces.Any(i => i.Name == ProcessIfxName));
@@ -67,9 +64,7 @@ namespace MIL.Services
             var p = new ProcessDefinition(processSymbol, ProcessIfxName);
             p.SetStateEnumUsingStrategy(defaultStateDiscoveryStrategy);
 
-            return p;   
+            return p;
         }
-
-         
     }
 }

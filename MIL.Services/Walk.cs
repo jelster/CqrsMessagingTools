@@ -1,20 +1,19 @@
 using System.Collections.Generic;
-using Roslyn.Compilers.CSharp;
+using Microsoft.CodeAnalysis;
 
 namespace MIL.Services
 {
-    public class Walk : SymbolVisitor<NamespaceSymbol, IEnumerable<NamedTypeSymbol>>
+    public class Walk : SymbolVisitor<IEnumerable<INamedTypeSymbol>>
     {
-
-        public override IEnumerable<NamedTypeSymbol> VisitNamespace(NamespaceSymbol symbol, NamespaceSymbol argument)
+        public override IEnumerable<INamedTypeSymbol> VisitNamespace(INamespaceSymbol symbol)
         {
-            var types = new List<NamedTypeSymbol>();
+            var types = new List<INamedTypeSymbol>();
 
             foreach (var ns in symbol.GetNamespaceMembers())
             {
                 var closeTypes = types;
                 closeTypes.AddRange(Visit(ns));
-                closeTypes.AddRange(ns.GetTypeMembers().AsEnumerable());
+                closeTypes.AddRange(ns.GetTypeMembers());
             }
             return types;
         }

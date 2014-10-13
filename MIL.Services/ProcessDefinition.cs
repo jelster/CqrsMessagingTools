@@ -1,13 +1,13 @@
 using System;
 using System.Linq;
+using Microsoft.CodeAnalysis;
 using MIL.Visitors;
-using Roslyn.Compilers.CSharp;
 
 namespace MIL.Services
 {
     public class ProcessDefinition
     {
-        internal ProcessDefinition(NamedTypeSymbol process, string ifxName)
+        internal ProcessDefinition(INamedTypeSymbol process, string ifxName)
         {
             ProcessInterface = process.Interfaces.ToList().FirstOrDefault(x => x.Name == ifxName);
             if (ProcessInterface == null)
@@ -20,21 +20,21 @@ namespace MIL.Services
         }
 
         public bool IsDefinitionComplete { get { return StateEnum != null && StateProperty != null && ProcessType != null && ProcessInterface != null; } }
-        public NamedTypeSymbol StateEnum { get; private set; }
-        public PropertySymbol StateProperty { get; private set; }
-        public NamedTypeSymbol ProcessType { get; private set; }
-        public NamedTypeSymbol ProcessInterface { get; private set; }
+        public INamedTypeSymbol StateEnum { get; private set; }
+        public IPropertySymbol StateProperty { get; private set; }
+        public INamedTypeSymbol ProcessType { get; private set; }
+        public INamedTypeSymbol ProcessInterface { get; private set; }
 
         public string ProcessName { get; private set; }
         public string ProcessInterfaceName { get; private set; }
 
-        public void SetStateEnumUsingStrategy(Func<NamedTypeSymbol, NamedTypeSymbol> strategy)
+        public void SetStateEnumUsingStrategy(Func<INamedTypeSymbol, INamedTypeSymbol> strategy)
         {
             StateEnum = strategy(ProcessType);
             if (StateEnum == null)
                 return;
 
-            StateProperty = ProcessType.GetMembers().OfType<PropertySymbol>().First(x => x.Type.Name == StateEnum.Name);
+            StateProperty = ProcessType.GetMembers().OfType<IPropertySymbol>().First(x => x.Type.Name == StateEnum.Name);
         }
 
         public static MilToken GetTokenFromDefinition(ProcessDefinition definition)

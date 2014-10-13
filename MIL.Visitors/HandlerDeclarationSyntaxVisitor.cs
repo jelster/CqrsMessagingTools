@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
-using Roslyn.Compilers.CSharp;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace MIL.Visitors
 {
-    public class HandlerDeclarationSyntaxVisitor : SyntaxVisitor<IEnumerable<GenericNameSyntax>>
+    public class HandlerDeclarationSyntaxVisitor : CSharpSyntaxVisitor<IEnumerable<GenericNameSyntax>>
     {
         private readonly string _handlerInterfaceName;
 
@@ -15,8 +16,9 @@ namespace MIL.Visitors
 
         public override IEnumerable<GenericNameSyntax> VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            return node.BaseList != null ? node.BaseList.Types.OfType<GenericNameSyntax>().Where(x => x.PlainName == _handlerInterfaceName) : Enumerable.Empty<GenericNameSyntax>();
+            // Dong Xie: here replaced x.PlainName, not sure about, REVIEW
+
+            return node.BaseList != null ? node.BaseList.Types.OfType<GenericNameSyntax>().Where(x => x.Identifier.Text == _handlerInterfaceName) : Enumerable.Empty<GenericNameSyntax>();
         }
-        
     }
 }

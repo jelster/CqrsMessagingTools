@@ -12,6 +12,5 @@ namespace SyntaxHelperUtilities
             var hashset = new HashSet<T>();
             return enumerable.Where(cur => !hashset.Add(cur));
         }
-
     }
 }
