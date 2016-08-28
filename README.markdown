@@ -3,8 +3,12 @@
 
 These concepts wouldn't have happened without the [Microsoft Patterns & Practices group's CQRS-Journey](http://cqrsjourney.github.com/) project and team. See below for instructions and warnings
 
+##8-28-2016 UPDATE:
+* The tooling succesfully builds in VS2015
+* The VS tooling (e.g., Syntax highlighter) has not been tested in VS2015 and may not behave as intended (YMMV)
+
 ##6-14-2012 IMPORTANT UPDATE:
-* The new CTP of the Roslyn tooling introduces a ton of new features as well as reworked API's. As a consequence, the tooling will not currently build using the new tooling. I'm hoping to correct this in the near future, but for now the CqrsMessagingTools (SawMIL sound like a good name?) do not support it. 
+* The new CTP of the Roslyn tooling introduces a ton of new features as well as reworked API's. As a consequence, the tooling will not currently build using the new tooling. I'm hoping to correct this in the near future, but for now the CqrsMessagingTools (SawMIL sound like a good name?) do not support it.
 * Questions, comments, feedback, etc are all welcome - visit the [https://github.com/jelster/CqrsMessagingTools/issues](issue tracker) to do so.
 
 # NEW! MilGenerator command-line tool
